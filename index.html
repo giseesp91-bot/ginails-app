@@ -1,0 +1,1747 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ginails · Cosmetología</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<!-- ============================================================
+  CONFIGURACIÓN FIREBASE
+  Reemplazá estos valores con los de TU proyecto Firebase
+  (ver instrucciones en COMO-CONFIGURAR.md)
+============================================================ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, collection, doc, setDoc, getDoc, getDocs, deleteDoc, updateDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+ // Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+  authDomain: "ginails-cosmetologia.firebaseapp.com",
+  projectId: "ginails-cosmetologia",
+  storageBucket: "ginails-cosmetologia.firebasestorage.app",
+  messagingSenderId: "35237686180",
+  appId: "1:35237686180:web:12d339cc0ef7172fb2af31"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig); 
+
+
+  const db = getFirestore(app);
+  window._db = db;
+  window._firestore = { collection, doc, setDoc, getDoc, getDocs, deleteDoc, updateDoc, onSnapshot, query, orderBy };
+  window._firebaseReady = true;
+  document.dispatchEvent(new Event('firebaseReady'));
+</script>
+
+<style>
+  :root {
+    --cream: #faf6f1; --blush: #e8c4b0; --rose: #c47a6e; --deep: #3d1f1a;
+    --sage: #8aaa8a; --gold: #c9a46a; --light: #fff9f5; --border: #ecddd4;
+    --text: #4a2d28; --muted: #9a7b74; --success: #6fa080; --danger: #c05c5c;
+    --shadow: 0 4px 24px rgba(61,31,26,0.08);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--text); min-height: 100vh; }
+
+  header { background: var(--deep); padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 20px rgba(0,0,0,0.2); gap: 12px; }
+  .logo { font-family: 'Playfair Display', serif; color: var(--blush); font-size: 1.4rem; letter-spacing: 1px; white-space: nowrap; }
+  .logo span { color: var(--gold); font-style: italic; }
+  .firebase-status { font-size: 0.72rem; padding: 4px 10px; border-radius: 20px; font-weight: 600; white-space: nowrap; }
+  .fb-ok { background: #2a5a3a; color: #90e0a0; }
+  .fb-err { background: #5a2a2a; color: #e09090; }
+  .fb-wait { background: #4a3a1a; color: #e0c070; }
+
+  nav { display: flex; gap: 5px; overflow-x: auto; padding: 12px 16px; background: rgba(61,31,26,0.95); border-bottom: 1px solid rgba(232,196,176,0.15); }
+  nav::-webkit-scrollbar { display: none; }
+  .nav-btn { background: transparent; border: 1.5px solid rgba(232,196,176,0.25); color: var(--blush); padding: 6px 13px; border-radius: 20px; font-size: 0.76rem; font-family: 'DM Sans', sans-serif; cursor: pointer; white-space: nowrap; transition: all 0.2s; font-weight: 500; }
+  .nav-btn:hover, .nav-btn.active { background: var(--blush); color: var(--deep); border-color: var(--blush); }
+
+  main { padding: 20px 16px; max-width: 900px; margin: 0 auto; }
+  .section { display: none; animation: fadeIn 0.3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; } }
+
+  .card { background: white; border-radius: 16px; padding: 20px; box-shadow: var(--shadow); border: 1px solid var(--border); margin-bottom: 16px; }
+  .card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--deep); margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1.5px solid var(--border); display: flex; align-items: center; gap: 8px; }
+  .section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--deep); margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:600px) { .form-grid { grid-template-columns: 1fr; } }
+  .form-group { display: flex; flex-direction: column; gap: 5px; }
+  .form-group.full { grid-column: 1/-1; }
+  label { font-size: 0.76rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  input, select, textarea { padding: 9px 12px; border: 1.5px solid var(--border); border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--text); background: var(--light); transition: border 0.2s; outline: none; }
+  input:focus, select:focus, textarea:focus { border-color: var(--rose); background: white; }
+  textarea { resize: vertical; min-height: 75px; }
+
+  .check-group { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 4px; }
+  .check-item { display: flex; align-items: center; gap: 6px; background: var(--light); border: 1.5px solid var(--border); border-radius: 8px; padding: 5px 11px; cursor: pointer; font-size: 0.83rem; transition: all 0.15s; user-select: none; }
+  .check-item input[type="checkbox"] { accent-color: var(--rose); }
+  .check-item:has(input:checked) { background: #fde8e3; border-color: var(--rose); color: var(--rose); font-weight: 600; }
+
+  .btn { padding: 9px 20px; border-radius: 10px; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+  .btn-primary { background: var(--rose); color: white; }
+  .btn-primary:hover { background: #b36057; transform: translateY(-1px); }
+  .btn-secondary { background: var(--border); color: var(--text); }
+  .btn-secondary:hover { background: var(--blush); }
+  .btn-success { background: var(--success); color: white; }
+  .btn-danger { background: var(--danger); color: white; }
+  .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+  .btn-row { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+
+  .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; }
+  .badge-rose { background: #fde8e3; color: var(--rose); }
+  .badge-sage { background: #e3f0e3; color: #4a7a4a; }
+  .badge-gold { background: #fdf3e3; color: #8a6a20; }
+  .badge-blue { background: #e3edf8; color: #3a5a8a; }
+
+  .client-card { background: white; border: 1.5px solid var(--border); border-radius: 12px; padding: 13px 15px; display: flex; align-items: center; gap: 12px; cursor: pointer; transition: all 0.2s; margin-bottom: 9px; }
+  .client-card:hover { border-color: var(--rose); box-shadow: var(--shadow); transform: translateX(3px); }
+  .client-avatar { width: 42px; height: 42px; border-radius: 50%; background: linear-gradient(135deg, var(--blush), var(--rose)); display: flex; align-items: center; justify-content: center; font-family: 'Playfair Display', serif; font-size: 1.1rem; color: white; flex-shrink: 0; }
+  .client-info { flex: 1; }
+  .client-info h4 { font-size: 0.93rem; font-weight: 600; }
+  .client-info p { font-size: 0.76rem; color: var(--muted); margin-top: 2px; }
+
+  /* PROGRESO TRATAMIENTO */
+  .trat-activo { background: linear-gradient(135deg, #fdf4f2, #f0fdf4); border: 1.5px solid var(--blush); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .trat-activo-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .trat-activo-nombre { font-weight: 700; font-size: 0.95rem; color: var(--deep); }
+  .progress-bar-wrap { background: var(--border); border-radius: 20px; height: 8px; margin: 6px 0; overflow: hidden; }
+  .progress-bar { background: linear-gradient(90deg, var(--rose), var(--gold)); height: 100%; border-radius: 20px; transition: width 0.4s; }
+  .progress-label { font-size: 0.76rem; color: var(--muted); }
+
+  /* SESION ITEM */
+  .sesion-item { background: white; border: 1.5px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; }
+  .sesion-item-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .sesion-num { background: var(--rose); color: white; width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 700; flex-shrink: 0; }
+  .rechazo-tag { background: #fde8e3; color: var(--danger); border-radius: 6px; padding: 3px 8px; font-size: 0.73rem; font-weight: 600; }
+
+  /* TRATAMIENTOS */
+  .tratamiento-card { border: 1.5px solid var(--border); border-radius: 12px; overflow: hidden; margin-bottom: 12px; }
+  .trat-header { background: linear-gradient(135deg, var(--deep), #5c2f29); color: white; padding: 13px 16px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+  .trat-header h4 { font-family: 'Playfair Display', serif; font-size: 0.95rem; }
+  .trat-body { padding: 14px 16px; background: white; display: none; }
+  .trat-body.open { display: block; }
+  .trat-section { margin-bottom: 12px; }
+  .trat-section h5 { font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 7px; font-weight: 700; }
+  .trat-section ul { list-style: none; }
+  .trat-section ul li { padding: 4px 0; font-size: 0.86rem; display: flex; gap: 7px; align-items: flex-start; border-bottom: 1px solid var(--border); }
+  .trat-section ul li:last-child { border-bottom: none; }
+  .trat-section ul li::before { content: "◆"; color: var(--rose); font-size: 0.5rem; margin-top: 5px; flex-shrink: 0; }
+  .pasos-list { display: flex; flex-direction: column; gap: 7px; }
+  .paso-item { display: flex; gap: 9px; align-items: flex-start; padding: 7px 9px; background: var(--light); border-radius: 8px; font-size: 0.85rem; }
+  .paso-num { background: var(--rose); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: 700; flex-shrink: 0; }
+
+  /* PRODUCTS */
+  .product-item { display: flex; align-items: center; justify-content: space-between; padding: 9px 13px; background: white; border: 1.5px solid var(--border); border-radius: 10px; margin-bottom: 7px; font-size: 0.86rem; }
+  .stock-indicator { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .stock-ok { background: var(--success); } .stock-low { background: var(--gold); } .stock-out { background: var(--danger); }
+
+  .highlight { background: #fff4f2; border-radius: 8px; padding: 9px 13px; font-size: 0.86rem; margin-bottom: 7px; }
+  .highlight strong { color: var(--rose); }
+  .ficha-section { background: var(--light); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+  .ficha-section h4 { font-family: 'Playfair Display', serif; font-size: 0.95rem; color: var(--deep); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 7px; }
+  @media(max-width:500px) { .field-row { grid-template-columns: 1fr; } }
+  .field-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
+  .field-value { font-size: 0.88rem; color: var(--text); }
+
+  .foto-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 8px; }
+  .foto-thumb { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; border: 2px solid var(--border); cursor: pointer; transition: all 0.2s; }
+  .foto-thumb:hover { border-color: var(--rose); transform: scale(1.03); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(61,31,26,0.55); z-index: 200; align-items: center; justify-content: center; padding: 14px; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: white; border-radius: 18px; padding: 22px; max-width: 620px; width: 100%; max-height: 92vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.2); animation: modalIn 0.3s ease; }
+  @keyframes modalIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+  .modal-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--deep); margin-bottom: 18px; }
+  .modal-close { float: right; background: var(--border); border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; font-size: 0.9rem; color: var(--text); }
+
+  .tabs { display: flex; gap: 3px; margin-bottom: 16px; border-bottom: 2px solid var(--border); overflow-x: auto; }
+  .tab { padding: 7px 14px; background: transparent; border: none; font-family: 'DM Sans', sans-serif; font-size: 0.84rem; color: var(--muted); cursor: pointer; font-weight: 500; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.2s; white-space: nowrap; }
+  .tab.active { color: var(--rose); border-bottom-color: var(--rose); font-weight: 700; }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  .alert { padding: 11px 14px; border-radius: 10px; font-size: 0.85rem; margin-bottom: 12px; display: flex; align-items: flex-start; gap: 8px; }
+  .alert-warning { background: #fff8e3; border-left: 4px solid var(--gold); color: #6a4a10; }
+  .alert-info { background: #e8f4fd; border-left: 4px solid #4a90d9; color: #1a3a5a; }
+  .alert-success { background: #e8f7ee; border-left: 4px solid var(--success); color: #1a4a2a; }
+
+  .empty-state { text-align: center; padding: 36px 16px; color: var(--muted); }
+  .empty-state .icon { font-size: 2.5rem; margin-bottom: 10px; }
+
+  .ai-box { background: linear-gradient(135deg, #fdf4f2, #f0faf0); border: 1.5px solid var(--blush); border-radius: 12px; padding: 16px; margin-top: 14px; }
+  .ai-loading { text-align: center; color: var(--muted); padding: 18px; }
+  .dot { animation: blink 1.4s infinite; }
+  .dot:nth-child(2) { animation-delay: 0.2s; }
+  .dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+
+  .sep { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-thumb { background: var(--blush); border-radius: 3px; }
+  input[type="file"] { display: none; }
+
+  .loading-screen { position: fixed; inset: 0; background: var(--deep); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
+  .loading-screen .logo-big { font-family: 'Playfair Display', serif; color: var(--blush); font-size: 2rem; }
+  .loading-screen p { color: var(--muted); font-size: 0.9rem; }
+  .spinner { width: 36px; height: 36px; border: 3px solid rgba(232,196,176,0.2); border-top-color: var(--blush); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="loading-screen" id="loading-screen">
+  <div class="logo-big">Ginails <span style="color:var(--gold);font-style:italic">·</span> Cosmetología</div>
+  <div class="spinner"></div>
+  <p id="loading-msg">Conectando con la base de datos...</p>
+</div>
+
+<header>
+  <div class="logo">Ginails <span>·</span> Cosmetología</div>
+  <div class="firebase-status fb-wait" id="fb-status">⏳ Conectando...</div>
+</header>
+<nav>
+  <button class="nav-btn active" onclick="showSection('inicio',this)">🏠 Inicio</button>
+  <button class="nav-btn" onclick="showSection('nueva-clienta',this)">➕ Nueva Clienta</button>
+  <button class="nav-btn" onclick="showSection('clientas',this)">👤 Mis Clientas</button>
+  <button class="nav-btn" onclick="showSection('tratamientos',this)">✨ Protocolos</button>
+  <button class="nav-btn" onclick="showSection('productos',this)">🧴 Productos</button>
+  <button class="nav-btn" onclick="showSection('precios',this)">🏷️ Precios</button>
+  <button class="nav-btn" onclick="showSection('presupuestos',this)">🧾 Presupuestos</button>
+  <button class="nav-btn" onclick="showSection('gastos',this)">📊 Mis Gastos</button>
+  <button class="nav-btn" onclick="showSection('compras',this)">🛍️ Compras</button>
+</nav>
+
+<main>
+
+<!-- INICIO -->
+<div id="inicio" class="section active">
+  <div class="section-title">🌸 Bienvenida, Gise</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
+    <div class="card" style="text-align:center;cursor:pointer;padding:16px" onclick="showSection('clientas',null)">
+      <div style="font-size:1.8rem">👤</div>
+      <div id="stat-clientas" style="font-size:1.6rem;font-weight:700;color:var(--rose)">—</div>
+      <div style="font-size:0.76rem;color:var(--muted)">Clientas</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;padding:16px" onclick="showSection('clientas',null)">
+      <div style="font-size:1.8rem">📅</div>
+      <div id="stat-sesiones" style="font-size:1.6rem;font-weight:700;color:var(--sage)">—</div>
+      <div style="font-size:0.76rem;color:var(--muted)">Sesiones</div>
+    </div>
+    <div class="card" style="text-align:center;cursor:pointer;padding:16px" onclick="showSection('productos',null)">
+      <div style="font-size:1.8rem">🧴</div>
+      <div id="stat-productos" style="font-size:1.6rem;font-weight:700;color:var(--gold)">—</div>
+      <div style="font-size:0.76rem;color:var(--muted)">Productos</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚀 Acceso Rápido</div>
+    <div style="display:flex;flex-direction:column;gap:9px">
+      <button class="btn btn-primary" onclick="showSection('nueva-clienta',null)" style="width:100%">➕ Nueva Clienta</button>
+      <button class="btn btn-secondary" onclick="showSection('clientas',null)" style="width:100%">👤 Ver Mis Clientas</button>
+      <button class="btn btn-secondary" onclick="showSection('tratamientos',null)" style="width:100%">✨ Ver Protocolos</button>
+    </div>
+  </div>
+  <div class="alert alert-info" id="firebase-config-alert" style="display:none">
+    ⚠️ <strong>Firebase no configurado.</strong> La app funciona en modo local (los datos se guardan solo en este navegador). Para sincronizar entre dispositivos, configurá Firebase. Ver instrucciones en el archivo <strong>COMO-CONFIGURAR.md</strong>.
+  </div>
+</div>
+
+<!-- NUEVA CLIENTA -->
+<div id="nueva-clienta" class="section">
+  <div class="section-title">📋 Nueva Clienta</div>
+  <div class="card">
+    <div class="card-title">👤 Datos Personales</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre completo *</label><input type="text" id="nc-nombre" placeholder="Ej: María García"></div>
+      <div class="form-group"><label>Teléfono / WhatsApp</label><input type="tel" id="nc-tel" placeholder="+54 351 ..."></div>
+      <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="nc-fnac"></div>
+      <div class="form-group"><label>Edad</label><input type="number" id="nc-edad" placeholder="Años" min="1" max="99"></div>
+      <div class="form-group"><label>Ocupación</label><input type="text" id="nc-ocup"></div>
+      <div class="form-group"><label>Instagram</label><input type="text" id="nc-insta" placeholder="@usuario"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔐 Anamnesis · Seguridad</div>
+    <div class="alert alert-warning">⚠️ Obligatorio antes de cualquier tratamiento.</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Condiciones a tener en cuenta</label>
+        <div class="check-group" id="condiciones-check">
+          <label class="check-item"><input type="checkbox"> Embarazo / lactancia</label>
+          <label class="check-item"><input type="checkbox"> Diabetes</label>
+          <label class="check-item"><input type="checkbox"> Hipertensión</label>
+          <label class="check-item"><input type="checkbox"> Epilepsia</label>
+          <label class="check-item"><input type="checkbox"> Marcapasos</label>
+          <label class="check-item"><input type="checkbox"> Implantes metálicos</label>
+          <label class="check-item"><input type="checkbox"> Cáncer activo</label>
+          <label class="check-item"><input type="checkbox"> Herpes activo</label>
+          <label class="check-item"><input type="checkbox"> Rosácea activa</label>
+          <label class="check-item"><input type="checkbox"> Psoriasis / eccema</label>
+          <label class="check-item"><input type="checkbox"> Acné quístico severo</label>
+          <label class="check-item"><input type="checkbox"> Alergias conocidas</label>
+          <label class="check-item"><input type="checkbox"> Cirugías recientes</label>
+          <label class="check-item"><input type="checkbox"> Uso de retinoides</label>
+          <label class="check-item"><input type="checkbox"> Isotretinoína (últimos 12 meses)</label>
+          <label class="check-item"><input type="checkbox"> Quimio / radioterapia</label>
+        </div>
+      </div>
+      <div class="form-group"><label>Medicación actual</label><input type="text" id="nc-medicacion" placeholder="Nombre o tipo"></div>
+      <div class="form-group"><label>Alergias conocidas</label><input type="text" id="nc-alergias"></div>
+      <div class="form-group full"><label>Tratamientos estéticos previos</label><textarea id="nc-tratprev" placeholder="¿Cuáles? ¿Cuándo? ¿Cómo reaccionó?"></textarea></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔬 Análisis de Piel</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Tipo de piel *</label>
+        <select id="nc-tpiel"><option value="">Seleccionar</option><option>Normal</option><option>Seca</option><option>Grasa</option><option>Mixta</option><option>Sensible</option><option>Deshidratada</option><option>Madura / envejecida</option></select>
+      </div>
+      <div class="form-group"><label>Fototipo (Fitzpatrick)</label>
+        <select id="nc-fototipo"><option value="">Seleccionar</option><option>I – Muy blanca</option><option>II – Clara</option><option>III – Intermedia</option><option>IV – Morena clara</option><option>V – Morena oscura</option><option>VI – Negra</option></select>
+      </div>
+      <div class="form-group full">
+        <label>Problemáticas principales</label>
+        <div class="check-group">
+          <label class="check-item"><input type="checkbox" class="prob"> Acné / granos</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Manchas</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Arrugas / líneas</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Flacidez</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Poros dilatados</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Deshidratación</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Ojeras / bolsas</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Rosácea / eritema</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Cicatrices / marcas</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Pestañas escasas/lacias</label>
+          <label class="check-item"><input type="checkbox" class="prob"> Cejas irregulares</label>
+        </div>
+      </div>
+      <div class="form-group"><label>Zona T</label>
+        <select id="nc-zonat"><option value="">Seleccionar</option><option>Normal</option><option>Grasa</option><option>Mixta con poros</option><option>Seca</option></select>
+      </div>
+      <div class="form-group"><label>Mejillas</label>
+        <select id="nc-mejillas"><option value="">Seleccionar</option><option>Normal</option><option>Seca</option><option>Sensible/reactiva</option><option>Con manchas</option></select>
+      </div>
+      <div class="form-group full"><label>Observaciones de la piel</label><textarea id="nc-obspiel" placeholder="Detalles que notes durante la evaluación..."></textarea></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🥗 Hábitos</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Alimentación</label>
+        <select id="nc-alim"><option value="">Seleccionar</option><option>Equilibrada</option><option>Alta en azúcares / harinas</option><option>Alta en grasas</option><option>Vegetariana / vegana</option><option>Muy procesada</option></select>
+      </div>
+      <div class="form-group"><label>Hidratación</label>
+        <select id="nc-agua"><option value="">Seleccionar</option><option>Buen consumo (2L+)</option><option>Regular (1-2L)</option><option>Bajo (menos de 1L)</option></select>
+      </div>
+      <div class="form-group"><label>Sueño</label>
+        <select id="nc-sueno"><option value="">Seleccionar</option><option>Buena (7-8hs)</option><option>Regular (5-7hs)</option><option>Mala (menos de 5hs)</option></select>
+      </div>
+      <div class="form-group"><label>Actividad física</label>
+        <select id="nc-ejercicio"><option value="">Seleccionar</option><option>Activa (4+ veces/semana)</option><option>Moderada (1-3 veces/semana)</option><option>Sedentaria</option></select>
+      </div>
+      <div class="form-group"><label>Exposición solar</label>
+        <select id="nc-solar"><option value="">Seleccionar</option><option>Alta</option><option>Moderada</option><option>Baja</option></select>
+      </div>
+      <div class="form-group"><label>Usa protector solar</label>
+        <select id="nc-fps"><option value="">Seleccionar</option><option>Sí, todos los días</option><option>A veces</option><option>No</option></select>
+      </div>
+      <div class="form-group"><label>Estrés</label>
+        <select id="nc-estres"><option value="">Seleccionar</option><option>Bajo</option><option>Moderado</option><option>Alto / crónico</option></select>
+      </div>
+      <div class="form-group full"><label>Rutina de skincare actual</label><textarea id="nc-skincare" placeholder="Qué productos usa, con qué frecuencia..."></textarea></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">👁️ Cejas & Pestañas</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Estado de cejas</label>
+        <select id="nc-cejas"><option value="">Seleccionar</option><option>Densas y bien definidas</option><option>Escasas / poco pelo</option><option>Irregulares</option><option>Despobladas en cola</option><option>Muy claras</option></select>
+      </div>
+      <div class="form-group"><label>Estado de pestañas</label>
+        <select id="nc-pestanas"><option value="">Seleccionar</option><option>Abundantes y sanas</option><option>Escasas / finas</option><option>Muy lacias</option><option>Frágiles / quebradizas</option></select>
+      </div>
+      <div class="form-group"><label>Tinte previo</label>
+        <select id="nc-prev-tinte"><option value="">Seleccionar</option><option>Nunca</option><option>Sí, sin problemas</option><option>Sí, con reacción</option></select>
+      </div>
+      <div class="form-group"><label>Extensiones de pestañas</label>
+        <select id="nc-extensiones"><option value="">Seleccionar</option><option>No</option><option>Sí, actualmente</option><option>Antes sí, ahora no</option></select>
+      </div>
+      <div class="form-group full"><label>Alergias a adhesivos / tintes</label><input type="text" id="nc-aleg-tinte" placeholder="Especificar si corresponde"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🎯 Plan Inicial</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Objetivo de la clienta</label><textarea id="nc-objetivo" placeholder="¿Qué quiere lograr? ¿Cuál es su expectativa?"></textarea></div>
+      <div class="form-group full"><label>Observaciones adicionales</label><textarea id="nc-obs" placeholder="Todo lo que quieras recordar..."></textarea></div>
+      <div class="form-group full">
+        <label class="check-item" style="width:fit-content"><input type="checkbox" id="nc-consentimiento"> Clienta informada y dio consentimiento verbal</label>
+      </div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" onclick="guardarClienta()">💾 Guardar Ficha</button>
+    <button class="btn btn-success" onclick="sugerirTratamientosIA()">🤖 Sugerir Tratamientos con IA</button>
+    <button class="btn btn-secondary" onclick="limpiarFormulario()">🗑️ Limpiar</button>
+  </div>
+  <div id="ia-resultado"></div>
+</div>
+
+<!-- MIS CLIENTAS -->
+<div id="clientas" class="section">
+  <div class="section-title">👤 Mis Clientas</div>
+  <div id="lista-clientas"><div class="empty-state"><div class="icon">🌸</div><p>Cargando...</p></div></div>
+</div>
+
+<!-- PROTOCOLOS -->
+<div id="tratamientos" class="section">
+  <div class="section-title">✨ Protocolos de Tratamiento</div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('facial',this)">🧖 Facial</button>
+    <button class="tab" onclick="showTab('cejas-pesta',this)">👁️ Cejas & Pestañas</button>
+    <button class="tab" onclick="showTab('complementos',this)">💎 Extra</button>
+  </div>
+  <div id="tab-facial" class="tab-content active">
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>💧 Hidratación Profunda</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Piel seca · deshidratada · normal</div></div><span class="badge badge-gold">4-6 ses · Mensual</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🎯 Efectos</h5><ul><li>Restaurar la barrera hidrolipídica</li><li>Aumento de hidratación y elasticidad</li><li>Piel suave, luminosa y confortable</li><li>Reducción de aspecto opaco y tirante</li></ul></div>
+        <div class="trat-section"><h5>⚠️ Contraindicaciones</h5><ul><li>Herpes activo en zona de tratamiento</li><li>Alergias conocidas a los activos</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo paso a paso</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza con leche desmaquillante. Retirar con agua tibia y esponja konjac.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Tónico o agua micelar para equilibrar el pH.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Vapor facial 5-8 min.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Exfoliación enzimática suave (ácido láctico o enzimas de papaya).</div>
+          <div class="paso-item"><span class="paso-num">5</span>Extracción de comedones si los hubiera.</div>
+          <div class="paso-item"><span class="paso-num">6</span>Galvánica con ampollas de hialurónico (iontoforesis, 10 min).</div>
+          <div class="paso-item"><span class="paso-num">7</span>Masaje con aceite de rosa mosqueta o vitamina E.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Mascarilla calmante e hidratante (aloe, colágeno) 15-20 min.</div>
+          <div class="paso-item"><span class="paso-num">9</span>Ultrasonido con sérum hialurónico.</div>
+          <div class="paso-item"><span class="paso-num">10</span>Crema hidratante + SPF 50.</div>
+        </div></div>
+        <div class="trat-section"><h5>⚙️ Aparatología</h5><ul><li>Vaporizador facial</li><li>Galvánica (iontoforesis)</li><li>Ultrasonido facial</li></ul></div>
+        <div class="trat-section"><h5>🏠 Para llevar a casa</h5><ul><li>Sérum hialurónico mañana y noche</li><li>Crema hidratante con ceramidas</li><li>Aceite facial de rosa mosqueta (noche)</li><li>SPF 50 todos los días SIN excepción</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🌿 Anti-Acné</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Piel grasa · mixta · acné leve-moderado</div></div><span class="badge badge-gold">6-8 ses · Quincenal</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🎯 Efectos</h5><ul><li>Reducción de lesiones activas</li><li>Control de secreción sebácea</li><li>Minimización de poros dilatados</li><li>Efecto antibacteriano y antiinflamatorio</li><li>Mejora de marcas postacné</li></ul></div>
+        <div class="trat-section"><h5>⚠️ Contraindicaciones</h5><ul><li>Acné quístico severo (derivar a dermatólogo)</li><li>Isotretinoína activa o en últimos 12 meses</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Doble limpieza: aceite desmaquillante + gel con ácido salicílico.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Tónico astringente con niacinamida o té verde.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Vapor facial 5 min (no más).</div>
+          <div class="paso-item"><span class="paso-num">4</span>Extracción de comedones abiertos y cerrados.</div>
+          <div class="paso-item"><span class="paso-num">5</span>Alta frecuencia: efecto ozono antibacteriano (5-10 min).</div>
+          <div class="paso-item"><span class="paso-num">6</span>Luz LED azul 415nm: antibacteriana (10-15 min).</div>
+          <div class="paso-item"><span class="paso-num">7</span>Mascarilla arcilla verde + árbol de té 15 min.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Crema fluida no comedogénica con niacinamida + SPF oil-free.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Para llevar a casa</h5><ul><li>Limpiador con ácido salicílico 2%</li><li>Sérum niacinamida 10%</li><li>SPF 50 oil-free diario</li><li>Reducir azúcares, lácteos y harinas refinadas</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>⭐ Anti-Manchas · Luminosidad</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Hiperpigmentación · melasma · opacidad</div></div><span class="badge badge-gold">6-10 ses · Cada 10 días</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🎯 Efectos</h5><ul><li>Inhibición de la melanina</li><li>Unificación del tono</li><li>Luminosidad y efecto glow</li><li>Reducción de hiperpigmentación postinflamatoria</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza suave.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Peeling enzimático con ácido kójico o mandélico.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Ultrasonido en modo desfibrilador.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Sérum despigmentante: vitamina C + arbutina + ácido tranexámico.</div>
+          <div class="paso-item"><span class="paso-num">5</span>Galvánica para ionizar los activos (15 min).</div>
+          <div class="paso-item"><span class="paso-num">6</span>Luz LED amarilla (15 min).</div>
+          <div class="paso-item"><span class="paso-num">7</span>Mascarilla iluminadora con vitamina C.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Crema + SPF 50 obligatorio.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Para llevar a casa</h5><ul><li>Vitamina C 15-20% (mañana)</li><li>Niacinamida 10% + zinc</li><li>SPF 50 SIN excepción — evitar sol 10am-4pm</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🌸 Anti-Edad · Lifting Facial</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Piel madura · flacidez · arrugas</div></div><span class="badge badge-gold">8-12 ses · Semanal</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🎯 Efectos</h5><ul><li>Estimulación de colágeno y fibroblastos</li><li>Efecto tensor y reafirmante visible</li><li>Reducción de arrugas finas</li><li>Mejora del contorno y óvalo facial</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Doble limpieza suave.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Exfoliación con AHA (ácido láctico o glicólico) bajo %.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Vapor + masaje drenante tipo Kobido (10 min).</div>
+          <div class="paso-item"><span class="paso-num">4</span>Ultrasonido con sérum de péptidos tensores.</div>
+          <div class="paso-item"><span class="paso-num">5</span>Galvánica en modo anafórico.</div>
+          <div class="paso-item"><span class="paso-num">6</span>LED rojo 630-660nm (15 min).</div>
+          <div class="paso-item"><span class="paso-num">7</span>Mascarilla colagenizante o alginato.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Crema reafirmante + contorno de ojos + SPF 50.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Para llevar a casa</h5><ul><li>Retinol 0.3% (noche, 3 veces/semana al inicio)</li><li>Sérum péptidos tensores (mañana)</li><li>Contorno de ojos con cafeína</li><li>SPF 50 diario obligatorio</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🌹 Piel Sensible / Rosácea</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Pieles reactivas · eritema · capilares</div></div><span class="badge badge-gold">4-8 ses · Cada 15 días</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>⚠️ NO usar</h5><ul><li>Vapor · Alta frecuencia · Exfoliantes mecánicos</li><li>Rosácea en fase aguda con pústulas → derivar</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza con leche micelar o agua termal. Agua TIBIA.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Tónico calmante: aloe, azuleno o agua de rosas.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Masaje suave drenante, sin fricción.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Sérum calmante: centella asiática, alantoína.</div>
+          <div class="paso-item"><span class="paso-num">5</span>LED verde o amarillo 15 min.</div>
+          <div class="paso-item"><span class="paso-num">6</span>Mascarilla aloe vera frío.</div>
+          <div class="paso-item"><span class="paso-num">7</span>Crema barrera con ceramidas + SPF mineral.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Para llevar a casa</h5><ul><li>Agua micelar sin fragancia para limpiar</li><li>Sérum centella asiática</li><li>Crema con ceramidas (barrera)</li><li>SPF mineral zinc · Evitar picantes, alcohol, agua caliente</li></ul></div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-cejas-pesta" class="tab-content">
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🔆 Lifting de Pestañas</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Pestañas lacias · sin curvatura</div></div><span class="badge badge-gold">1 ses · Dura 6-8 sem</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>⚠️ Contraindicaciones</h5><ul><li>Alergia a adhesivos del kit</li><li>Orzuelo / conjuntivitis activa</li><li>Extensiones puestas (esperar 2 sem post retiro)</li><li>Pestañas muy dañadas o quebradizas</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza con removedor sin aceite.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Prueba de parche si es primera vez (ideal 48hs antes).</div>
+          <div class="paso-item"><span class="paso-num">3</span>Proteger párpado inferior con parche de gel.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Seleccionar rodillo según longitud (S/M/L/XL). Aplicar adhesivo y adherir pestañas.</div>
+          <div class="paso-item"><span class="paso-num">5</span>Solución 1 (perming): 10-15 min según grosor de pestaña.</div>
+          <div class="paso-item"><span class="paso-num">6</span>Retirar S1. Solución 2 (neutralizante): 10 min.</div>
+          <div class="paso-item"><span class="paso-num">7</span>Retirar S2. Sérum nutritivo / aceite de argán.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Retirar rodillo con cuidado. Cepillar con spooly.</div>
+          <div class="paso-item"><span class="paso-num">9</span>Opcional: aplicar tinte para mayor impacto.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Cuidados post</h5><ul><li>No mojar 24-48hs · No rímmel 2 días · Aceite de argán noche</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🎨 Laminado de Cejas</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Cejas despeinadas · irregulares</div></div><span class="badge badge-gold">1 ses · Dura 4-6 sem</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpiar con removedor sin aceite.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Cepillar hacia arriba con spooly.</div>
+          <div class="paso-item"><span class="paso-num">3</span>S1 sobre vellos + film. 8-12 min.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Retirar S1. Peinar vellos en posición deseada.</div>
+          <div class="paso-item"><span class="paso-num">5</span>S2 + film. 8-10 min.</div>
+          <div class="paso-item"><span class="paso-num">6</span>Retirar S2. Sérum nutritivo.</div>
+          <div class="paso-item"><span class="paso-num">7</span>Depilación / diseño del contorno.</div>
+          <div class="paso-item"><span class="paso-num">8</span>Opcional: henna o tinte para completar.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Cuidados post</h5><ul><li>No mojar 24hs · Aceite nutritivo noche · Gel de cejas para mantener</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🌿 Henna de Cejas</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Cejas claras · diseño natural</div></div><span class="badge badge-gold">1 ses · Dura 2-4 sem</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>🔬 Protocolo</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza y desgrasado con alcohol o removedor.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Diseño con lápiz: inicio, arco y cola.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Depilación del contorno.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Preparar henna (consistencia pastosa).</div>
+          <div class="paso-item"><span class="paso-num">5</span>Aplicar con pincel fino, 15-25 min según tono deseado.</div>
+          <div class="paso-item"><span class="paso-num">6</span>Retirar con hisopo seco, luego húmedo.</div>
+          <div class="paso-item"><span class="paso-num">7</span>Gel fijador o spooly para terminar.</div>
+        </div></div>
+        <div class="trat-section"><h5>🏠 Cuidados post</h5><ul><li>No mojar 12hs · Sin desmaquillantes con aceite en la zona</li></ul></div>
+      </div>
+    </div>
+    <div class="tratamiento-card">
+      <div class="trat-header" onclick="toggleTrat(this)"><div><h4>🖤 Tinte Cejas & Pestañas</h4><div style="font-size:0.76rem;color:#c5a090;margin-top:2px">Cejas/pestañas claras · definición</div></div><span class="badge badge-gold">1 ses · Dura 3-6 sem</span></div>
+      <div class="trat-body">
+        <div class="trat-section"><h5>⚠️ SIEMPRE test de parche 48hs antes</h5><ul><li>Nunca en alérgicas a PPD</li><li>No en embarazo · No con ojo irritado</li></ul></div>
+        <div class="trat-section"><h5>🔬 Protocolo cejas</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Limpiar y desengrasar.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Vaselina en contorno para evitar manchas en piel.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Mezclar tinte + oxidante 1:1. Aplicar 5-10 min.</div>
+          <div class="paso-item"><span class="paso-num">4</span>Retirar con hisopo húmedo.</div>
+        </div></div>
+        <div class="trat-section"><h5>🔬 Protocolo pestañas</h5><div class="pasos-list">
+          <div class="paso-item"><span class="paso-num">1</span>Parches bajo el ojo. Ojos cerrados.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Aplicar con brocha de raíz a punta. 5-10 min.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Retirar con hisopo húmedo, ojos cerrados.</div>
+        </div></div>
+      </div>
+    </div>
+  </div>
+  <div id="tab-complementos" class="tab-content">
+    <div class="card"><div class="card-title">💎 Complementos</div>
+      <div class="highlight"><strong>Peeling Químico Superficial:</strong> AHA/BHA 10-30%. Manchas leves, acné, rejuvenecimiento. 4-6 ses cada 2-3 sem. Contraindicado en embarazo e isotretinoína reciente.</div>
+      <div class="highlight"><strong>Drenaje Linfático Facial:</strong> Técnica manual. Edemas, ojeras, post-cirugía. 4-8 sesiones seguidas.</div>
+      <div class="highlight"><strong>Masaje Kobido:</strong> Anti-edad japonés. Tonifica, oxigena y reduce tensión facial. Complementa cualquier protocolo anti-edad.</div>
+      <div class="highlight"><strong>Parches de Colágeno:</strong> Bajo los ojos. Efecto inmediato en ojeras. Ideal como complemento.</div>
+    </div>
+  </div>
+</div>
+
+<!-- PRODUCTOS -->
+<div id="productos" class="section">
+  <div class="section-title">🧴 Mis Productos</div>
+  <div class="card">
+    <div class="card-title">➕ Agregar Producto</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre *</label><input type="text" id="prod-nombre" placeholder="Ej: Sérum Vitamina C"></div>
+      <div class="form-group"><label>Categoría</label>
+        <select id="prod-cat"><option>Limpieza</option><option>Tónicos</option><option>Sérums</option><option>Cremas</option><option>Mascarillas</option><option>Exfoliantes</option><option>Protectores solares</option><option>Aceites</option><option>Ampollas</option><option>Cejas y pestañas</option><option>Aparatología</option><option>Descartables</option><option>Reutilizables</option><option>Otros</option></select>
+      </div>
+      <div class="form-group"><label>Marca</label><input type="text" id="prod-marca"></div>
+      <div class="form-group"><label>Stock</label>
+        <select id="prod-stock"><option value="ok">✅ Suficiente</option><option value="low">⚠️ Poco</option><option value="out">❌ Sin stock</option></select>
+      </div>
+      <div class="form-group full"><label>Para qué tratamiento/s</label><input type="text" id="prod-uso" placeholder="Hidratación, anti-acné..."></div>
+      <div class="form-group full"><label>Notas</label><input type="text" id="prod-notas" placeholder="Concentración, modo de uso..."></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="agregarProducto()">💾 Agregar</button>
+      <button class="btn btn-success" onclick="planTratamientoIA()">🤖 Generar plan con mis productos</button>
+    </div>
+  </div>
+  <div id="lista-productos"><div class="empty-state"><div class="icon">🧴</div><p>Cargando...</p></div></div>
+  <div id="ia-productos"></div>
+</div>
+
+<!-- PRECIOS -->
+<div id="precios" class="section">
+  <div class="section-title">🏷️ Mis Precios & Combos</div>
+  <div class="alert alert-info">💡 Editá cualquier precio tocando el número. Se guarda automáticamente.</div>
+  <div class="card"><div class="card-title">💆 Servicios Faciales</div><div id="lista-precios-facial"></div><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="agregarPrecio('facial')">+ Agregar</button></div>
+  <div class="card"><div class="card-title">👁️ Cejas & Pestañas</div><div id="lista-precios-cejas"></div><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="agregarPrecio('cejas')">+ Agregar</button></div>
+  <div class="card"><div class="card-title">✨ Combos</div><div id="lista-precios-combos"></div><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="agregarPrecio('combos')">+ Agregar</button></div>
+  <div class="card"><div class="card-title">📦 Planes / Packs</div><div id="lista-precios-planes"></div><button class="btn btn-secondary btn-sm" style="margin-top:10px" onclick="agregarPrecio('planes')">+ Agregar</button></div>
+  <div class="card" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5)">
+    <div class="card-title">💡 Referencia de mercado</div>
+    <p style="font-size:0.85rem;line-height:1.7">Servicios faciales: $18.000–$32.000 · Cejas/pestañas: $12.000–$25.000 · Combos: $26.000–$40.000<br>Para arrancar, posicionarte 15-20% por debajo es estratégico. En 3-4 meses subís tranquila.</p>
+  </div>
+</div>
+
+<!-- QUÉ COMPRAR -->
+<div id="compras" class="section">
+  <div class="section-title">🛍️ Guía de Compras</div>
+  <div class="alert alert-success">✅ Pensada para arrancar desde cero priorizando lo reutilizable.</div>
+  <div class="card">
+    <div class="card-title">🥇 Prioridad 1 — Para empezar ya</div>
+    <div class="trat-section"><h5>🔄 Reutilizables (compra única)</h5><ul class="trat-section" style="margin:0"><li>Sábanas tela impermeable x 3</li><li>Toallitas microfibra x 15</li><li>Espátulas acero inox x 2</li><li>Bols cerámica para mezclar x 2</li><li>Turbantes tela lavable x 3</li><li>Esponja konjac x 2</li></ul></div>
+    <div class="trat-section"><h5>🧤 Descartables esenciales</h5><ul class="trat-section" style="margin:0"><li>Guantes nitrilo caja x 100</li><li>Barbijos descartables</li><li>Cofias descartables</li><li>Algodones · Hisopos · Gasas · Alcohol 70°</li><li>Papel film · Vasitos para mezclar</li></ul></div>
+    <div class="trat-section"><h5>🧴 Productos faciales</h5><ul class="trat-section" style="margin:0"><li>Biobellus: Leche desmaquillante + Gel limpiador + Tónico + Exfoliante enzimático</li><li>Biobellus / Libra: Sérum hialurónico + Sérum niacinamida + Crema hidratante</li><li>Dra. Morán: Vitamina C 20% + Retinol 0.5%</li><li>Arcilla verde + caolín a granel x 500g c/u</li><li>Mascarillas lámina colágeno y aloe (caja x 5)</li><li>Aceite rosa mosqueta + aceite argán</li><li>SPF 50 (Isdin Fusion Water + La Roche-Posay oil-free)</li></ul></div>
+    <div class="trat-section"><h5>👁️ Cejas & Pestañas</h5><ul class="trat-section" style="margin:0"><li>Kit lifting pestañas Iconsign (S1+S2+adhesivo+rodillos)</li><li>Kit laminado cejas Iconsign</li><li>Henna Thuya: negro, marrón oscuro, marrón, castaño, gris</li><li>Tinte RefectoCil negro + marrón + oxidante 3%</li><li>Parches gel · Removedor sin aceite · Pinzas · Tijera · Spoolies · Hilo</li></ul></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🥈 Prioridad 2 — Aparatología (en orden)</div>
+    <ul class="trat-section" style="margin:8px 0 0">
+      <li>1️⃣ <strong>Vaporizador facial ozono</strong> — base de todo protocolo · $15.000–$30.000</li>
+      <li>2️⃣ <strong>Alta frecuencia</strong> — anti-acné indispensable · $20.000–$40.000</li>
+      <li>3️⃣ <strong>Lupa con luz LED</strong> — análisis y extracciones · $15.000–$25.000</li>
+      <li>4️⃣ <strong>Galvánica</strong> — iontoforesis, introduce activos · $25.000–$50.000</li>
+      <li>5️⃣ <strong>Ultrasonido facial</strong> — exfolia, reafirma · $30.000–$60.000</li>
+      <li>6️⃣ <strong>Panel LED rojo/azul</strong> — anti-edad + anti-acné · $30.000–$80.000</li>
+    </ul>
+  </div>
+</div>
+
+<!-- PRESUPUESTOS -->
+<div id="presupuestos" class="section">
+  <div class="section-title">🧾 Presupuestos para Clientas</div>
+
+  <div class="card">
+    <div class="card-title">➕ Nuevo Presupuesto</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Clienta</label><select id="pres-clienta"><option value="">Sin clienta asignada</option></select></div>
+      <div class="form-group"><label>Fecha</label><input type="date" id="pres-fecha"></div>
+      <div class="form-group full"><label>Descripción / nombre del presupuesto</label><input type="text" id="pres-nombre" placeholder="Ej: Pack mirada completa, Plan anti-acné 6 sesiones..."></div>
+    </div>
+    <div style="margin:14px 0 8px">
+      <div style="font-size:0.76rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">Servicios incluidos</div>
+      <div id="pres-items-container"></div>
+      <button class="btn btn-secondary btn-sm" onclick="agregarItemPres()" style="margin-top:8px">+ Agregar ítem</button>
+    </div>
+    <div style="background:var(--light);border-radius:10px;padding:11px 14px;margin-top:10px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-weight:700">Total</span>
+      <span id="pres-total-display" style="font-size:1.15rem;font-weight:700;color:var(--rose)">$0</span>
+    </div>
+    <div class="form-grid" style="margin-top:12px">
+      <div class="form-group full"><label>Notas / condiciones</label><textarea id="pres-notas" placeholder="Validez, condiciones de pago, descuentos..."></textarea></div>
+      <div class="form-group"><label>Estado</label>
+        <select id="pres-estado"><option value="pendiente">⏳ Pendiente</option><option value="aprobado">✅ Aprobado</option><option value="rechazado">❌ Rechazado</option></select>
+      </div>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="guardarPresupuesto()">💾 Guardar</button></div>
+  </div>
+
+  <div id="lista-presupuestos"><div class="empty-state"><div class="icon">🧾</div><p>Sin presupuestos todavía.</p></div></div>
+</div>
+
+<!-- MIS GASTOS -->
+<div id="gastos" class="section">
+  <div class="section-title">📊 Mis Gastos & Rentabilidad</div>
+
+  <!-- RESUMEN -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px">
+    <div class="card" style="text-align:center;padding:14px">
+      <div style="font-size:1.5rem">💸</div>
+      <div id="res-gastos" style="font-size:1.1rem;font-weight:700;color:var(--danger)">$0</div>
+      <div style="font-size:0.74rem;color:var(--muted)">Total gastado</div>
+    </div>
+    <div class="card" style="text-align:center;padding:14px">
+      <div style="font-size:1.5rem">💰</div>
+      <div id="res-cobrado" style="font-size:1.1rem;font-weight:700;color:var(--success)">$0</div>
+      <div style="font-size:0.74rem;color:var(--muted)">Total cobrado</div>
+    </div>
+    <div class="card" style="text-align:center;padding:14px">
+      <div style="font-size:1.5rem">📈</div>
+      <div id="res-ganancia" style="font-size:1.1rem;font-weight:700;color:var(--gold)">$0</div>
+      <div style="font-size:0.74rem;color:var(--muted)">Ganancia neta</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">➕ Registrar Gasto</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Descripción *</label><input type="text" id="gasto-desc" placeholder="Ej: Kit lifting Iconsign, Guantes x 100..."></div>
+      <div class="form-group"><label>Categoría</label>
+        <select id="gasto-cat">
+          <option>Productos cosméticos</option>
+          <option>Insumos / descartables</option>
+          <option>Reutilizables</option>
+          <option>Aparatología</option>
+          <option>Kits cejas / pestañas</option>
+          <option>Capacitación / cursos</option>
+          <option>Otros</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Monto ($) *</label><input type="number" id="gasto-monto" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Fecha</label><input type="date" id="gasto-fecha"></div>
+      <div class="form-group full"><label>Notas (opcional)</label><input type="text" id="gasto-notas" placeholder="Marca, dónde lo compraste, para qué..."></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-primary" onclick="guardarGasto()">💾 Registrar Gasto</button></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 Filtrar por categoría</div>
+    <select id="gasto-filtro" onchange="renderGastos()" style="width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;background:var(--light)">
+      <option value="">Todas las categorías</option>
+      <option>Productos cosméticos</option>
+      <option>Insumos / descartables</option>
+      <option>Reutilizables</option>
+      <option>Aparatología</option>
+      <option>Kits cejas / pestañas</option>
+      <option>Capacitación / cursos</option>
+      <option>Otros</option>
+    </select>
+  </div>
+
+  <div id="lista-gastos"><div class="empty-state"><div class="icon">📊</div><p>Sin gastos registrados.</p></div></div>
+</div>
+
+</main>
+
+<!-- MODAL FICHA CLIENTA -->
+<div class="modal-overlay" id="modal-ficha">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-ficha')">✕</button>
+    <div class="modal-title" id="modal-nombre">Ficha de Clienta</div>
+    <div class="tabs" style="margin-top:4px">
+      <button class="tab active" onclick="showModalTab('tab-ficha-datos',this)">📋 Datos</button>
+      <button class="tab" onclick="showModalTab('tab-ficha-plan',this)">🎯 Plan Activo</button>
+      <button class="tab" onclick="showModalTab('tab-ficha-historial',this)">📅 Historial</button>
+      <button class="tab" onclick="showModalTab('tab-ficha-fotos',this)">📸 Fotos</button>
+      <button class="tab" onclick="showModalTab('tab-ficha-notas',this)">📝 Notas</button>
+    </div>
+    <div id="tab-ficha-datos" class="tab-content active"><div id="modal-contenido"></div></div>
+    <div id="tab-ficha-plan" class="tab-content"><div id="modal-plan"></div></div>
+    <div id="tab-ficha-historial" class="tab-content"><div id="modal-historial"></div></div>
+    <div id="tab-ficha-fotos" class="tab-content">
+      <label class="btn btn-secondary btn-sm" style="cursor:pointer;margin-bottom:10px;display:inline-block">
+        📸 Agregar Foto
+        <input type="file" accept="image/*" id="input-foto-clienta" onchange="agregarFotoClienta(event)">
+      </label>
+      <div id="modal-fotos-container"></div>
+    </div>
+    <div id="tab-ficha-notas" class="tab-content">
+      <textarea id="nueva-nota-texto" placeholder="Escribí lo que quieras recordar: actitudes, preferencias, reacciones, lo que te contó..." style="width:100%;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;resize:vertical;min-height:85px;outline:none;background:var(--light);margin-bottom:8px"></textarea>
+      <button class="btn btn-primary btn-sm" onclick="guardarNota()">💾 Agregar Nota</button>
+      <hr class="sep">
+      <div id="lista-notas-modal"></div>
+    </div>
+    <div class="btn-row" style="margin-top:16px;padding-top:14px;border-top:1px solid var(--border)">
+      <button class="btn btn-success btn-sm" onclick="sugerirTratClientaActual()">🤖 IA Sugerir</button>
+      <button class="btn btn-danger btn-sm" onclick="eliminarClientaActual()">🗑️ Eliminar</button>
+    </div>
+    <div id="modal-ia-result"></div>
+  </div>
+</div>
+
+<!-- MODAL NUEVA SESION -->
+<div class="modal-overlay" id="modal-sesion">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-sesion')">✕</button>
+    <div class="modal-title" id="modal-sesion-titulo">Registrar Sesión</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Fecha *</label><input type="date" id="ses-fecha"></div>
+      <div class="form-group"><label>Número de sesión</label><input type="number" id="ses-numero" min="1"></div>
+      <div class="form-group full"><label>Tratamiento realizado *</label>
+        <select id="ses-tratamiento">
+          <option value="">Seleccionar</option>
+          <option>Hidratación profunda</option><option>Anti-acné</option>
+          <option>Anti-manchas / luminosidad</option><option>Anti-edad / lifting facial</option>
+          <option>Piel sensible / rosácea</option><option>Lifting de pestañas</option>
+          <option>Laminado de cejas</option><option>Henna de cejas</option>
+          <option>Tinte de cejas</option><option>Tinte de pestañas</option>
+          <option>Lifting + tinte de pestañas</option><option>Laminado + henna</option>
+          <option>Peeling químico</option><option>Otro (ver notas)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Estado de la piel al inicio</label>
+        <select id="ses-estado-piel"><option value="">Seleccionar</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option><option>Con brote / inflamación</option><option>Deshidratada</option><option>Sensible / reactiva</option></select>
+      </div>
+      <div class="form-group"><label>Duración (min)</label><input type="number" id="ses-duracion" min="5" placeholder="60"></div>
+      <div class="form-group full"><label>Productos y aparatología usados</label><input type="text" id="ses-productos" placeholder="Sérum hialurónico, vaporizador, mascarilla arcilla..."></div>
+      <div class="form-group full"><label>Resultado / cómo reaccionó la piel</label><textarea id="ses-reaccion" placeholder="¿Toleró bien? ¿Hubo enrojecimiento? ¿Notó mejoría?..."></textarea></div>
+      <div class="form-group full">
+        <label>¿Hubo rechazo o reacción a algún producto?</label>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <label class="check-item"><input type="checkbox" id="ses-tuvo-rechazo" onchange="toggleRechazoField()"> Sí, hubo rechazo</label>
+        </div>
+        <div id="rechazo-detail" style="display:none;margin-top:8px">
+          <input type="text" id="ses-rechazo-producto" placeholder="¿A qué producto? Ej: ácido glicólico 30%">
+          <textarea id="ses-rechazo-desc" placeholder="Describir la reacción: enrojecimiento, picazón, hinchazón... ¿Se cambió por otro producto?" style="margin-top:6px;min-height:60px"></textarea>
+          <input type="text" id="ses-producto-reemplazado" placeholder="Producto con el que se reemplazó (si aplica)" style="margin-top:6px">
+        </div>
+      </div>
+      <div class="form-group full"><label>Notas para la próxima sesión</label><textarea id="ses-proxima" placeholder="¿Qué cambiar? ¿Qué reforzar? ¿Qué recordar?..."></textarea></div>
+      <div class="form-group"><label>Precio cobrado ($)</label><input type="number" id="ses-precio" min="0" placeholder="0"></div>
+      <div class="form-group"><label>Forma de pago</label>
+        <select id="ses-pago"><option value="">Seleccionar</option><option>Efectivo</option><option>Transferencia</option><option>Débito</option><option>Crédito</option><option>Sin cobrar</option></select>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarSesion()">💾 Guardar Sesión</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-sesion')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PLAN DE TRATAMIENTO -->
+<div class="modal-overlay" id="modal-plan-form">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-plan-form')">✕</button>
+    <div class="modal-title">🎯 Plan de Tratamiento</div>
+    <div class="form-grid">
+      <div class="form-group full"><label>Tratamiento</label>
+        <select id="plan-tratamiento">
+          <option value="">Seleccionar</option>
+          <option>Hidratación profunda</option><option>Anti-acné</option>
+          <option>Anti-manchas / luminosidad</option><option>Anti-edad / lifting facial</option>
+          <option>Piel sensible / rosácea</option><option>Lifting de pestañas</option>
+          <option>Laminado de cejas</option><option>Henna de cejas</option>
+          <option>Combo personalizado (ver notas)</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Total de sesiones planificadas</label><input type="number" id="plan-total-ses" min="1" max="30" placeholder="Ej: 6"></div>
+      <div class="form-group"><label>Frecuencia</label>
+        <select id="plan-frecuencia"><option value="">Seleccionar</option><option>Semanal</option><option>Quincenal</option><option>Cada 10 días</option><option>Mensual</option><option>Única sesión</option></select>
+      </div>
+      <div class="form-group"><label>Fecha de inicio</label><input type="date" id="plan-fecha-inicio"></div>
+      <div class="form-group"><label>Precio por sesión ($)</label><input type="number" id="plan-precio-ses" min="0" placeholder="0"></div>
+      <div class="form-group full"><label>Objetivo del plan</label><textarea id="plan-objetivo" placeholder="Qué resultado se espera lograr con este plan..."></textarea></div>
+      <div class="form-group full"><label>Productos planificados para usar</label><textarea id="plan-productos" placeholder="Sérum vitamina C, mascarilla alginato, ultrasonido..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarPlan()">💾 Guardar Plan</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-plan-form')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== ESTADO GLOBAL ======
+let db = null;
+let fs = null;
+let useFirebase = false;
+let clientaActualId = null;
+let clientas = {};
+let productos = {};
+let sesiones = {};
+let planes = {};
+
+// ====== INIT FIREBASE ======
+document.addEventListener('firebaseReady', async () => {
+  db = window._db;
+  fs = window._firestore;
+  const testConfig = document.querySelector('script[type="module"]').textContent;
+  if (testConfig.includes('TU_API_KEY')) {
+    useFirebase = false;
+    document.getElementById('fb-status').textContent = '💾 Modo local';
+    document.getElementById('fb-status').className = 'firebase-status fb-err';
+    document.getElementById('firebase-config-alert').style.display = 'flex';
+    initLocalMode();
+  } else {
+    try {
+      useFirebase = true;
+      document.getElementById('fb-status').textContent = '🔥 Firebase activo';
+      document.getElementById('fb-status').className = 'firebase-status fb-ok';
+      await loadAllFromFirebase();
+    } catch(e) {
+      console.error(e);
+      useFirebase = false;
+      document.getElementById('fb-status').textContent = '⚠️ Error Firebase';
+      document.getElementById('fb-status').className = 'firebase-status fb-err';
+      initLocalMode();
+    }
+  }
+  hideLoading();
+});
+
+setTimeout(() => {
+  if (!window._firebaseReady) {
+    initLocalMode();
+    hideLoading();
+  }
+}, 3000);
+
+function hideLoading() {
+  const ls = document.getElementById('loading-screen');
+  ls.style.opacity = '0';
+  ls.style.transition = 'opacity 0.5s';
+  setTimeout(() => ls.style.display = 'none', 500);
+}
+
+function initLocalMode() {
+  clientas = JSON.parse(localStorage.getItem('g_clientas') || '{}');
+  productos = JSON.parse(localStorage.getItem('g_productos') || '{}');
+  sesiones = JSON.parse(localStorage.getItem('g_sesiones') || '{}');
+  planes = JSON.parse(localStorage.getItem('g_planes') || '{}');
+  renderClientas();
+  renderProductos();
+  renderTodosPrecios();
+  updateStats();
+}
+
+async function loadAllFromFirebase() {
+  document.getElementById('loading-msg').textContent = 'Cargando clientas...';
+  const colecciones = ['clientas','productos','sesiones','planes'];
+  const datos = [clientas, productos, sesiones, planes];
+  for (let i = 0; i < colecciones.length; i++) {
+    const snap = await fs.getDocs(fs.collection(db, colecciones[i]));
+    snap.forEach(d => datos[i][d.id] = d.data());
+  }
+  renderClientas();
+  renderProductos();
+  renderTodosPrecios();
+  updateStats();
+}
+
+async function saveDoc(coleccion, id, data) {
+  if (useFirebase) {
+    await fs.setDoc(fs.doc(db, coleccion, id), data);
+  } else {
+    if (coleccion === 'clientas') { clientas[id] = data; localStorage.setItem('g_clientas', JSON.stringify(clientas)); }
+    if (coleccion === 'productos') { productos[id] = data; localStorage.setItem('g_productos', JSON.stringify(productos)); }
+    if (coleccion === 'sesiones') { sesiones[id] = data; localStorage.setItem('g_sesiones', JSON.stringify(sesiones)); }
+    if (coleccion === 'planes') { planes[id] = data; localStorage.setItem('g_planes', JSON.stringify(planes)); }
+  }
+}
+
+async function deleteDocF(coleccion, id) {
+  if (useFirebase) {
+    await fs.deleteDoc(fs.doc(db, coleccion, id));
+  } else {
+    if (coleccion === 'clientas') { delete clientas[id]; localStorage.setItem('g_clientas', JSON.stringify(clientas)); }
+    if (coleccion === 'productos') { delete productos[id]; localStorage.setItem('g_productos', JSON.stringify(productos)); }
+    if (coleccion === 'sesiones') { delete sesiones[id]; localStorage.setItem('g_sesiones', JSON.stringify(sesiones)); }
+    if (coleccion === 'planes') { delete planes[id]; localStorage.setItem('g_planes', JSON.stringify(planes)); }
+  }
+}
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).substr(2,5); }
+function v(id) { const el = document.getElementById(id); return el ? el.value : ''; }
+function vb(id) { const el = document.getElementById(id); return el ? el.checked : false; }
+
+function updateStats() {
+  document.getElementById('stat-clientas').textContent = Object.keys(clientas).length;
+  document.getElementById('stat-sesiones').textContent = Object.keys(sesiones).length;
+  document.getElementById('stat-productos').textContent = Object.keys(productos).length;
+}
+
+// ====== NAVEGACIÓN ======
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  if (id === 'clientas') renderClientas();
+  if (id === 'productos') renderProductos();
+  if (id === 'precios') renderTodosPrecios();
+}
+
+function showTab(id, btn) {
+  const parent = btn ? btn.closest('.tabs').parentElement : document;
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+
+function showModalTab(id, btn) {
+  document.querySelectorAll('#modal-ficha .tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#modal-ficha .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'tab-ficha-plan') renderPlanModal();
+  if (id === 'tab-ficha-historial') renderHistorialModal();
+  if (id === 'tab-ficha-fotos') renderFotosModal();
+  if (id === 'tab-ficha-notas') renderNotasModal();
+}
+
+function toggleTrat(header) { header.nextElementSibling.classList.toggle('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function toggleRechazoField() {
+  document.getElementById('rechazo-detail').style.display = document.getElementById('ses-tuvo-rechazo').checked ? 'block' : 'none';
+}
+
+// ====== CLIENTAS ======
+function getChecked(containerSelector) {
+  return Array.from(document.querySelectorAll(containerSelector + ' input[type="checkbox"]:checked')).map(i => i.parentElement.textContent.trim());
+}
+
+async function guardarClienta() {
+  const nombre = document.getElementById('nc-nombre').value.trim();
+  if (!nombre) { alert('Ingresá el nombre'); return; }
+  const id = uid();
+  const clienta = {
+    id, nombre, tel: v('nc-tel'), fnac: v('nc-fnac'), edad: v('nc-edad'),
+    ocup: v('nc-ocup'), insta: v('nc-insta'),
+    condiciones: getChecked('#condiciones-check'),
+    medicacion: v('nc-medicacion'), alergias: v('nc-alergias'), tratprev: v('nc-tratprev'),
+    tpiel: v('nc-tpiel'), fototipo: v('nc-fototipo'), zonat: v('nc-zonat'),
+    mejillas: v('nc-mejillas'), obspiel: v('nc-obspiel'),
+    problematicas: Array.from(document.querySelectorAll('.prob:checked')).map(i => i.parentElement.textContent.trim()),
+    alim: v('nc-alim'), agua: v('nc-agua'), sueno: v('nc-sueno'),
+    ejercicio: v('nc-ejercicio'), solar: v('nc-solar'), fps: v('nc-fps'),
+    skincare: v('nc-skincare'), estres: v('nc-estres'),
+    cejas: v('nc-cejas'), pestanas: v('nc-pestanas'),
+    prevTinte: v('nc-prev-tinte'), extensiones: v('nc-extensiones'), alegTinte: v('nc-aleg-tinte'),
+    objetivo: v('nc-objetivo'), obs: v('nc-obs'),
+    consentimiento: vb('nc-consentimiento'),
+    notas: [], fotos: [],
+    fecha: new Date().toLocaleDateString('es-AR'),
+    fechaTs: Date.now()
+  };
+  clientas[id] = clienta;
+  await saveDoc('clientas', id, clienta);
+  updateStats();
+  alert(`✅ Ficha de ${nombre} guardada!`);
+  limpiarFormulario();
+  renderClientas();
+}
+
+function limpiarFormulario() {
+  document.querySelectorAll('#nueva-clienta input, #nueva-clienta select, #nueva-clienta textarea').forEach(el => {
+    if (el.type === 'checkbox') el.checked = false; else el.value = '';
+  });
+  document.getElementById('ia-resultado').innerHTML = '';
+}
+
+function renderClientas() {
+  const cont = document.getElementById('lista-clientas');
+  const lista = Object.values(clientas).sort((a,b) => (b.fechaTs||0)-(a.fechaTs||0));
+  if (!lista.length) {
+    cont.innerHTML = `<div class="empty-state"><div class="icon">🌸</div><p>Todavía no tenés clientas.</p><br><button class="btn btn-primary" onclick="showSection('nueva-clienta',null)">➕ Nueva Clienta</button></div>`;
+    return;
+  }
+  cont.innerHTML = lista.map(c => {
+    const sesCli = Object.values(sesiones).filter(s => s.clientaId === c.id);
+    const planCli = Object.values(planes).find(p => p.clientaId === c.id && p.activo);
+    const progreso = planCli ? Math.round((sesCli.filter(s=>s.planId===planCli.id).length / planCli.totalSesiones)*100) : null;
+    return `<div class="client-card" onclick="abrirFicha('${c.id}')">
+      <div class="client-avatar">${c.nombre[0].toUpperCase()}</div>
+      <div class="client-info">
+        <h4>${c.nombre}</h4>
+        <p>${c.tpiel||'Piel no especificada'} · ${c.fecha}</p>
+        <div style="margin-top:4px;display:flex;flex-wrap:wrap;gap:4px">
+          ${(c.problematicas||[]).slice(0,2).map(p=>`<span class="badge badge-rose" style="font-size:0.67rem">${p}</span>`).join('')}
+          ${planCli ? `<span class="badge badge-sage" style="font-size:0.67rem">🎯 ${planCli.tratamiento} ${progreso}%</span>` : ''}
+          ${sesCli.length ? `<span class="badge badge-gold" style="font-size:0.67rem">📅 ${sesCli.length} ses</span>` : ''}
+        </div>
+        ${planCli ? `<div class="progress-bar-wrap" style="margin-top:6px"><div class="progress-bar" style="width:${progreso}%"></div></div>` : ''}
+      </div>
+      <div style="color:var(--muted);font-size:1.2rem">›</div>
+    </div>`;
+  }).join('');
+}
+
+function abrirFicha(id) {
+  clientaActualId = id;
+  const c = clientas[id];
+  document.getElementById('modal-nombre').textContent = '🌸 ' + c.nombre;
+  const contraFlag = (c.condiciones||[]).length ? `<div class="alert alert-warning">⚠️ Condiciones: ${c.condiciones.join(', ')}</div>` : '';
+  document.getElementById('modal-contenido').innerHTML = `
+    ${contraFlag}
+    <div class="ficha-section"><h4>👤 Datos</h4>
+      <div class="field-row"><div><div class="field-label">Teléfono</div><div class="field-value">${c.tel||'—'}</div></div><div><div class="field-label">Edad</div><div class="field-value">${c.edad||'—'}</div></div></div>
+      <div class="field-row"><div><div class="field-label">Ocupación</div><div class="field-value">${c.ocup||'—'}</div></div><div><div class="field-label">Cargada</div><div class="field-value">${c.fecha}</div></div></div>
+    </div>
+    <div class="ficha-section"><h4>🔬 Piel</h4>
+      <div class="field-row"><div><div class="field-label">Tipo</div><div class="field-value">${c.tpiel||'—'}</div></div><div><div class="field-label">Fototipo</div><div class="field-value">${c.fototipo||'—'}</div></div></div>
+      <div class="field-label" style="margin-top:6px">Problemáticas</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">${(c.problematicas||[]).map(p=>`<span class="badge badge-rose">${p}</span>`).join('')||'—'}</div>
+      ${c.obspiel ? `<div style="margin-top:8px;font-size:0.85rem;color:var(--muted)">${c.obspiel}</div>` : ''}
+    </div>
+    <div class="ficha-section"><h4>🥗 Hábitos</h4>
+      <div class="field-row"><div><div class="field-label">Alimentación</div><div class="field-value">${c.alim||'—'}</div></div><div><div class="field-label">Hidratación</div><div class="field-value">${c.agua||'—'}</div></div></div>
+      <div class="field-row"><div><div class="field-label">Sueño</div><div class="field-value">${c.sueno||'—'}</div></div><div><div class="field-label">Estrés</div><div class="field-value">${c.estres||'—'}</div></div></div>
+      <div class="field-row"><div><div class="field-label">SPF</div><div class="field-value">${c.fps||'—'}</div></div><div><div class="field-label">Ejercicio</div><div class="field-value">${c.ejercicio||'—'}</div></div></div>
+    </div>
+    <div class="ficha-section"><h4>👁️ Cejas & Pestañas</h4>
+      <div class="field-row"><div><div class="field-label">Cejas</div><div class="field-value">${c.cejas||'—'}</div></div><div><div class="field-label">Pestañas</div><div class="field-value">${c.pestanas||'—'}</div></div></div>
+      ${c.alegTinte ? `<div style="margin-top:5px"><span class="field-label">Alergias tinte: </span><span style="color:var(--danger);font-size:0.85rem">${c.alegTinte}</span></div>` : ''}
+    </div>
+    ${c.obs ? `<div class="ficha-section"><h4>📝 Observaciones</h4><p style="font-size:0.86rem">${c.obs}</p></div>` : ''}
+  `;
+  document.getElementById('modal-ia-result').innerHTML = '';
+  document.getElementById('modal-ficha').classList.add('open');
+  // reset tabs
+  document.querySelectorAll('#modal-ficha .tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('#modal-ficha .tab-content').forEach((t,i) => t.classList.toggle('active', i===0));
+}
+
+async function eliminarClientaActual() {
+  if (!clientaActualId) return;
+  const c = clientas[clientaActualId];
+  if (!confirm(`¿Eliminar la ficha de ${c.nombre} y TODOS sus datos?`)) return;
+  // eliminar sesiones y planes de esta clienta
+  for (const id of Object.keys(sesiones)) { if (sesiones[id].clientaId === clientaActualId) await deleteDocF('sesiones', id); }
+  for (const id of Object.keys(planes)) { if (planes[id].clientaId === clientaActualId) await deleteDocF('planes', id); }
+  await deleteDocF('clientas', clientaActualId);
+  delete clientas[clientaActualId];
+  closeModal('modal-ficha');
+  renderClientas();
+  updateStats();
+}
+
+// ====== PLAN DE TRATAMIENTO ======
+function abrirModalPlan() {
+  document.getElementById('plan-fecha-inicio').value = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-plan-form').classList.add('open');
+}
+
+async function guardarPlan() {
+  const trat = v('plan-tratamiento');
+  if (!trat) { alert('Seleccioná un tratamiento'); return; }
+  const totalSes = parseInt(v('plan-total-ses')) || 1;
+  // desactivar planes anteriores
+  for (const id of Object.keys(planes)) {
+    if (planes[id].clientaId === clientaActualId && planes[id].activo) {
+      planes[id].activo = false;
+      await saveDoc('planes', id, planes[id]);
+    }
+  }
+  const id = uid();
+  const plan = {
+    id, clientaId: clientaActualId,
+    tratamiento: trat,
+    totalSesiones: totalSes,
+    frecuencia: v('plan-frecuencia'),
+    fechaInicio: v('plan-fecha-inicio'),
+    precioPorSesion: parseInt(v('plan-precio-ses')) || 0,
+    objetivo: v('plan-objetivo'),
+    productos: v('plan-productos'),
+    activo: true,
+    fechaTs: Date.now()
+  };
+  planes[id] = plan;
+  await saveDoc('planes', id, plan);
+  closeModal('modal-plan-form');
+  renderPlanModal();
+  renderClientas();
+  alert('✅ Plan guardado!');
+}
+
+function renderPlanModal() {
+  const cont = document.getElementById('modal-plan');
+  const planActivo = Object.values(planes).find(p => p.clientaId === clientaActualId && p.activo);
+  const sesPlan = planActivo ? Object.values(sesiones).filter(s => s.planId === planActivo.id) : [];
+  const totalHechas = sesPlan.length;
+  const progreso = planActivo ? Math.min(100, Math.round((totalHechas / planActivo.totalSesiones) * 100)) : 0;
+  const rechazos = Object.values(sesiones).filter(s => s.clientaId === clientaActualId && s.tuvoRechazo);
+
+  let html = `<div class="btn-row" style="margin-bottom:14px">
+    <button class="btn btn-primary btn-sm" onclick="abrirModalPlan()">🎯 ${planActivo ? 'Cambiar Plan' : 'Asignar Plan'}</button>
+    <button class="btn btn-success btn-sm" onclick="abrirModalSesion()">➕ Registrar Sesión</button>
+  </div>`;
+
+  if (planActivo) {
+    html += `<div class="trat-activo">
+      <div class="trat-activo-header">
+        <div>
+          <div class="trat-activo-nombre">🎯 ${planActivo.tratamiento}</div>
+          <div style="font-size:0.78rem;color:var(--muted);margin-top:2px">${planActivo.frecuencia||''} · Inicio: ${planActivo.fechaInicio||'—'}</div>
+        </div>
+        <span class="badge badge-${progreso>=100?'sage':'gold'}">${totalHechas}/${planActivo.totalSesiones} sesiones</span>
+      </div>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:${progreso}%"></div></div>
+      <div class="progress-label">${progreso}% completado${progreso>=100?' ✅ Plan terminado':''}</div>
+      ${planActivo.objetivo ? `<div style="font-size:0.82rem;color:var(--muted);margin-top:8px"><strong>Objetivo:</strong> ${planActivo.objetivo}</div>` : ''}
+      ${planActivo.productos ? `<div style="font-size:0.82rem;color:var(--muted);margin-top:4px"><strong>Productos planificados:</strong> ${planActivo.productos}</div>` : ''}
+    </div>`;
+  } else {
+    html += `<div class="empty-state" style="padding:20px"><div class="icon">🎯</div><p>No hay plan activo. Asigná uno arriba.</p></div>`;
+  }
+
+  if (rechazos.length) {
+    html += `<div class="card" style="margin-top:12px;background:#fff8f8;border-color:#e8c0c0">
+      <div class="card-title" style="color:var(--danger)">⚠️ Rechazos / Reacciones registradas</div>
+      ${rechazos.map(s => `<div style="padding:8px 0;border-bottom:1px solid var(--border);font-size:0.84rem">
+        <strong>${s.fecha}</strong> — <span style="color:var(--danger)">${s.rechazoProd||'producto no especificado'}</span><br>
+        <span style="color:var(--muted)">${s.rechazoDesc||''}</span>
+        ${s.productoReemplazo ? `<br><span style="color:var(--success)">↔️ Reemplazado por: ${s.productoReemplazo}</span>` : ''}
+      </div>`).join('')}
+    </div>`;
+  }
+
+  cont.innerHTML = html;
+}
+
+// ====== SESIONES ======
+function abrirModalSesion() {
+  document.getElementById('ses-fecha').value = new Date().toISOString().split('T')[0];
+  const planActivo = Object.values(planes).find(p => p.clientaId === clientaActualId && p.activo);
+  if (planActivo) document.getElementById('ses-tratamiento').value = planActivo.tratamiento;
+  const sesPlan = planActivo ? Object.values(sesiones).filter(s => s.planId === planActivo.id) : [];
+  document.getElementById('ses-numero').value = sesPlan.length + 1;
+  document.getElementById('ses-tuvo-rechazo').checked = false;
+  document.getElementById('rechazo-detail').style.display = 'none';
+  document.getElementById('modal-sesion-titulo').textContent = clientas[clientaActualId]?.nombre + ' — Nueva Sesión';
+  document.getElementById('modal-sesion').classList.add('open');
+}
+
+async function guardarSesion() {
+  const trat = v('ses-tratamiento');
+  if (!trat) { alert('Seleccioná el tratamiento'); return; }
+  const planActivo = Object.values(planes).find(p => p.clientaId === clientaActualId && p.activo);
+  const tuvoRechazo = vb('ses-tuvo-rechazo');
+  const id = uid();
+  const ses = {
+    id, clientaId: clientaActualId,
+    planId: planActivo ? planActivo.id : null,
+    fecha: v('ses-fecha') || new Date().toLocaleDateString('es-AR'),
+    fechaTs: Date.now(),
+    numero: parseInt(v('ses-numero')) || 1,
+    tratamiento: trat,
+    estadoPiel: v('ses-estado-piel'),
+    duracion: v('ses-duracion'),
+    productos: v('ses-productos'),
+    reaccion: v('ses-reaccion'),
+    tuvoRechazo,
+    rechazoProd: tuvoRechazo ? v('ses-rechazo-producto') : '',
+    rechazoDesc: tuvoRechazo ? v('ses-rechazo-desc') : '',
+    productoReemplazo: tuvoRechazo ? v('ses-producto-reemplazado') : '',
+    notaProxima: v('ses-proxima'),
+    precio: parseInt(v('ses-precio')) || 0,
+    pago: v('ses-pago')
+  };
+  sesiones[id] = ses;
+  await saveDoc('sesiones', id, ses);
+  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-producto','ses-rechazo-desc','ses-producto-reemplazado'].forEach(i => { const el = document.getElementById(i); if(el) el.value=''; });
+  closeModal('modal-sesion');
+  renderPlanModal();
+  renderHistorialModal();
+  renderClientas();
+  updateStats();
+  alert('✅ Sesión registrada!');
+}
+
+function renderHistorialModal() {
+  const cont = document.getElementById('modal-historial');
+  const sesCli = Object.values(sesiones).filter(s => s.clientaId === clientaActualId).sort((a,b) => b.fechaTs - a.fechaTs);
+  if (!sesCli.length) {
+    cont.innerHTML = `<div class="empty-state" style="padding:20px"><div class="icon">📅</div><p>No hay sesiones registradas todavía.<br>Asigná un plan y registrá la primera sesión.</p></div>`;
+    return;
+  }
+  cont.innerHTML = `<div style="margin-bottom:10px;font-size:0.82rem;color:var(--muted)">${sesCli.length} sesión${sesCli.length>1?'es':''} en total</div>` +
+  sesCli.map(s => `
+    <div class="sesion-item">
+      <div class="sesion-item-header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div class="sesion-num">${s.numero||'?'}</div>
+          <div>
+            <div style="font-weight:600;font-size:0.88rem">${s.tratamiento}</div>
+            <div style="font-size:0.75rem;color:var(--muted)">${s.fecha}${s.duracion ? ' · '+s.duracion+' min' : ''}</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:5px;align-items:center">
+          ${s.precio ? `<span class="badge badge-gold">$${s.precio.toLocaleString('es-AR')}</span>` : ''}
+          ${s.tuvoRechazo ? `<span class="rechazo-tag">⚠️ Rechazo</span>` : ''}
+        </div>
+      </div>
+      ${s.estadoPiel ? `<div style="font-size:0.8rem;color:var(--muted);margin-top:6px">Estado piel: ${s.estadoPiel}</div>` : ''}
+      ${s.productos ? `<div style="font-size:0.8rem;margin-top:5px"><strong>Usados:</strong> ${s.productos}</div>` : ''}
+      ${s.reaccion ? `<div style="font-size:0.8rem;margin-top:5px;background:var(--light);padding:7px;border-radius:7px">${s.reaccion}</div>` : ''}
+      ${s.tuvoRechazo ? `<div style="font-size:0.8rem;margin-top:5px;background:#fff0f0;padding:7px;border-radius:7px;color:var(--danger)">⚠️ Rechazo a: <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?'<br>'+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ Reemplazado por: '+s.productoReemplazo:''}</div>` : ''}
+      ${s.notaProxima ? `<div style="font-size:0.8rem;margin-top:5px;background:#e8f7ee;padding:7px;border-radius:7px;color:#2a5a3a">📌 Próxima: ${s.notaProxima}</div>` : ''}
+      <div style="text-align:right;margin-top:8px">
+        <button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function eliminarSesion(id) {
+  if (!confirm('¿Eliminar esta sesión?')) return;
+  delete sesiones[id];
+  await deleteDocF('sesiones', id);
+  renderHistorialModal();
+  renderPlanModal();
+  renderClientas();
+  updateStats();
+}
+
+// ====== FOTOS ======
+function renderFotosModal() {
+  const c = clientas[clientaActualId];
+  const cont = document.getElementById('modal-fotos-container');
+  if (!c.fotos || !c.fotos.length) {
+    cont.innerHTML = `<div style="color:var(--muted);font-size:0.84rem;margin-top:8px">📸 Sin fotos todavía.</div>`;
+    return;
+  }
+  cont.innerHTML = `<div style="margin-bottom:8px;font-size:0.8rem;color:var(--muted)">${c.fotos.length} foto${c.fotos.length>1?'s':''}</div><div class="foto-grid">${c.fotos.map(f=>`<img class="foto-thumb" src="${f.data}" title="${f.fecha}" onclick="verFoto('${f.data}')">`).join('')}</div>`;
+}
+
+function agregarFotoClienta(event) {
+  if (!clientaActualId) return;
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const c = clientas[clientaActualId];
+    c.fotos = c.fotos || [];
+    c.fotos.push({ data: e.target.result, fecha: new Date().toLocaleDateString('es-AR') });
+    await saveDoc('clientas', clientaActualId, c);
+    renderFotosModal();
+  };
+  reader.readAsDataURL(file);
+}
+
+function verFoto(src) { const w = window.open(); w.document.write(`<img src="${src}" style="max-width:100%;max-height:100vh">`); }
+
+// ====== NOTAS ======
+function renderNotasModal() {
+  const c = clientas[clientaActualId];
+  const notas = c.notas || [];
+  const cont = document.getElementById('lista-notas-modal');
+  if (!notas.length) { cont.innerHTML = `<div style="color:var(--muted);font-size:0.84rem;text-align:center;padding:14px">Sin notas todavía.</div>`; return; }
+  cont.innerHTML = notas.slice().reverse().map((n, ri) => {
+    const i = notas.length - 1 - ri;
+    return `<div style="background:var(--light);border-radius:9px;padding:11px 13px;margin-bottom:9px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;gap:8px">
+        <div style="font-size:0.86rem;line-height:1.6;flex:1">${n.texto}</div>
+        <button onclick="eliminarNota(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;flex-shrink:0">×</button>
+      </div>
+      <div style="font-size:0.71rem;color:var(--muted);margin-top:5px">${n.fecha}</div>
+    </div>`;
+  }).join('');
+}
+
+async function guardarNota() {
+  if (!clientaActualId) return;
+  const texto = document.getElementById('nueva-nota-texto').value.trim();
+  if (!texto) return;
+  const c = clientas[clientaActualId];
+  c.notas = c.notas || [];
+  c.notas.push({ texto, fecha: new Date().toLocaleString('es-AR') });
+  await saveDoc('clientas', clientaActualId, c);
+  document.getElementById('nueva-nota-texto').value = '';
+  renderNotasModal();
+  renderClientas();
+}
+
+async function eliminarNota(idx) {
+  if (!confirm('¿Eliminar nota?')) return;
+  const c = clientas[clientaActualId];
+  c.notas.splice(idx, 1);
+  await saveDoc('clientas', clientaActualId, c);
+  renderNotasModal();
+}
+
+// ====== PRODUCTOS ======
+async function agregarProducto() {
+  const nombre = v('prod-nombre').trim();
+  if (!nombre) { alert('Ingresá el nombre'); return; }
+  const id = uid();
+  const prod = { id, nombre, categoria: v('prod-cat'), marca: v('prod-marca'), stock: v('prod-stock'), uso: v('prod-uso'), notas: v('prod-notas'), fechaTs: Date.now() };
+  productos[id] = prod;
+  await saveDoc('productos', id, prod);
+  ['prod-nombre','prod-marca','prod-uso','prod-notas'].forEach(i => document.getElementById(i).value='');
+  updateStats();
+  renderProductos();
+}
+
+function renderProductos() {
+  const cont = document.getElementById('lista-productos');
+  const lista = Object.values(productos).sort((a,b) => (b.fechaTs||0)-(a.fechaTs||0));
+  if (!lista.length) { cont.innerHTML = `<div class="empty-state"><div class="icon">🧴</div><p>Agregá tus productos.</p></div>`; return; }
+  const sc = {ok:'stock-ok',low:'stock-low',out:'stock-out'};
+  cont.innerHTML = lista.map(p => `<div class="product-item">
+    <div><div style="font-weight:600;font-size:0.88rem">${p.nombre}</div><div style="font-size:0.76rem;color:var(--muted)">${p.categoria}${p.marca?' · '+p.marca:''}${p.uso?' · '+p.uso:''}</div></div>
+    <div style="display:flex;align-items:center;gap:7px"><div class="stock-indicator ${sc[p.stock]||'stock-ok'}"></div><button class="btn btn-danger btn-sm" onclick="eliminarProducto('${p.id}')">×</button></div>
+  </div>`).join('');
+}
+
+async function eliminarProducto(id) {
+  if (!confirm('¿Eliminar?')) return;
+  delete productos[id];
+  await deleteDocF('productos', id);
+  renderProductos();
+  updateStats();
+}
+
+// ====== PRECIOS ======
+const preciosDefault = {
+  facial:[
+    {nombre:'Limpieza facial profunda',precio:20000,desc:'Completa con extracción y mascarilla'},
+    {nombre:'Hidratación profunda',precio:22000,desc:'Piel seca y deshidratada'},
+    {nombre:'Anti-acné',precio:22000,desc:'Con alta frecuencia y arcilla verde'},
+    {nombre:'Anti-manchas / luminosidad',precio:24000,desc:'Vitamina C + despigmentantes + LED'},
+    {nombre:'Anti-edad / lifting facial',precio:26000,desc:'Colágeno, péptidos, LED rojo'},
+    {nombre:'Piel sensible / rosácea',precio:20000,desc:'Protocolo calmante'},
+    {nombre:'Peeling químico superficial',precio:22000,desc:'AHA/BHA, renueva e ilumina'},
+  ],
+  cejas:[
+    {nombre:'Perfilado de cejas (hilo)',precio:8000,desc:'Diseño y depilación'},
+    {nombre:'Henna de cejas',precio:15000,desc:'Color natural + diseño'},
+    {nombre:'Tinte de cejas',precio:10000,desc:'Color permanente 4-6 sem'},
+    {nombre:'Tinte de pestañas',precio:10000,desc:'Define y oscurece'},
+    {nombre:'Laminado de cejas',precio:20000,desc:'Efecto peinado 4-6 sem'},
+    {nombre:'Lifting de pestañas',precio:22000,desc:'Curvatura 6-8 sem'},
+    {nombre:'Lifting + tinte pestañas',precio:28000,desc:'Mirada completa'},
+  ],
+  combos:[
+    {nombre:'Limpieza + perfilado cejas',precio:24000,desc:'Rostro limpio y cejas en armonía'},
+    {nombre:'Lifting + laminado cejas',precio:35000,desc:'Mirada completa transformada'},
+    {nombre:'Lifting + laminado + perfilado',precio:38000,desc:'Pack mirada total'},
+    {nombre:'Perfilado + laminado cejas',precio:24000,desc:'Cejas definidas y peinadas'},
+    {nombre:'Limpieza + peeling',precio:26000,desc:'Renueva e ilumina'},
+    {nombre:'Henna + perfilado cejas',precio:20000,desc:'Diseño + color natural'},
+  ],
+  planes:[
+    {nombre:'Plan hidratación x 4 sesiones',precio:72000,desc:'Ahorrás $16.000'},
+    {nombre:'Plan anti-acné x 6 sesiones',precio:110000,desc:'Ahorrás $22.000'},
+    {nombre:'Plan anti-manchas x 8 sesiones',precio:160000,desc:'Ahorrás $32.000'},
+    {nombre:'Plan anti-edad x 6 sesiones',precio:130000,desc:'Ahorrás $26.000'},
+    {nombre:'Pack lifting x 3 (mantenimiento)',precio:58000,desc:'Ahorrás $8.000'},
+  ]
+};
+
+let misPrecios = JSON.parse(localStorage.getItem('ginails_precios') || 'null');
+if (!misPrecios) { misPrecios = JSON.parse(JSON.stringify(preciosDefault)); localStorage.setItem('ginails_precios', JSON.stringify(misPrecios)); }
+
+function savePrecios() { localStorage.setItem('ginails_precios', JSON.stringify(misPrecios)); }
+
+function renderTodosPrecios() { ['facial','cejas','combos','planes'].forEach(renderPrecios); }
+
+function renderPrecios(cat) {
+  const cont = document.getElementById('lista-precios-' + cat);
+  if (!cont) return;
+  cont.innerHTML = misPrecios[cat].map((s,i) => `
+    <div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1"><div style="font-weight:600;font-size:0.88rem">${s.nombre}</div><div style="font-size:0.76rem;color:var(--muted)">${s.desc||''}</div></div>
+      <div style="display:flex;align-items:center;gap:5px;flex-shrink:0">
+        <span style="font-size:0.73rem;color:var(--muted)">$</span>
+        <input type="number" value="${s.precio}" min="0" onchange="misPrecios['${cat}'][${i}].precio=parseInt(this.value)||0;savePrecios()" style="width:85px;padding:5px 7px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:700;color:var(--rose);text-align:right;background:var(--light)">
+        <button onclick="eliminarPrecio('${cat}',${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">×</button>
+      </div>
+    </div>`).join('');
+}
+
+function eliminarPrecio(cat, idx) {
+  if (!confirm('¿Eliminar?')) return;
+  misPrecios[cat].splice(idx,1);
+  savePrecios();
+  renderPrecios(cat);
+}
+
+function agregarPrecio(cat) {
+  const nombre = prompt('Nombre del servicio:');
+  if (!nombre) return;
+  const precio = parseInt(prompt('Precio ($):') || '0') || 0;
+  const desc = prompt('Descripción corta (opcional):') || '';
+  misPrecios[cat].push({nombre,precio,desc});
+  savePrecios();
+  renderPrecios(cat);
+}
+
+// ====== IA ======
+async function sugerirTratClientaActual() {
+  if (!clientaActualId) return;
+  const c = clientas[clientaActualId];
+  const rd = document.getElementById('modal-ia-result');
+  rd.innerHTML = `<div class="ai-box"><div class="ai-loading">✨ Analizando perfil de ${c.nombre}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
+  const sesCli = Object.values(sesiones).filter(s => s.clientaId === clientaActualId);
+  const rechazos = sesCli.filter(s => s.tuvoRechazo).map(s => `${s.rechazoProd} (sesión ${s.numero})`).join(', ');
+  const prompt = `Sos una cosmetóloga profesional argentina. Analizá este perfil completo:
+NOMBRE: ${c.nombre}
+PIEL: ${c.tpiel} | Fototipo: ${c.fototipo} | Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
+CONDICIONES MÉDICAS: ${(c.condiciones||[]).join(', ')||'ninguna'} | Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'}
+HÁBITOS: Alimentación ${c.alim} | Agua ${c.agua} | Sueño ${c.sueno} | Estrés ${c.estres} | SPF ${c.fps}
+CEJAS: ${c.cejas} | PESTAÑAS: ${c.pestanas} | Alergias tinte: ${c.alegTinte||'ninguna'}
+OBJETIVO: ${c.objetivo||'no especificado'}
+SESIONES REALIZADAS: ${sesCli.length}
+RECHAZOS A PRODUCTOS: ${rechazos||'ninguno'}
+NOTAS EXTRA: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
+Generá:
+1. Diagnóstico cutáneo breve
+2. Plan de tratamientos recomendados con cantidad de sesiones
+3. Tratamientos contraindicados para este caso
+4. Skincare domiciliario personalizado
+5. Consejos de hábitos según su perfil
+Respondé en español rioplatense, tono cálido y profesional.`;
+  await callIA(prompt, rd);
+}
+
+async function sugerirTratamientosIA() {
+  const rd = document.getElementById('ia-resultado');
+  rd.innerHTML = `<div class="ai-box"><div class="ai-loading">✨ Generando plan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
+  const prompt = `Sos una cosmetóloga profesional argentina. Basándote en este perfil:
+Tipo de piel: ${v('nc-tpiel')||'no especificado'}
+Problemáticas: ${Array.from(document.querySelectorAll('.prob:checked')).map(i=>i.parentElement.textContent.trim()).join(', ')||'no especificadas'}
+Medicación: ${v('nc-medicacion')||'ninguna'}
+Condiciones: ${getChecked('#condiciones-check').join(', ')||'ninguna'}
+Cejas: ${v('nc-cejas')} | Pestañas: ${v('nc-pestanas')}
+Generá: 1. Tratamientos faciales recomendados 2. Cejas/pestañas si corresponde 3. Contraindicaciones 4. Domiciliario 5. Hábitos. Tono cálido y práctico.`;
+  await callIA(prompt, rd);
+}
+
+async function planTratamientoIA() {
+  if (!Object.keys(productos).length) { alert('Primero agregá productos'); return; }
+  const rd = document.getElementById('ia-productos');
+  rd.innerHTML = `<div class="ai-box"><div class="ai-loading">🤖 Armando plan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
+  const lista = Object.values(productos).map(p=>`- ${p.nombre} (${p.categoria}${p.marca?', '+p.marca:''}) — ${p.uso||'general'}`).join('\n');
+  await callIA(`Sos una cosmetóloga argentina. Con estos productos:\n${lista}\nArmame: 1. Qué tratamientos puedo ofrecer 2. Protocolo ejemplo por tratamiento 3. Qué me falta comprar para ampliar. Respuesta práctica en español rioplatense.`, rd);
+}
+
+async function callIA(prompt, resultDiv) {
+  try {
+    const r = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1200, messages:[{role:"user",content:prompt}] })
+    });
+    const data = await r.json();
+    const text = data.content.map(i=>i.text||'').join('\n');
+    resultDiv.innerHTML = `<div class="ai-box"><div style="font-size:0.86rem;line-height:1.8;white-space:pre-wrap">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
+  } catch(e) {
+    resultDiv.innerHTML = `<div class="alert alert-warning">❌ Error al conectar con la IA. Revisá tu conexión.</div>`;
+  }
+}
+
+// ====== PRESUPUESTOS ======
+let presupuestos = JSON.parse(localStorage.getItem('g_presupuestos') || '{}');
+let gastos = JSON.parse(localStorage.getItem('g_gastos') || '{}');
+let presItems = [];
+
+function poblarSelectClientas() {
+  const lista = Object.values(clientas).sort((a,b) => a.nombre.localeCompare(b.nombre));
+  const opts = `<option value="">Sin clienta asignada</option>` + lista.map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  const el = document.getElementById('pres-clienta');
+  if (el) el.innerHTML = opts;
+}
+
+function initPresItems() {
+  presItems = [{desc:'',cant:1,precio:0}];
+  renderPresItems();
+}
+
+function agregarItemPres() { presItems.push({desc:'',cant:1,precio:0}); renderPresItems(); }
+
+function renderPresItems() {
+  const cont = document.getElementById('pres-items-container');
+  if (!cont) return;
+  cont.innerHTML = presItems.map((item,i) => `
+    <div style="display:grid;grid-template-columns:1fr 55px 95px 32px;gap:6px;margin-bottom:6px;align-items:center">
+      <input type="text" value="${item.desc}" placeholder="Servicio / combo" onchange="presItems[${i}].desc=this.value" style="padding:7px 9px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+      <input type="number" value="${item.cant}" min="1" onchange="presItems[${i}].cant=parseInt(this.value)||1;calcTotal()" style="padding:7px 6px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.84rem;text-align:center;background:var(--light)">
+      <input type="number" value="${item.precio}" min="0" placeholder="$" onchange="presItems[${i}].precio=parseFloat(this.value)||0;calcTotal()" style="padding:7px 9px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+      <button onclick="quitarItemPres(${i})" style="background:var(--danger);color:white;border:none;border-radius:7px;width:32px;height:32px;cursor:pointer">×</button>
+    </div>`).join('');
+  calcTotal();
+}
+
+function quitarItemPres(i) { presItems.splice(i,1); if(!presItems.length) presItems=[{desc:'',cant:1,precio:0}]; renderPresItems(); }
+
+function calcTotal() {
+  const t = presItems.reduce((s,it)=>s+(it.precio*it.cant),0);
+  const el = document.getElementById('pres-total-display');
+  if (el) el.textContent = '$' + t.toLocaleString('es-AR');
+}
+
+async function guardarPresupuesto() {
+  const nombre = v('pres-nombre').trim();
+  if (!nombre) { alert('Poné un nombre al presupuesto'); return; }
+  const cidx = v('pres-clienta');
+  const total = presItems.reduce((s,it)=>s+(it.precio*it.cant),0);
+  const id = uid();
+  const pres = {
+    id, nombre,
+    clientaId: cidx||null,
+    clientaNombre: cidx ? (clientas[cidx]?.nombre||'—') : '—',
+    fecha: v('pres-fecha')||new Date().toLocaleDateString('es-AR'),
+    fechaTs: Date.now(),
+    items: JSON.parse(JSON.stringify(presItems)),
+    total, notas: v('pres-notas'), estado: v('pres-estado')
+  };
+  presupuestos[id] = pres;
+  if (useFirebase) await saveDoc('presupuestos', id, pres);
+  else localStorage.setItem('g_presupuestos', JSON.stringify(presupuestos));
+  document.getElementById('pres-nombre').value = '';
+  document.getElementById('pres-notas').value = '';
+  initPresItems();
+  renderPresupuestos();
+  alert('✅ Presupuesto guardado!');
+}
+
+function renderPresupuestos() {
+  const cont = document.getElementById('lista-presupuestos');
+  if (!cont) return;
+  const lista = Object.values(presupuestos).sort((a,b)=>b.fechaTs-a.fechaTs);
+  if (!lista.length) { cont.innerHTML=`<div class="empty-state"><div class="icon">🧾</div><p>Sin presupuestos todavía.</p></div>`; return; }
+  const ecol = {pendiente:'badge-gold',aprobado:'badge-sage',rechazado:'badge-rose'};
+  const elab = {pendiente:'⏳ Pendiente',aprobado:'✅ Aprobado',rechazado:'❌ Rechazado'};
+  cont.innerHTML = lista.map((p,ri) => `
+    <div class="card" style="margin-bottom:11px">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
+        <div><div style="font-weight:700;font-size:0.92rem">${p.nombre}</div><div style="font-size:0.78rem;color:var(--muted)">${p.clientaNombre} · ${p.fecha}</div></div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge ${ecol[p.estado]||'badge-gold'}">${elab[p.estado]||p.estado}</span>
+          <span style="font-size:1rem;font-weight:700;color:var(--rose)">$${p.total.toLocaleString('es-AR')}</span>
+        </div>
+      </div>
+      <div style="margin-top:10px">
+        ${p.items.map(it=>`<div style="display:flex;justify-content:space-between;font-size:0.83rem;padding:4px 0;border-bottom:1px solid var(--border)"><span>${it.cant}x ${it.desc||'—'}</span><span style="font-weight:600">$${(it.precio*it.cant).toLocaleString('es-AR')}</span></div>`).join('')}
+        <div style="display:flex;justify-content:space-between;padding:7px 0;font-weight:700"><span>Total</span><span style="color:var(--rose)">$${p.total.toLocaleString('es-AR')}</span></div>
+      </div>
+      ${p.notas?`<div style="font-size:0.8rem;color:var(--muted);font-style:italic">${p.notas}</div>`:''}
+      <div style="margin-top:10px;display:flex;gap:7px;flex-wrap:wrap">
+        <button class="btn btn-sm" style="background:#e8f7ee;color:#2a5a3a;border:none;cursor:pointer" onclick="cambiarEstadoPres('${p.id}','aprobado')">✅ Aprobar</button>
+        <button class="btn btn-sm" style="background:#fdf3e3;color:#8a6a20;border:none;cursor:pointer" onclick="cambiarEstadoPres('${p.id}','pendiente')">⏳ Pendiente</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarPres('${p.id}')">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function cambiarEstadoPres(id, estado) {
+  presupuestos[id].estado = estado;
+  if (useFirebase) await saveDoc('presupuestos', id, presupuestos[id]);
+  else localStorage.setItem('g_presupuestos', JSON.stringify(presupuestos));
+  renderPresupuestos();
+}
+
+async function eliminarPres(id) {
+  if (!confirm('¿Eliminar?')) return;
+  delete presupuestos[id];
+  if (useFirebase) await fs.deleteDoc(fs.doc(db,'presupuestos',id));
+  else localStorage.setItem('g_presupuestos', JSON.stringify(presupuestos));
+  renderPresupuestos();
+}
+
+// ====== GASTOS ======
+async function guardarGasto() {
+  const desc = v('gasto-desc').trim();
+  const monto = parseFloat(v('gasto-monto'));
+  if (!desc || !monto) { alert('Completá descripción y monto'); return; }
+  const id = uid();
+  const gasto = {
+    id, desc, monto,
+    categoria: v('gasto-cat'),
+    fecha: v('gasto-fecha')||new Date().toLocaleDateString('es-AR'),
+    fechaTs: Date.now(),
+    notas: v('gasto-notas')
+  };
+  gastos[id] = gasto;
+  if (useFirebase) await saveDoc('gastos', id, gasto);
+  else localStorage.setItem('g_gastos', JSON.stringify(gastos));
+  ['gasto-desc','gasto-monto','gasto-notas'].forEach(i=>document.getElementById(i).value='');
+  renderGastos();
+  actualizarResumen();
+}
+
+function renderGastos() {
+  const cont = document.getElementById('lista-gastos');
+  if (!cont) return;
+  const filtro = document.getElementById('gasto-filtro')?.value || '';
+  let lista = Object.values(gastos).sort((a,b)=>b.fechaTs-a.fechaTs);
+  if (filtro) lista = lista.filter(g=>g.categoria===filtro);
+  if (!lista.length) { cont.innerHTML=`<div class="empty-state"><div class="icon">📊</div><p>Sin gastos${filtro?' en esta categoría':''} todavía.</p></div>`; return; }
+  const catColors = {
+    'Productos cosméticos':'badge-rose','Insumos / descartables':'badge-gold',
+    'Reutilizables':'badge-sage','Aparatología':'badge-blue',
+    'Kits cejas / pestañas':'badge-rose','Capacitación / cursos':'badge-gold','Otros':'badge-sage'
+  };
+  cont.innerHTML = lista.map(g => `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+      <div style="flex:1">
+        <div style="font-weight:600;font-size:0.88rem">${g.desc}</div>
+        <div style="display:flex;gap:6px;align-items:center;margin-top:3px;flex-wrap:wrap">
+          <span class="badge ${catColors[g.categoria]||'badge-sage'}" style="font-size:0.68rem">${g.categoria}</span>
+          <span style="font-size:0.76rem;color:var(--muted)">${g.fecha}</span>
+          ${g.notas?`<span style="font-size:0.76rem;color:var(--muted)">${g.notas}</span>`:''}
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <span style="font-weight:700;color:var(--danger)">-$${g.monto.toLocaleString('es-AR')}</span>
+        <button onclick="eliminarGasto('${g.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem">×</button>
+      </div>
+    </div>`).join('');
+}
+
+async function eliminarGasto(id) {
+  if (!confirm('¿Eliminar este gasto?')) return;
+  delete gastos[id];
+  if (useFirebase) await fs.deleteDoc(fs.doc(db,'gastos',id));
+  else localStorage.setItem('g_gastos', JSON.stringify(gastos));
+  renderGastos();
+  actualizarResumen();
+}
+
+function actualizarResumen() {
+  const totalGastado = Object.values(gastos).reduce((s,g)=>s+g.monto,0);
+  const totalCobrado = Object.values(sesiones).reduce((s,ses)=>s+(ses.precio||0),0);
+  const ganancia = totalCobrado - totalGastado;
+  const elG = document.getElementById('res-gastos');
+  const elC = document.getElementById('res-cobrado');
+  const elN = document.getElementById('res-ganancia');
+  if (elG) elG.textContent = '$' + totalGastado.toLocaleString('es-AR');
+  if (elC) elC.textContent = '$' + totalCobrado.toLocaleString('es-AR');
+  if (elN) {
+    elN.textContent = (ganancia>=0?'+':'') + '$' + ganancia.toLocaleString('es-AR');
+    elN.style.color = ganancia >= 0 ? 'var(--success)' : 'var(--danger)';
+  }
+}
+
+// ====== PATCH showSection to handle new sections ======
+const _origShowSection = showSection;
+window.showSection = function(id, btn) {
+  _origShowSection(id, btn);
+  if (id === 'presupuestos') { poblarSelectClientas(); renderPresupuestos(); document.getElementById('pres-fecha').value = new Date().toISOString().split('T')[0]; initPresItems(); }
+  if (id === 'gastos') { renderGastos(); actualizarResumen(); document.getElementById('gasto-fecha').value = new Date().toISOString().split('T')[0]; }
+};
+
+// PATCH loadAllFromFirebase to also load presupuestos and gastos
+const _origLoad = loadAllFromFirebase;
+window.loadAllFromFirebase = async function() {
+  await _origLoad();
+  const snapP = await fs.getDocs(fs.collection(db,'presupuestos'));
+  snapP.forEach(d => presupuestos[d.id] = d.data());
+  const snapG = await fs.getDocs(fs.collection(db,'gastos'));
+  snapG.forEach(d => gastos[d.id] = d.data());
+};
+
+// init presItems on load
+initPresItems();
+</script>
+</body>
+</html>
