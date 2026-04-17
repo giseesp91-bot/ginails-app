@@ -1517,14 +1517,17 @@ async function planTratamientoIA() {
   await callIA(`Sos una cosmetóloga argentina. Con estos productos:\n${lista}\nArmame: 1. Qué tratamientos puedo ofrecer 2. Protocolo ejemplo por tratamiento 3. Qué me falta comprar para ampliar. Respuesta práctica en español rioplatense.`, rd);
 }
 
+const WORKER_URL = "https://ginails-ia.gis-eesp91.workers.dev";
+
 async function callIA(prompt, resultDiv) {
   try {
-    const r = await fetch("https://api.anthropic.com/v1/messages", {
-      method:"POST", headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1200, messages:[{role:"user",content:prompt}] })
+    const r = await fetch(WORKER_URL, {
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({ prompt })
     });
     const data = await r.json();
-    const text = data.content.map(i=>i.text||'').join('\n');
+    const text = data.text || 'No se pudo generar respuesta.';
     resultDiv.innerHTML = `<div class="ai-box"><div style="font-size:0.86rem;line-height:1.8;white-space:pre-wrap">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div></div>`;
   } catch(e) {
     resultDiv.innerHTML = `<div class="alert alert-warning">❌ Error al conectar con la IA. Revisá tu conexión.</div>`;
