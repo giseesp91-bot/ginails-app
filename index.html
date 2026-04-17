@@ -1476,36 +1476,66 @@ async function sugerirTratClientaActual() {
   rd.innerHTML = `<div class="ai-box"><div class="ai-loading">✨ Analizando perfil de ${c.nombre}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
   const sesCli = Object.values(sesiones).filter(s => s.clientaId === clientaActualId);
   const rechazos = sesCli.filter(s => s.tuvoRechazo).map(s => `${s.rechazoProd} (sesión ${s.numero})`).join(', ');
-  const prompt = `Sos una cosmetóloga profesional argentina. Analizá este perfil completo:
-NOMBRE: ${c.nombre}
-PIEL: ${c.tpiel} | Fototipo: ${c.fototipo} | Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
-CONDICIONES MÉDICAS: ${(c.condiciones||[]).join(', ')||'ninguna'} | Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'}
-HÁBITOS: Alimentación ${c.alim} | Agua ${c.agua} | Sueño ${c.sueno} | Estrés ${c.estres} | SPF ${c.fps}
-CEJAS: ${c.cejas} | PESTAÑAS: ${c.pestanas} | Alergias tinte: ${c.alegTinte||'ninguna'}
-OBJETIVO: ${c.objetivo||'no especificado'}
-SESIONES REALIZADAS: ${sesCli.length}
-RECHAZOS A PRODUCTOS: ${rechazos||'ninguno'}
-NOTAS EXTRA: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
-Generá:
-1. Diagnóstico cutáneo breve
-2. Plan de tratamientos recomendados con cantidad de sesiones
-3. Tratamientos contraindicados para este caso
-4. Skincare domiciliario personalizado
-5. Consejos de hábitos según su perfil
-Respondé en español rioplatense, tono cálido y profesional.`;
+  const prompt = `Sos una cosmetóloga profesional experta con 15 años de experiencia. Estás asistiendo a una colega que puede ser principiante. Analizá este perfil de clienta y generá un plan de trabajo DETALLADO para el GABINETE. Respondé en español rioplatense, de forma clara, práctica y profesional. NO des consejos a la clienta — hablale SIEMPRE a la cosmetóloga.
+
+PERFIL DE LA CLIENTA:
+- Nombre: ${c.nombre}
+- Tipo de piel: ${c.tpiel} | Fototipo: ${c.fototipo}
+- Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
+- Condiciones médicas: ${(c.condiciones||[]).join(', ')||'ninguna'}
+- Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'}
+- Alimentación: ${c.alim} | Agua: ${c.agua} | Sueño: ${c.sueno} | Estrés: ${c.estres} | SPF: ${c.fps}
+- Cejas: ${c.cejas} | Pestañas: ${c.pestanas} | Alergias tinte: ${c.alegTinte||'ninguna'}
+- Objetivo: ${c.objetivo||'no especificado'}
+- Sesiones realizadas: ${sesCli.length}
+- Rechazos a productos anteriores: ${rechazos||'ninguno'}
+- Notas adicionales: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
+
+Generá la siguiente información para la cosmetóloga:
+
+**1. DIAGNÓSTICO PROFESIONAL**
+Describí brevemente qué tipo de piel es, qué está pasando y cuáles son las prioridades a trabajar.
+
+**2. TRATAMIENTOS RECOMENDADOS (en orden de prioridad)**
+Para cada tratamiento indicá:
+- Nombre del tratamiento
+- Por qué está indicado para ESTE caso específico
+- Cantidad de sesiones recomendadas y frecuencia
+- Pasos del protocolo a seguir en el gabinete (numerados)
+- Productos a usar en cada paso (con activos específicos)
+- Aparatología a usar (si corresponde)
+- Qué observar y cómo saber si está funcionando
+
+**3. TRATAMIENTOS PROHIBIDOS O A EVITAR**
+Qué NO podés hacer con esta clienta y por qué. Sé específica.
+
+**4. PRODUCTOS PARA RECOMENDAR A DOMICILIO**
+Qué le mandás a hacer en casa (rutina mañana y noche), con activos específicos y por qué cada uno.
+
+**5. ADVERTENCIAS Y TIPS PROFESIONALES**
+Cosas importantes a tener en cuenta con esta clienta específica antes de empezar.`;
   await callIA(prompt, rd);
 }
 
 async function sugerirTratamientosIA() {
   const rd = document.getElementById('ia-resultado');
   rd.innerHTML = `<div class="ai-box"><div class="ai-loading">✨ Generando plan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
-  const prompt = `Sos una cosmetóloga profesional argentina. Basándote en este perfil:
-Tipo de piel: ${v('nc-tpiel')||'no especificado'}
-Problemáticas: ${Array.from(document.querySelectorAll('.prob:checked')).map(i=>i.parentElement.textContent.trim()).join(', ')||'no especificadas'}
-Medicación: ${v('nc-medicacion')||'ninguna'}
-Condiciones: ${getChecked('#condiciones-check').join(', ')||'ninguna'}
-Cejas: ${v('nc-cejas')} | Pestañas: ${v('nc-pestanas')}
-Generá: 1. Tratamientos faciales recomendados 2. Cejas/pestañas si corresponde 3. Contraindicaciones 4. Domiciliario 5. Hábitos. Tono cálido y práctico.`;
+  const prompt = `Sos una cosmetóloga profesional experta con 15 años de experiencia. Estás asistiendo a una colega que puede ser principiante. Analizá este perfil y generá un plan de trabajo DETALLADO para el GABINETE. Respondé en español rioplatense. NO des consejos a la clienta — hablale SIEMPRE a la cosmetóloga.
+
+PERFIL:
+- Tipo de piel: ${v('nc-tpiel')||'no especificado'}
+- Problemáticas: ${Array.from(document.querySelectorAll('.prob:checked')).map(i=>i.parentElement.textContent.trim()).join(', ')||'no especificadas'}
+- Medicación: ${v('nc-medicacion')||'ninguna'}
+- Condiciones: ${getChecked('#condiciones-check').join(', ')||'ninguna'}
+- Cejas: ${v('nc-cejas')} | Pestañas: ${v('nc-pestanas')}
+- Objetivo: ${v('nc-objetivo')||'no especificado'}
+
+Generá:
+**1. DIAGNÓSTICO PROFESIONAL** - qué tipo de piel es y prioridades
+**2. TRATAMIENTOS RECOMENDADOS** - para cada uno: por qué, sesiones, pasos del protocolo, productos y activos, aparatología
+**3. TRATAMIENTOS PROHIBIDOS** - qué no hacer y por qué
+**4. DOMICILIARIO** - rutina mañana/noche con activos específicos
+**5. TIPS PROFESIONALES** - advertencias importantes para esta clienta`;
   await callIA(prompt, rd);
 }
 
@@ -1514,7 +1544,7 @@ async function planTratamientoIA() {
   const rd = document.getElementById('ia-productos');
   rd.innerHTML = `<div class="ai-box"><div class="ai-loading">🤖 Armando plan<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
   const lista = Object.values(productos).map(p=>`- ${p.nombre} (${p.categoria}${p.marca?', '+p.marca:''}) — ${p.uso||'general'}`).join('\n');
-  await callIA(`Sos una cosmetóloga argentina. Con estos productos:\n${lista}\nArmame: 1. Qué tratamientos puedo ofrecer 2. Protocolo ejemplo por tratamiento 3. Qué me falta comprar para ampliar. Respuesta práctica en español rioplatense.`, rd);
+  await callIA(`Sos una cosmetóloga profesional experta. Tengo estos productos disponibles en mi gabinete:\n${lista}\n\nAnalizá y decime:\n1. QUÉ TRATAMIENTOS COMPLETOS puedo ofrecer con estos productos (con protocolo paso a paso para cada uno)\n2. QUÉ APARATOLOGÍA complementaría mejor lo que tengo\n3. QUÉ PRODUCTOS ME FALTAN para ampliar servicios (en orden de prioridad de compra)\nRespondé en español rioplatense, de forma práctica y detallada.`, rd);
 }
 
 const WORKER_URL = "https://ginails-ia.gis-eesp91.workers.dev";
