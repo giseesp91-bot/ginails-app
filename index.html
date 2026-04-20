@@ -4,25 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ginails · Cosmetología Pro</title>
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com; connect-src *; font-src *; img-src * data:;">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, doc, setDoc, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-  const firebaseConfig = {
-    apiKey: "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
-    authDomain: "ginails-cosmetologia.firebaseapp.com",
-    projectId: "ginails-cosmetologia",
-    storageBucket: "ginails-cosmetologia.firebasestorage.app",
-    messagingSenderId: "35237686180",
-    appId: "1:35237686180:web:029e58bbe90034e8b2af31"
-  };
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  window._db = db;
-  window._fs = { collection, doc, setDoc, getDocs, deleteDoc };
-  window._firebaseReady = true;
-  document.dispatchEvent(new Event('firebaseReady'));
-</script>
 <style>
 :root {
   --cream:#faf6f1;--blush:#e8c4b0;--rose:#c47a6e;--deep:#3d1f1a;
@@ -397,7 +380,7 @@ input[type="file"]{display:none;}
         <div><h4>🧼 Limpieza Facial Profunda</h4><div style="font-size:0.73rem;color:#c5a090;margin-top:2px">Todos los tipos de piel · Adaptable</div></div>
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-limpieza-profunda">$20.000</span><span class="badge badge-gold">1 ses</span></div>
       </div>
-      <div class="serv-body">
+      <div class="serv-body" style="display:none">
         <div class="tag-aviso">⚠️ <strong>Adaptar según el caso:</strong> Piel sensible/rosácea → NO vapor intenso, NO extracción agresiva. Acné activo severo → derivar a dermatólogo. Isotretinoína reciente → NO exfoliación.</div>
 
         <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
@@ -1534,20 +1517,13 @@ let misPrecios = JSON.parse(localStorage.getItem('ginails_precios2') || JSON.str
 
 const WORKER_URL = "https://ginails-ia.gis-eesp91.workers.dev";
 
-// ===================== FIREBASE INIT =====================
-document.addEventListener('firebaseReady', async () => {
-  db=window._db; fs=window._fs;
-  const cfg=document.querySelector('script[type="module"]').textContent;
-  if(cfg.includes('TU_API_KEY')){initLocal();hideLoading();return;}
-  try{
-    useFirebase=true;
-    document.getElementById('fb-status').textContent='🔥 Firebase activo';
-    document.getElementById('fb-status').className='fb-badge fb-ok';
-    await loadFirebase();
-  }catch(e){initLocal();}
+// ===================== INIT (localStorage) =====================
+// Firebase removido temporalmente por CSP en Cloudflare — se reintegra con login
+window.addEventListener('DOMContentLoaded', () => {
+  initLocal();
   hideLoading();
 });
-setTimeout(()=>{if(!window._firebaseReady){initLocal();hideLoading();}},3000);
+
 
 function hideLoading(){
   const ls=document.getElementById('loading-screen');
@@ -1557,9 +1533,8 @@ function hideLoading(){
 
 function initLocal(){
   useFirebase=false;
-  document.getElementById('fb-status').textContent='💾 Modo local';
-  document.getElementById('fb-status').className='fb-badge fb-err';
-  document.getElementById('fb-config-alert').style.display='flex';
+  document.getElementById('fb-status').textContent='💾 Datos guardados';
+  document.getElementById('fb-status').className='fb-badge fb-ok';
   clientas=JSON.parse(localStorage.getItem('g_clientas')||'{}');
   sesiones=JSON.parse(localStorage.getItem('g_sesiones')||'{}');
   planes=JSON.parse(localStorage.getItem('g_planes')||'{}');
@@ -1639,7 +1614,14 @@ function showModalTab(id,btn){
   if(id==='mf-fotos')renderFotosModal();
   if(id==='mf-notas')renderNotasModal();
 }
-function toggleServ(h){h.nextElementSibling.classList.toggle('open');}
+function toggleServ(h){
+  const body = h.nextElementSibling;
+  if(body.style.display === 'none' || body.style.display === ''){
+    body.style.display = 'block';
+  } else {
+    body.style.display = 'none';
+  }
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function toggleRechazo(){document.getElementById('rechazo-det').style.display=vb('ses-rechazo')?'block':'none';}
 function setHoy(id){const el=document.getElementById(id);if(el&&!el.value)el.value=new Date().toISOString().split('T')[0];}
@@ -1741,7 +1723,12 @@ function abrirFicha(id){
     </div>
     ${c.medicacion?`<div class="alert alert-warning">💊 Medicación: ${c.medicacion}</div>`:''}
     ${c.obs?`<div class="ficha-section"><h4>📝 Obs</h4><p style="font-size:0.84rem">${c.obs}</p></div>`:''}
-    ${(c.analisisIA||[]).length?`<div class="ficha-section" style="background:#f0fdf4"><h4>🤖 Último análisis IA</h4><p style="font-size:0.8rem;color:var(--muted)">${(c.analisisIA[c.analisisIA.length-1].fecha)}</p><p style="font-size:0.83rem;line-height:1.6;margin-top:5px">${(c.analisisIA[c.analisisIA.length-1].texto||'').substring(0,300)}...</p></div>`:''}
+    ${(c.analisisIA||[]).length?`<div class="ficha-section" style="background:#f0fdf4">
+      <h4>🤖 Análisis IA guardado</h4>
+      <p style="font-size:0.76rem;color:var(--muted);margin-bottom:8px">${(c.analisisIA[c.analisisIA.length-1].fecha)}</p>
+      <div id="ia-guardado-texto" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:8px;padding:10px;border:1px solid var(--border)">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+      ${c.analisisIA.length>1?`<div style="font-size:0.74rem;color:var(--muted);margin-top:5px">${c.analisisIA.length} análisis guardados — mostrando el último</div>`:''}
+    </div>`:''}
   `;
   document.getElementById('modal-ia-result').innerHTML='';
   document.getElementById('modal-ficha').classList.add('open');
