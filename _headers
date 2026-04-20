@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://*.firebaseapp.com; connect-src *;
