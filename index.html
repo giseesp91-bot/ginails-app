@@ -33,8 +33,10 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
 header{background:var(--deep);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 2px 20px rgba(0,0,0,0.2);gap:10px;}
-.logo{font-family:'Playfair Display',serif;color:var(--blush);font-size:1.3rem;letter-spacing:1px;white-space:nowrap;}
-.logo span{color:var(--gold);font-style:italic;}
+.logo{display:flex;align-items:center;gap:10px;white-space:nowrap;}
+.logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
+.logo-text{font-family:'Playfair Display',serif;color:var(--blush);font-size:1.2rem;letter-spacing:1px;}
+.logo-text span{color:var(--gold);font-style:italic;}
 .fb-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
 .fb-ok{background:#1a4a2a;color:#90e0a0;}.fb-err{background:#4a1a1a;color:#e09090;}.fb-wait{background:#3a2a0a;color:#e0c070;}
 nav{display:flex;gap:4px;overflow-x:auto;padding:10px 14px;background:rgba(61,31,26,0.97);border-bottom:1px solid rgba(232,196,176,0.12);}
@@ -154,7 +156,10 @@ input[type="file"]{display:none;}
 </div>
 
 <header>
-  <div class="logo">Ginails <span>·</span> Pro</div>
+  <div style="display:flex;align-items:center;gap:10px">
+    <div style="width:38px;height:38px;background:linear-gradient(135deg,#7E4A5F,#c47a6e);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:white;font-weight:700;flex-shrink:0">G</div>
+    <div class="logo">Ginails <span>Pro</span></div>
+  </div>
   <div class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</div>
 </header>
 <nav>
@@ -204,7 +209,10 @@ input[type="file"]{display:none;}
 
 <!-- NUEVA CLIENTA -->
 <div id="nueva-clienta" class="section">
-  <div class="section-title">📋 Nueva Clienta</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px">
+    <div class="section-title" style="margin-bottom:0">📋 Nueva Clienta</div>
+    <button class="btn btn-secondary btn-sm" onclick="showSection('clientas',null)">← Volver</button>
+  </div>
   <div class="card">
     <div class="card-title">👤 Datos Personales</div>
     <div class="form-grid">
@@ -354,7 +362,8 @@ input[type="file"]{display:none;}
   </div>
   <div class="btn-row">
     <button class="btn btn-primary" onclick="guardarClienta()">💾 Guardar Ficha</button>
-    <button class="btn btn-success" onclick="sugerirTratamientosIA()">🤖 Sugerir Tratamientos con IA</button>
+    <button class="btn btn-success" onclick="sugerirTratamientosIA()">🤖 Sugerir con IA</button>
+    <button class="btn btn-gold" onclick="generarFormWsp()">📲 Enviar por WhatsApp</button>
     <button class="btn btn-secondary" onclick="limpiarFormulario()">🗑️ Limpiar</button>
   </div>
   <div id="ia-resultado"></div>
@@ -390,14 +399,14 @@ input[type="file"]{display:none;}
       <div class="serv-body">
         <div class="tag-aviso">⚠️ <strong>Adaptar según el caso:</strong> Piel sensible/rosácea → NO vapor intenso, NO extracción agresiva. Acné activo severo → derivar a dermatólogo. Isotretinoína reciente → NO exfoliación.</div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
-          <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
-          <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Se elige porque es la base de todo. Sin una piel limpia en profundidad, ningún activo penetra correctamente. Elimina el exceso de sebo, células muertas y comedones que obstruyen los poros e impiden que los tratamientos posteriores funcionen. Es el primer paso obligatorio para cualquier clienta, independientemente de su problemática.</p>
-        </div>
-
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
-          <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
-          <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10"><strong>Desde la 1ra sesión:</strong> Piel visiblemente más limpia, luminosa y suave al tacto.<br><strong>Importante aclarar:</strong> Puede haber leve enrojecimiento post-extracción que dura 1-2hs. Normal.<br><strong>Mantenimiento:</strong> 1 vez por mes para mantener el resultado.</p>
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+          <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
+          <div style="font-size:0.85rem;line-height:1.8">
+            <strong>Tratamiento:</strong> Limpieza Facial Profunda<br>
+            <strong>Frecuencia:</strong> 1 vez por mes (mantenimiento) · Primera vez: puede hacerse antes<br>
+            <strong>Objetivo:</strong> Piel limpia en profundidad, poros destapados, base lista para cualquier tratamiento posterior<br>
+            <strong>Duración sesión:</strong> 45-60 minutos
+          </div>
         </div>
 
         <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
@@ -410,7 +419,31 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section"><h5>🎯 Efectos</h5>
+        <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
+          <div class="paso-item"><span class="paso-num">1</span>Limpieza con leche o gel desmaquillante suave. Retirar con agua tibia y toallita de microfibra.</div>
+          <div class="paso-item"><span class="paso-num">2</span>Tónico equilibrante para normalizar el pH.</div>
+          <div class="paso-item"><span class="paso-num">3</span>Vapor facial 5-8 min para ablandar comedones. <em>(Omitir en rosácea y piel muy sensible)</em></div>
+          <div class="paso-item"><span class="paso-num">4</span>Exfoliación: mecánica suave (piel normal/grasa) o enzimática (piel sensible/seca).</div>
+          <div class="paso-item"><span class="paso-num">5</span>Extracción de comedones con técnica correcta. <em>(Solo si la piel lo permite)</em></div>
+          <div class="paso-item"><span class="paso-num">6</span>Alta frecuencia sobre zona extraída: efecto antiséptico y cicatrizante 3-5 min.</div>
+          <div class="paso-item"><span class="paso-num">7</span>Mascarilla según tipo de piel: arcilla (grasa/mixta) · hidratante (seca) · calmante (sensible).</div>
+          <div class="paso-item"><span class="paso-num">8</span>Sérum específico + crema hidratante finalizadora + SPF 50.</div>
+        </div>
+        <div class="serv-section"><h5>🧴 Productos e insumos</h5>
+          <div class="highlight">Leche/gel limpiador · Tónico · Exfoliante enzimático o mecánico · Arcilla verde o blanca · Mascarilla lámina · Sérum hialurónico · Crema hidratante · SPF 50 · Alta frecuencia · Vaporizador</div>
+        </div>
+        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+          <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
+          <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Se elige porque es la base de todo. Sin una piel limpia en profundidad, ningún activo penetra correctamente. Elimina el exceso de sebo, células muertas y comedones que obstruyen los poros e impiden que los tratamientos posteriores funcionen. Es el primer paso obligatorio para cualquier clienta, independientemente de su problemática.</p>
+        </div>
+        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+          <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
+          <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10"><strong>Desde la 1ra sesión:</strong> Piel visiblemente más limpia, luminosa y suave al tacto.<br><strong>Importante aclarar:</strong> Puede haber leve enrojecimiento post-extracción que dura 1-2hs. Normal.<br><strong>Mantenimiento:</strong> 1 vez por mes para mantener el resultado.</p>
+        </div>
+        <div class="serv-section"><h5>🏠 Domiciliario a recomendar</h5>
+          <div class="highlight">Limpiador suave 2 veces/día · Tónico · Crema hidratante · SPF 50 diario sin excepción · No tocar ni apretar la cara</div>
+        </div>
+      </div>
           <div class="highlight">Piel limpia en profundidad · Poros destapados · Eliminación de impurezas · Base ideal para cualquier tratamiento posterior · Mejora inmediata de la luminosidad</div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
@@ -1198,9 +1231,53 @@ input[type="file"]{display:none;}
     </div>
     <div class="btn-row" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
       <button class="btn btn-success btn-sm" onclick="abrirIA()">🤖 IA Analizar</button>
+      <button class="btn btn-gold btn-sm" onclick="enviarFormWhatsApp()">📲 Enviar Ficha por WhatsApp</button>
       <button class="btn btn-danger btn-sm" onclick="eliminarClientaActual()">🗑️ Eliminar</button>
     </div>
     <div id="modal-ia-result"></div>
+  </div>
+</div>
+
+<!-- MODAL WHATSAPP FORM -->
+<div class="modal-overlay" id="modal-whatsapp">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('modal-whatsapp')">✕</button>
+    <div class="modal-title">📲 Enviar Cuestionario por WhatsApp</div>
+    <div class="alert alert-info">💡 La clienta recibe un link para completar su ficha desde el celu antes del turno. Vos recibís los datos listos para revisar.</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Nombre de la clienta</label>
+        <input type="text" id="wa-nombre" placeholder="Nombre de la clienta">
+      </div>
+      <div class="form-group full">
+        <label>Número de WhatsApp de la clienta</label>
+        <input type="tel" id="wa-telefono" placeholder="Ej: 5493513000000 (con código de país, sin +)">
+      </div>
+      <div class="form-group full">
+        <label>Mensaje personalizado (opcional)</label>
+        <textarea id="wa-mensaje-extra" placeholder="Algo extra que quieras agregar al mensaje..." style="min-height:60px"></textarea>
+      </div>
+    </div>
+    <div style="background:var(--light);border-radius:10px;padding:12px 14px;margin:12px 0;font-size:0.83rem;color:var(--muted)">
+      <strong style="color:var(--text)">Vista previa del mensaje:</strong><br><br>
+      <div id="wa-preview" style="line-height:1.7"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="abrirWhatsApp()">📲 Abrir WhatsApp</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-whatsapp')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO CLIENTA (link público) -->
+<div class="modal-overlay" id="modal-form-publico" style="background:rgba(0,0,0,0.8)">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-title">📋 Cuestionario Previo · Ginails Pro</div>
+    <div class="alert alert-info">🌸 Completá lo que puedas. Lo que no sepás lo vemos juntas en el turno.</div>
+    <div id="form-publico-contenido"></div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="enviarFormPublico()">✅ Enviar mis datos</button>
+    </div>
   </div>
 </div>
 
@@ -1284,6 +1361,76 @@ input[type="file"]{display:none;}
       <div class="form-group full"><label>Objetivo</label><textarea id="plan-obj" placeholder="Qué resultado se busca lograr..."></textarea></div>
     </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="guardarPlan()">💾 Guardar Plan</button><button class="btn btn-secondary" onclick="closeModal('modal-plan-form')">Cancelar</button></div>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO WHATSAPP -->
+<div class="modal-overlay" id="modal-wsp">
+  <div class="modal" style="max-width:600px">
+    <button class="modal-close" onclick="closeModal('modal-wsp')">✕</button>
+    <div class="modal-title">📲 Formulario previo por WhatsApp</div>
+    <div class="alert alert-info">💡 Generá un link único para que la clienta complete su ficha desde el celu antes del turno. Vos recibís los datos completos y ahorrás tiempo en el gabinete.</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Nombre de la clienta *</label><input type="text" id="wsp-nombre" placeholder="Nombre y apellido"></div>
+      <div class="form-group"><label>Número de WhatsApp *</label><input type="tel" id="wsp-tel" placeholder="+54 351 ..."></div>
+      <div class="form-group full"><label>Mensaje personalizado (opcional)</label><textarea id="wsp-mensaje" placeholder="Hola! Antes de tu turno te pido que completes este formulario..." style="min-height:70px"></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-success" onclick="enviarFormWsp()">📲 Abrir WhatsApp</button>
+      <button class="btn btn-secondary" onclick="copiarLinkForm()">📋 Copiar link</button>
+      <button class="btn btn-secondary" onclick="closeModal('modal-wsp')">Cancelar</button>
+    </div>
+    <div id="wsp-link-preview" style="margin-top:12px;display:none">
+      <div class="alert alert-success">✅ Link generado:<br><a id="wsp-link-url" href="#" target="_blank" style="color:var(--rose);word-break:break-all;font-size:0.83rem"></a></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL FORMULARIO CLIENTA (link público) -->
+<div class="modal-overlay" id="modal-form-clienta" style="background:rgba(61,31,26,0.7)">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-title">🌸 Formulario de Ficha Previa</div>
+    <p style="font-size:0.85rem;color:var(--muted);margin-bottom:16px">Completá lo que puedas. Lo que no sepas lo vemos juntas en el gabinete 🌸</p>
+    <div class="form-grid">
+      <div class="form-group"><label>Tu nombre completo *</label><input type="text" id="fc-nombre" placeholder="Nombre y apellido"></div>
+      <div class="form-group"><label>Edad</label><input type="number" id="fc-edad" min="1" max="99"></div>
+      <div class="form-group"><label>Ocupación</label><input type="text" id="fc-ocup"></div>
+      <div class="form-group"><label>¿Tomás medicación?</label><input type="text" id="fc-medicacion" placeholder="Nombre o tipo (si tomás)"></div>
+      <div class="form-group full"><label>¿Tenés alergias conocidas?</label><input type="text" id="fc-alergias" placeholder="A qué sos alérgica (si sabés)"></div>
+      <div class="form-group full"><label>Condiciones médicas</label>
+        <div class="check-group">
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Embarazo / lactancia</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Diabetes</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Epilepsia</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Marcapasos</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Herpes activo</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Rosácea</label>
+          <label class="check-item"><input type="checkbox" class="fc-cond"> Ninguna</label>
+        </div>
+      </div>
+      <div class="form-group"><label>Alimentación general</label>
+        <select id="fc-alim"><option value="">Seleccionar</option><option>Equilibrada</option><option>Alta en azúcares / harinas</option><option>Alta en grasas</option><option>Vegetariana / vegana</option><option>Muy procesada</option></select>
+      </div>
+      <div class="form-group"><label>¿Tomás agua? (por día)</label>
+        <select id="fc-agua"><option value="">Seleccionar</option><option>Más de 2 litros</option><option>Entre 1 y 2 litros</option><option>Menos de 1 litro</option></select>
+      </div>
+      <div class="form-group"><label>¿Cómo dormís?</label>
+        <select id="fc-sueno"><option value="">Seleccionar</option><option>Bien (7-8hs)</option><option>Regular (5-7hs)</option><option>Mal (menos de 5hs)</option></select>
+      </div>
+      <div class="form-group"><label>Nivel de estrés</label>
+        <select id="fc-estres"><option value="">Seleccionar</option><option>Bajo</option><option>Moderado</option><option>Alto</option></select>
+      </div>
+      <div class="form-group"><label>¿Usás protector solar?</label>
+        <select id="fc-fps"><option value="">Seleccionar</option><option>Sí, todos los días</option><option>A veces</option><option>No uso</option></select>
+      </div>
+      <div class="form-group full"><label>¿Qué usás en tu rutina de piel?</label><textarea id="fc-skincare" placeholder="¿Qué cremas, sérums o productos usás? ¿Con qué frecuencia te lavás la cara?"></textarea></div>
+      <div class="form-group full"><label>¿Tuviste tratamientos estéticos antes?</label><textarea id="fc-tratprev" placeholder="¿Cuáles? ¿Cuándo? ¿Cómo te fue?"></textarea></div>
+      <div class="form-group full"><label>¿Qué querés mejorar o lograr?</label><textarea id="fc-objetivo" placeholder="Contame qué te trajo acá, qué te gustaría mejorar..."></textarea></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="enviarFormClientaWsp()">✅ Enviar mis respuestas</button>
+    </div>
+    <div id="fc-enviado" style="display:none" class="alert alert-success" style="margin-top:12px">✅ ¡Gracias! Tu cosmetóloga va a revisar tu ficha antes del turno. ¡Nos vemos pronto! 🌸</div>
   </div>
 </div>
 
@@ -2077,6 +2224,292 @@ function actualizarResumen(){
   if(elC)elC.textContent='$'+cobrado.toLocaleString('es-AR');
   if(elN){elN.textContent=(gan>=0?'+':'')+('$'+Math.abs(gan).toLocaleString('es-AR'));elN.style.color=gan>=0?'var(--success)':'var(--danger)';}
   updateStats();
+}
+
+// ===================== WHATSAPP FORM =====================
+function generarFormWsp(){
+  document.getElementById('wsp-nombre').value = v('nc-nombre') || '';
+  document.getElementById('wsp-tel').value = v('nc-tel') || '';
+  document.getElementById('wsp-link-preview').style.display='none';
+  document.getElementById('modal-wsp').classList.add('open');
+}
+
+function getLinkForm(nombre){
+  const base = window.location.href.split('?')[0];
+  const params = new URLSearchParams({form:'1', nombre: nombre||''});
+  return base + '?' + params.toString();
+}
+
+function enviarFormWsp(){
+  const nombre = v('wsp-nombre').trim();
+  let tel = v('wsp-tel').trim().replace(/\D/g,'');
+  if(!nombre){alert('Ingresá el nombre de la clienta');return;}
+  if(!tel){alert('Ingresá el número de WhatsApp');return;}
+  if(tel.startsWith('0'))tel=tel.substring(1);
+  if(!tel.startsWith('54'))tel='54'+tel;
+  const link = getLinkForm(nombre);
+  const msgCustom = v('wsp-mensaje').trim();
+  const msg = msgCustom ||
+    `Hola ${nombre}! 🌸 Soy tu cosmetóloga. Antes de tu turno te pido que completes esta ficha previa para poder preparar tu tratamiento personalizado. ¡Es rápida y fácil!\n\n${link}\n\nCompletá lo que puedas — lo que no sepas lo vemos juntas en el gabinete. ¡Nos vemos pronto! 💕`;
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  window.open(url,'_blank');
+  const prev = document.getElementById('wsp-link-preview');
+  const linkEl = document.getElementById('wsp-link-url');
+  linkEl.href = link;
+  linkEl.textContent = link;
+  prev.style.display='block';
+}
+
+function copiarLinkForm(){
+  const nombre = v('wsp-nombre').trim() || 'clienta';
+  const link = getLinkForm(nombre);
+  navigator.clipboard.writeText(link).then(()=>alert('✅ Link copiado!')).catch(()=>{
+    prompt('Copiá este link:', link);
+  });
+}
+
+function enviarFormClientaWsp(){
+  const nombre = v('fc-nombre').trim();
+  if(!nombre){alert('Ingresá tu nombre');return;}
+  const condiciones = Array.from(document.querySelectorAll('.fc-cond:checked')).map(i=>i.parentElement.textContent.trim());
+  const datos = {
+    nombre, edad: v('fc-edad'), ocup: v('fc-ocup'),
+    medicacion: v('fc-medicacion'), alergias: v('fc-alergias'),
+    condiciones: condiciones.join(', '),
+    alim: v('fc-alim'), agua: v('fc-agua'), sueno: v('fc-sueno'),
+    estres: v('fc-estres'), fps: v('fc-fps'),
+    skincare: v('fc-skincare'), tratprev: v('fc-tratprev'), objetivo: v('fc-objetivo')
+  };
+  // Guardar en localStorage con clave única para que la cosmetóloga lo vea
+  const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+  respuestas.push({...datos, fechaTs: Date.now(), fecha: new Date().toLocaleString('es-AR')});
+  localStorage.setItem('ginails_form_respuestas', JSON.stringify(respuestas));
+  document.getElementById('fc-enviado').style.display='block';
+  document.querySelector('#modal-form-clienta .btn-row').style.display='none';
+  // Si hay referencia a cosmetóloga, mandamos WhatsApp
+  const params = new URLSearchParams(window.location.search);
+  const nombreCosm = params.get('nombre');
+  if(nombreCosm){
+    setTimeout(()=>{
+      alert('✅ ¡Tus respuestas fueron registradas! Tu cosmetóloga las va a ver antes del turno. 🌸');
+    },500);
+  }
+}
+
+// Detectar si se abrió el formulario de clienta via link
+window.addEventListener('DOMContentLoaded',()=>{
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('form')==='1'){
+    // Mostrar solo el formulario de clienta
+    document.querySelector('header').style.display='none';
+    document.querySelector('nav').style.display='none';
+    document.querySelector('main').style.display='none';
+    document.getElementById('modal-form-clienta').classList.add('open');
+    document.getElementById('modal-form-clienta').style.position='fixed';
+    document.getElementById('modal-form-clienta').style.background='var(--cream)';
+    const nombre = params.get('nombre');
+    if(nombre){
+      const titulo = document.querySelector('#modal-form-clienta .modal-title');
+      if(titulo) titulo.textContent = `🌸 Ficha previa para ${nombre}`;
+    }
+    // Verificar si hay respuestas pendientes para mostrar a la cosmetóloga
+    const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+    if(respuestas.length && !params.get('form')){
+      // Notificar a la cosmetóloga (solo en modo normal)
+    }
+  }
+  // Verificar respuestas pendientes de formularios
+  checkFormulariosRecibidos();
+});
+
+function checkFormulariosRecibidos(){
+  const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+  if(!respuestas.length) return;
+  // Mostrar notificación en inicio
+  const inicio = document.getElementById('inicio');
+  if(!inicio) return;
+  const notif = document.createElement('div');
+  notif.className = 'alert alert-success';
+  notif.style.cursor='pointer';
+  notif.innerHTML = `📲 <strong>${respuestas.length} formulario${respuestas.length>1?'s':''} recibido${respuestas.length>1?'s':''}!</strong> Hay clientas que completaron su ficha previa. <u>Tocá para ver</u>`;
+  notif.onclick = () => mostrarFormulariosRecibidos();
+  inicio.insertBefore(notif, inicio.firstChild);
+}
+
+function mostrarFormulariosRecibidos(){
+  const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+  if(!respuestas.length){alert('No hay formularios pendientes');return;}
+  const html = respuestas.map((r,i)=>`
+    <div style="background:var(--light);border-radius:10px;padding:13px;margin-bottom:10px;border:1px solid var(--border)">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">🌸 ${r.nombre} <span style="font-size:0.75rem;color:var(--muted);font-weight:400">· ${r.fecha}</span></div>
+      ${r.medicacion?`<div style="font-size:0.83rem"><strong>Medicación:</strong> ${r.medicacion}</div>`:''}
+      ${r.alergias?`<div style="font-size:0.83rem"><strong>Alergias:</strong> ${r.alergias}</div>`:''}
+      ${r.condiciones?`<div style="font-size:0.83rem"><strong>Condiciones:</strong> ${r.condiciones}</div>`:''}
+      ${r.objetivo?`<div style="font-size:0.83rem;margin-top:4px"><strong>Objetivo:</strong> ${r.objetivo}</div>`:''}
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="cargarFormEnFicha(${i})">📋 Cargar en ficha nueva</button>
+        <button class="btn btn-danger btn-sm" onclick="eliminarFormRecibido(${i})">🗑️ Descartar</button>
+      </div>
+    </div>
+  `).join('');
+  const modal = document.createElement('div');
+  modal.className='modal-overlay open';
+  modal.innerHTML=`<div class="modal"><button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+    <div class="modal-title">📲 Formularios recibidos (${respuestas.length})</div>${html}</div>`;
+  document.body.appendChild(modal);
+}
+
+function cargarFormEnFicha(idx){
+  const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+  const r = respuestas[idx];
+  if(!r)return;
+  showSection('nueva-clienta',null);
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  setTimeout(()=>{
+    if(document.getElementById('nc-nombre'))document.getElementById('nc-nombre').value=r.nombre||'';
+    if(document.getElementById('nc-edad'))document.getElementById('nc-edad').value=r.edad||'';
+    if(document.getElementById('nc-ocup'))document.getElementById('nc-ocup').value=r.ocup||'';
+    if(document.getElementById('nc-medicacion'))document.getElementById('nc-medicacion').value=r.medicacion||'';
+    if(document.getElementById('nc-alergias'))document.getElementById('nc-alergias').value=r.alergias||'';
+    if(document.getElementById('nc-alim'))document.getElementById('nc-alim').value=r.alim||'';
+    if(document.getElementById('nc-agua'))document.getElementById('nc-agua').value=r.agua||'';
+    if(document.getElementById('nc-sueno'))document.getElementById('nc-sueno').value=r.sueno||'';
+    if(document.getElementById('nc-estres'))document.getElementById('nc-estres').value=r.estres||'';
+    if(document.getElementById('nc-fps'))document.getElementById('nc-fps').value=r.fps||'';
+    if(document.getElementById('nc-skincare'))document.getElementById('nc-skincare').value=r.skincare||'';
+    if(document.getElementById('nc-tratprev'))document.getElementById('nc-tratprev').value=r.tratprev||'';
+    if(document.getElementById('nc-objetivo'))document.getElementById('nc-objetivo').value=r.objetivo||'';
+    alert('✅ Datos cargados! Completá el resto de la ficha en el gabinete.');
+  },300);
+}
+
+function eliminarFormRecibido(idx){
+  if(!confirm('¿Descartar este formulario?'))return;
+  const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
+  respuestas.splice(idx,1);
+  localStorage.setItem('ginails_form_respuestas',JSON.stringify(respuestas));
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  if(respuestas.length) mostrarFormulariosRecibidos();
+}
+// ===================== WHATSAPP FORM =====================
+function enviarFormWhatsApp() {
+  if (!clientaActualId) return;
+  const c = clientas[clientaActualId];
+  document.getElementById('wa-nombre').value = c.nombre || '';
+  document.getElementById('wa-telefono').value = (c.tel || '').replace(/\D/g, '');
+  document.getElementById('wa-mensaje-extra').value = '';
+  actualizarPreviewWA();
+  document.getElementById('modal-whatsapp').classList.add('open');
+}
+
+function actualizarPreviewWA() {
+  const nombre = document.getElementById('wa-nombre').value || 'clienta';
+  const extra = document.getElementById('wa-mensaje-extra').value;
+  const baseUrl = window.location.origin + window.location.pathname;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
+  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno en *Ginails Pro* te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepas lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
+  document.getElementById('wa-preview').innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const waInputs = ['wa-nombre', 'wa-mensaje-extra'];
+  waInputs.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', actualizarPreviewWA);
+  });
+
+  // Detectar si es un formulario público
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('form') === '1') {
+    mostrarFormPublico(params.get('ref'));
+  }
+});
+
+function abrirWhatsApp() {
+  const tel = document.getElementById('wa-telefono').value.replace(/\D/g, '');
+  if (!tel) { alert('Ingresá el número de WhatsApp de la clienta'); return; }
+  const nombre = document.getElementById('wa-nombre').value || 'clienta';
+  const extra = document.getElementById('wa-mensaje-extra').value;
+  const baseUrl = window.location.origin + window.location.pathname;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
+  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno en Ginails Pro te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
+  const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  closeModal('modal-whatsapp');
+}
+
+function mostrarFormPublico(clientaId) {
+  document.getElementById('modal-form-publico').classList.add('open');
+  document.getElementById('form-publico-contenido').innerHTML = `
+    <div class="form-grid">
+      <div class="form-group"><label>Tu nombre completo</label><input type="text" id="fp-nombre" placeholder="Nombre y apellido"></div>
+      <div class="form-group"><label>Tu edad</label><input type="number" id="fp-edad" min="1" max="99" placeholder="Años"></div>
+      <div class="form-group"><label>Ocupación</label><input type="text" id="fp-ocup" placeholder="A qué te dedicás"></div>
+      <div class="form-group"><label>Instagram (opcional)</label><input type="text" id="fp-insta" placeholder="@usuario"></div>
+      <div class="form-group full"><label>¿Tenés alguna condición médica?</label><textarea id="fp-condiciones" placeholder="Diabetes, hipertensión, embarazo, medicación, alergias... Si no tenés ninguna, escribí 'ninguna'" style="min-height:60px"></textarea></div>
+      <div class="form-group full"><label>¿Qué problema querés tratar o qué querés mejorar?</label><textarea id="fp-objetivo" placeholder="Manchas, acné, arrugas, pestañas, cejas... contame lo que más te molesta" style="min-height:70px"></textarea></div>
+      <div class="form-group"><label>¿Usás protector solar?</label>
+        <select id="fp-fps"><option value="">Seleccionar</option><option>Sí, todos los días</option><option>A veces</option><option>No</option></select>
+      </div>
+      <div class="form-group"><label>¿Cómo es tu alimentación?</label>
+        <select id="fp-alim"><option value="">Seleccionar</option><option>Equilibrada</option><option>Alta en azúcares / harinas</option><option>Alta en grasas</option><option>Vegetariana / vegana</option><option>Muy procesada</option></select>
+      </div>
+      <div class="form-group"><label>¿Cuánta agua tomás por día?</label>
+        <select id="fp-agua"><option value="">Seleccionar</option><option>Más de 2 litros</option><option>Entre 1 y 2 litros</option><option>Menos de 1 litro</option></select>
+      </div>
+      <div class="form-group"><label>¿Cómo dormís?</label>
+        <select id="fp-sueno"><option value="">Seleccionar</option><option>Bien (7-8hs)</option><option>Regular (5-7hs)</option><option>Mal (menos de 5hs)</option></select>
+      </div>
+      <div class="form-group"><label>Nivel de estrés</label>
+        <select id="fp-estres"><option value="">Seleccionar</option><option>Bajo</option><option>Moderado</option><option>Alto</option></select>
+      </div>
+      <div class="form-group"><label>Estado de tus cejas</label>
+        <select id="fp-cejas"><option value="">Seleccionar</option><option>Densas y bien definidas</option><option>Escasas / poco pelo</option><option>Irregulares</option><option>Muy claras</option></select>
+      </div>
+      <div class="form-group"><label>Estado de tus pestañas</label>
+        <select id="fp-pestanas"><option value="">Seleccionar</option><option>Abundantes y sanas</option><option>Escasas / finas</option><option>Muy lacias</option><option>Frágiles</option></select>
+      </div>
+      <div class="form-group full"><label>¿Hiciste algún tratamiento estético antes?</label><textarea id="fp-tratprev" placeholder="¿Cuáles? ¿Cómo te fue?" style="min-height:55px"></textarea></div>
+      <div class="form-group full"><label>¿Algo más que quieras contarme?</label><textarea id="fp-obs" placeholder="Cualquier detalle que creas importante..." style="min-height:55px"></textarea></div>
+    </div>`;
+  // Store clientaId for later
+  window._formPublicoClientaId = clientaId;
+}
+
+async function enviarFormPublico() {
+  const nombre = document.getElementById('fp-nombre')?.value?.trim();
+  if (!nombre) { alert('Por favor ingresá tu nombre'); return; }
+
+  const datos = {
+    nombre,
+    edad: document.getElementById('fp-edad')?.value || '',
+    ocup: document.getElementById('fp-ocup')?.value || '',
+    insta: document.getElementById('fp-insta')?.value || '',
+    condiciones: document.getElementById('fp-condiciones')?.value || '',
+    objetivo: document.getElementById('fp-objetivo')?.value || '',
+    fps: document.getElementById('fp-fps')?.value || '',
+    alim: document.getElementById('fp-alim')?.value || '',
+    agua: document.getElementById('fp-agua')?.value || '',
+    sueno: document.getElementById('fp-sueno')?.value || '',
+    estres: document.getElementById('fp-estres')?.value || '',
+    cejas: document.getElementById('fp-cejas')?.value || '',
+    pestanas: document.getElementById('fp-pestanas')?.value || '',
+    tratprev: document.getElementById('fp-tratprev')?.value || '',
+    obs: document.getElementById('fp-obs')?.value || '',
+    completadoPorClienta: true,
+    fechaFormulario: new Date().toLocaleString('es-AR')
+  };
+
+  // Guardar en Firebase como formulario pendiente
+  const id = uid();
+  await saveDoc('formularios_pendientes', id, { ...datos, clientaRefId: window._formPublicoClientaId });
+
+  document.getElementById('modal-form-publico').innerHTML = `
+    <div style="text-align:center;padding:30px">
+      <div style="font-size:3rem;margin-bottom:16px">🌸</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--deep);margin-bottom:10px">¡Listo, ${nombre}!</div>
+      <p style="color:var(--muted);font-size:0.9rem;line-height:1.7">Tus datos llegaron correctamente.<br>¡Nos vemos en el turno! 💕</p>
+    </div>`;
 }
 </script>
 </body>
