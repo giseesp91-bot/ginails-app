@@ -172,6 +172,7 @@ input[type="file"]{display:none;}
   <button class="nav-btn" onclick="showSection('presupuestos',this)">🧾 Presupuestos</button>
   <button class="nav-btn" onclick="showSection('gastos',this)">📊 Gastos</button>
   <button class="nav-btn" onclick="showSection('compras',this)">🛍️ Compras</button>
+  <button class="nav-btn" onclick="showSection('config',this)">⚙️ Config</button>
 </nav>
 
 <main>
@@ -1202,6 +1203,38 @@ input[type="file"]{display:none;}
   </div>
 </div>
 
+<!-- CONFIG -->
+<div id="config" class="section">
+  <div class="section-title">⚙️ Configuración</div>
+  <div class="card">
+    <div class="card-title">🌸 Tu Perfil Profesional</div>
+    <div class="alert alert-info">💡 Este nombre aparece en el mensaje de WhatsApp que le mandás a tus clientas.</div>
+    <div class="form-grid">
+      <div class="form-group full">
+        <label>Tu nombre o nombre de tu local *</label>
+        <input type="text" id="cfg-salon" placeholder="Ej: Gise · Ginails Beauty Studio · Estética Valentina...">
+        <div style="font-size:0.74rem;color:var(--muted);margin-top:3px">Así aparecerá en el mensaje: "Antes de tu turno en <strong>[tu nombre]</strong> te comparto..."</div>
+      </div>
+      <div class="form-group full">
+        <label>Tu nombre (para el saludo)</label>
+        <input type="text" id="cfg-nombre" placeholder="Ej: Gise">
+      </div>
+      <div class="form-group">
+        <label>Tu Instagram (opcional)</label>
+        <input type="text" id="cfg-insta" placeholder="@ginailsbeautystudio">
+      </div>
+      <div class="form-group">
+        <label>Tu ciudad</label>
+        <input type="text" id="cfg-ciudad" placeholder="Ej: Balnearia, Córdoba">
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="guardarConfig()">💾 Guardar Configuración</button>
+    </div>
+    <div id="config-preview" style="display:none;margin-top:14px;background:var(--light);border-radius:10px;padding:12px 14px;font-size:0.84rem;line-height:1.8;border:1.5px solid var(--border)"></div>
+  </div>
+</div>
+
 </main>
 
 <!-- MODAL FICHA CLIENTA -->
@@ -1230,8 +1263,9 @@ input[type="file"]{display:none;}
       <div id="lista-notas"></div>
     </div>
     <div class="btn-row" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+      <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-ficha')">← Volver</button>
       <button class="btn btn-success btn-sm" onclick="abrirIA()">🤖 IA Analizar</button>
-      <button class="btn btn-gold btn-sm" onclick="enviarFormWhatsApp()">📲 Enviar Ficha por WhatsApp</button>
+      <button class="btn btn-gold btn-sm" onclick="enviarFormWhatsApp()">📲 WhatsApp</button>
       <button class="btn btn-danger btn-sm" onclick="eliminarClientaActual()">🗑️ Eliminar</button>
     </div>
     <div id="modal-ia-result"></div>
@@ -1243,11 +1277,16 @@ input[type="file"]{display:none;}
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-whatsapp')">✕</button>
     <div class="modal-title">📲 Enviar Cuestionario por WhatsApp</div>
-    <div class="alert alert-info">💡 La clienta recibe un link para completar su ficha desde el celu antes del turno. Vos recibís los datos listos para revisar.</div>
+    <div class="alert alert-info">💡 La clienta recibe un link para completar su ficha desde el celu antes del turno.</div>
     <div class="form-grid">
       <div class="form-group full">
+        <label>Tu nombre o nombre de tu local *</label>
+        <input type="text" id="wa-salon" placeholder="Ej: Gise · Ginails Beauty Studio · Estética Valentina..." oninput="actualizarPreviewWA()">
+        <div style="font-size:0.74rem;color:var(--muted);margin-top:3px">Así aparecerá en el mensaje a la clienta</div>
+      </div>
+      <div class="form-group full">
         <label>Nombre de la clienta</label>
-        <input type="text" id="wa-nombre" placeholder="Nombre de la clienta">
+        <input type="text" id="wa-nombre" placeholder="Nombre de la clienta" oninput="actualizarPreviewWA()">
       </div>
       <div class="form-group full">
         <label>Número de WhatsApp de la clienta</label>
@@ -1255,7 +1294,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="form-group full">
         <label>Mensaje personalizado (opcional)</label>
-        <textarea id="wa-mensaje-extra" placeholder="Algo extra que quieras agregar al mensaje..." style="min-height:60px"></textarea>
+        <textarea id="wa-mensaje-extra" placeholder="Algo extra que quieras agregar..." style="min-height:55px" oninput="actualizarPreviewWA()"></textarea>
       </div>
     </div>
     <div style="background:var(--light);border-radius:10px;padding:12px 14px;margin:12px 0;font-size:0.83rem;color:var(--muted)">
@@ -1578,6 +1617,7 @@ function showSection(id,btn){
   if(id==='clientas')renderClientas();
   if(id==='precios')renderPreciosSection();
   if(id==='insumos')renderInsumos();
+  if(id==='config'){cargarConfig();}
   if(id==='presupuestos'){poblarSelectClientas();renderPresupuestos();setHoy('pres-fecha');initPresItems();}
   if(id==='gastos'){renderGastos();actualizarResumen();setHoy('gasto-fecha');}
   if(id==='servicios')renderServiciosCustom();
@@ -2391,24 +2431,57 @@ function eliminarFormRecibido(idx){
   document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
   if(respuestas.length) mostrarFormulariosRecibidos();
 }
+// ===================== CONFIGURACIÓN =====================
+let miConfig = JSON.parse(localStorage.getItem('ginails_config') || '{}');
+
+function cargarConfig() {
+  if (miConfig.salon) { const el = document.getElementById('cfg-salon'); if(el) el.value = miConfig.salon; }
+  if (miConfig.nombre) { const el = document.getElementById('cfg-nombre'); if(el) el.value = miConfig.nombre; }
+  if (miConfig.insta) { const el = document.getElementById('cfg-insta'); if(el) el.value = miConfig.insta; }
+  if (miConfig.ciudad) { const el = document.getElementById('cfg-ciudad'); if(el) el.value = miConfig.ciudad; }
+}
+
+function guardarConfig() {
+  miConfig = {
+    salon: v('cfg-salon').trim() || 'mi estética',
+    nombre: v('cfg-nombre').trim(),
+    insta: v('cfg-insta').trim(),
+    ciudad: v('cfg-ciudad').trim()
+  };
+  localStorage.setItem('ginails_config', JSON.stringify(miConfig));
+  const prev = document.getElementById('config-preview');
+  if(prev){prev.style.display='block';prev.innerHTML=`✅ <strong>¡Guardado!</strong><br><br>Vista previa del mensaje:<br><br><em>"Hola [clienta] 🌸<br>Antes de tu turno en <strong>${miConfig.salon}</strong> te comparto este cuestionario..."</em>`;}
+  alert('✅ Configuración guardada!');
+}
+
 // ===================== WHATSAPP FORM =====================
-function enviarFormWhatsApp() {
-  if (!clientaActualId) return;
-  const c = clientas[clientaActualId];
-  document.getElementById('wa-nombre').value = c.nombre || '';
-  document.getElementById('wa-telefono').value = (c.tel || '').replace(/\D/g, '');
-  document.getElementById('wa-mensaje-extra').value = '';
+function enviarFormWhatsApp(){
+  if(!clientaActualId)return;
+  const c=clientas[clientaActualId];
+  const elSalon=document.getElementById('wa-salon');
+  const elNombre=document.getElementById('wa-nombre');
+  const elTel=document.getElementById('wa-telefono');
+  if(elSalon)elSalon.value=miConfig.salon||'';
+  if(elNombre)elNombre.value=c.nombre||'';
+  if(elTel)elTel.value=(c.tel||'').replace(/\D/g,'');
+  document.getElementById('wa-mensaje-extra').value='';
   actualizarPreviewWA();
   document.getElementById('modal-whatsapp').classList.add('open');
 }
 
+
+
 function actualizarPreviewWA() {
-  const nombre = document.getElementById('wa-nombre').value || 'clienta';
-  const extra = document.getElementById('wa-mensaje-extra').value;
+  const salon = document.getElementById('wa-salon')?.value || 'tu cosmetóloga';
+  const nombre = document.getElementById('wa-nombre')?.value || 'clienta';
+  const extra = document.getElementById('wa-mensaje-extra')?.value || '';
+  // Guardar nombre del salón automáticamente
+  if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
   const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
-  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno en *Ginails Pro* te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepas lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
-  document.getElementById('wa-preview').innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
+  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con *${salon}* te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
+  const prev = document.getElementById('wa-preview');
+  if (prev) prev.innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -2428,11 +2501,13 @@ document.addEventListener('DOMContentLoaded', () => {
 function abrirWhatsApp() {
   const tel = document.getElementById('wa-telefono').value.replace(/\D/g, '');
   if (!tel) { alert('Ingresá el número de WhatsApp de la clienta'); return; }
+  const salon = document.getElementById('wa-salon')?.value || 'tu cosmetóloga';
   const nombre = document.getElementById('wa-nombre').value || 'clienta';
   const extra = document.getElementById('wa-mensaje-extra').value;
+  if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
   const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
-  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno en Ginails Pro te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
+  const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con ${salon} te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos juntas en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
   closeModal('modal-whatsapp');
