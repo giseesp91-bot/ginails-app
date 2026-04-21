@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ginails Pro · Elegí tu plan</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rosa:       #D4537E;
+      --rosa-light: #FBEAF0;
+      --rosa-mid:   #F4C0D1;
+      --rosa-dark:  #4B1528;
+      --text:       #1a1a1a;
+      --text-muted: #7a7a7a;
+      --border:     #e8d8de;
+      --white:      #ffffff;
+      --bg:         #fdf6f8;
+      --green:      #25D366;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 1.8rem;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .brand-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .divider-brand {
+      width: 36px; height: 1.5px;
+      background: var(--rosa-mid);
+      margin: 8px auto 0;
+    }
+
+    .titulo {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.45s ease both;
+    }
+
+    .titulo h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+    }
+
+    .titulo p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Planes */
+    .planes {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @media(max-width: 480px) {
+      .planes { grid-template-columns: 1fr; }
+    }
+
+    .plan-card {
+      background: var(--white);
+      border-radius: 18px;
+      border: 1.5px solid var(--border);
+      padding: 1.6rem 1.4rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .plan-card:hover {
+      border-color: var(--rosa-mid);
+      transform: translateY(-2px);
+    }
+
+    .plan-card.selected {
+      border: 2px solid var(--rosa);
+      box-shadow: 0 4px 20px rgba(212,83,126,0.12);
+    }
+
+    .plan-card.destacado {
+      border-color: var(--rosa-mid);
+    }
+
+    .badge-ahorro {
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--rosa);
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 500;
+      padding: 3px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .plan-nombre {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .plan-precio {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      line-height: 1;
+    }
+
+    .plan-precio span {
+      font-size: 1rem;
+      font-weight: 400;
+      color: var(--text-muted);
+    }
+
+    .plan-periodo {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .plan-equiv {
+      font-size: 0.78rem;
+      color: var(--rosa);
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    .plan-check {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      margin-top: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .plan-card.selected .plan-check {
+      background: var(--rosa);
+      border-color: var(--rosa);
+    }
+
+    .plan-card.selected .plan-check::after {
+      content: '✓';
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Features */
+    .features-card {
+      background: var(--white);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 1.2rem 1.4rem;
+      width: 100%;
+      max-width: 560px;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.55s ease both;
+    }
+
+    .features-title {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 0;
+      font-size: 0.85rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-item:last-child { border-bottom: none; }
+
+    .feature-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--rosa);
+      flex-shrink: 0;
+    }
+
+    /* Botón pagar */
+    .btn-pagar {
+      width: 100%;
+      max-width: 560px;
+      padding: 15px;
+      background: var(--rosa);
+      color: white;
+      border: none;
+      border-radius: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 1rem;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .btn-pagar:hover  { opacity: 0.9; }
+    .btn-pagar:active { transform: scale(0.98); }
+    .btn-pagar:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .seguridad {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn-logout {
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    /* Loading overlay */
+    #loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(253,246,248,0.9);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    #loading-overlay.show { display: flex; }
+
+    .spinner {
+      width: 40px; height: 40px;
+      border: 3px solid var(--rosa-mid);
+      border-top-color: var(--rosa);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #loading-overlay p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <p>Procesando tu pago...</p>
+  </div>
+
+  <div class="brand">
+    <div class="brand-logo">Ginails Pro</div>
+    <div class="brand-sub">Para profesionales de la estética</div>
+    <div class="divider-brand"></div>
+  </div>
+
+  <div class="titulo">
+    <h1>Elegí tu plan</h1>
+    <p>Tu período de prueba terminó · Seguí usando Ginails Pro</p>
+  </div>
+
+  <!-- Planes -->
+  <div class="planes">
+    <div class="plan-card" id="card-mensual" onclick="seleccionar('mensual')">
+      <div class="plan-nombre">Mensual</div>
+      <div class="plan-precio">$5.000<span> ARS</span></div>
+      <div class="plan-periodo">por mes</div>
+      <div class="plan-check"></div>
+    </div>
+
+    <div class="plan-card destacado" id="card-anual" onclick="seleccionar('anual')">
+      <div class="badge-ahorro">⭐ Ahorrás $20.000</div>
+      <div class="plan-nombre">Anual</div>
+      <div class="plan-precio">$40.000<span> ARS</span></div>
+      <div class="plan-periodo">por año</div>
+      <div class="plan-equiv">= $3.333/mes</div>
+      <div class="plan-check"></div>
+    </div>
+  </div>
+
+  <!-- Features -->
+  <div class="features-card">
+    <div class="features-title">Todo incluido en tu plan</div>
+    <div class="feature-item"><div class="feature-dot"></div>Gestión de clientas y turnos</div>
+    <div class="feature-item"><div class="feature-dot"></div>Historial clínico completo</div>
+    <div class="feature-item"><div class="feature-dot"></div>Análisis con inteligencia artificial</div>
+    <div class="feature-item"><div class="feature-dot"></div>Herramientas de organización del gabinete</div>
+    <div class="feature-item"><div class="feature-dot"></div>Sincronización con Google Calendar</div>
+    <div class="feature-item"><div class="feature-dot"></div>Recordatorios por WhatsApp</div>
+    <div class="feature-item"><div class="feature-dot"></div>Soporte por WhatsApp</div>
+  </div>
+
+  <button class="btn-pagar" id="btn-pagar" onclick="pagar()" disabled>
+    Seleccioná un plan para continuar
+  </button>
+
+  <p class="seguridad">🔒 Pago seguro con MercadoPago · Cancelá cuando quieras</p>
+  <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
+
+  <!-- MercadoPago SDK -->
+  <script src="https://sdk.mercadopago.com/js/v2"></script>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+      authDomain:        "ginails-cosmetologia.firebaseapp.com",
+      projectId:         "ginails-cosmetologia",
+      storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+      messagingSenderId: "35237686180",
+      appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    onAuthStateChanged(auth, (user) => {
+      if (!user) { window.location.href = "login.html"; return; }
+      window._userEmail = user.email;
+      window._userName  = user.displayName || user.email.split("@")[0];
+    });
+
+    window.cerrarSesion = async () => {
+      await signOut(auth);
+      window.location.href = "login.html";
+    };
+  </script>
+
+  <script>
+    let planSeleccionado = null;
+
+    const PLANES = {
+      mensual: {
+        nombre:      "Plan Mensual",
+        precio:      5000,
+        descripcion: "Ginails Pro · Suscripción mensual"
+      },
+      anual: {
+        nombre:      "Plan Anual",
+        precio:      40000,
+        descripcion: "Ginails Pro · Suscripción anual (ahorrás $20.000)"
+      }
+    };
+
+    function seleccionar(plan) {
+      planSeleccionado = plan;
+      document.getElementById("card-mensual").classList.toggle("selected", plan === "mensual");
+      document.getElementById("card-anual").classList.toggle("selected", plan === "anual");
+      const btn = document.getElementById("btn-pagar");
+      const p   = PLANES[plan];
+      btn.textContent = `Pagar ${p.nombre} · $${p.precio.toLocaleString("es-AR")} ARS`;
+      btn.disabled = false;
+    }
+
+    async function pagar() {
+      if (!planSeleccionado) return;
+
+      document.getElementById("loading-overlay").classList.add("show");
+
+      const plan  = PLANES[planSeleccionado];
+      const email = window._userEmail || "";
+      const nombre = window._userName || "Usuaria";
+
+      try {
+        const mp = new MercadoPago("APP_USR-8cc7cc91-3d3f-4717-8548-32ef14e153d9", {
+          locale: "es-AR"
+        });
+
+        // Crear preferencia de pago via worker
+        const res = await fetch("/api/crear-pago", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            plan:        planSeleccionado,
+            precio:      plan.precio,
+            descripcion: plan.descripcion,
+            email,
+            nombre
+          })
+        });
+
+        const data = await res.json();
+
+        if (data.init_point) {
+          window.location.href = data.init_point;
+        } else {
+          throw new Error("Sin init_point");
+        }
+
+      } catch (err) {
+        console.error(err);
+        document.getElementById("loading-overlay").classList.remove("show");
+        alert("Hubo un error al procesar el pago. Intentá de nuevo o escribinos por WhatsApp.");
+      }
+    }
+
+    window.pagar = pagar;
+    window.seleccionar = seleccionar;
+  </script>
+
+</body>
+</html>
