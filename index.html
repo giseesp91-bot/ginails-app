@@ -1547,7 +1547,11 @@ function initLocal(){
   gastosD=JSON.parse(localStorage.getItem('g_gastos')||'{}');
   presupuestos=JSON.parse(localStorage.getItem('g_presupuestos')||'{}');
   serviciosCustom=JSON.parse(localStorage.getItem('g_servicios_custom')||'{}');
-  renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
+ if(typeof updateStats==='function')updateStats();
+if(typeof renderClientas==='function')renderClientas();
+if(typeof renderInsumos==='function')renderInsumos();
+if(typeof renderPreciosSection==='function')renderPreciosSection();
+if(typeof initPresItems==='function')initPresItems();
 }
 
 async function loadFirebase(){
