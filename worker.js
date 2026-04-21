@@ -1,19 +1,20 @@
+// ⬇️ AGREGÁ ACÁ LOS EMAILS DE TUS BETA TESTERS
+const BETA_EMAILS = [
+  "gis.eesp91@gmail.com",
+];
+
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Proxy para Google Apps Script
+    // Verificar email
     if (url.pathname === '/api/verificar-email') {
-      const email = url.searchParams.get('email');
-      const scriptUrl = `https://script.google.com/macros/s/AKfycbzCWb5QInEh90gHLKmqc0d_Bg3CWDY2Xet9BOUK7pDQ35xJJILnBVn3vtpyWCQwglCi/exec?email=${encodeURIComponent(email)}`;
-      
-      const resp = await fetch(scriptUrl, {
-        redirect: 'follow',
-        headers: { 'User-Agent': 'Mozilla/5.0' }
-      });
-      const data = await resp.json();
-      
-      return new Response(JSON.stringify(data), {
+      const email = url.searchParams.get('email') || '';
+      const autorizada = BETA_EMAILS
+        .map(e => e.toLowerCase().trim())
+        .includes(email.toLowerCase().trim());
+
+      return new Response(JSON.stringify({ autorizada }), {
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*'
