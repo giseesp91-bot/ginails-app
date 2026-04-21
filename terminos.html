@@ -475,6 +475,7 @@
       const userRef  = doc(db, "usuarios", user.email);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists() && userSnap.data().terminosAceptados) {
+        clearTimeout(timeout);
         window.location.href = "trial.html";
         return;
       }
@@ -485,7 +486,7 @@
       if (!user) return;
       const userRef = doc(db, "usuarios", user.email);
       await setDoc(userRef, { terminosAceptados: true, fechaAceptacion: Date.now() }, { merge: true });
-      clearTimeout(timeout);
+      
       window.location.href = "trial.html";
     };
   </script>
