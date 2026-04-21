@@ -485,6 +485,7 @@
       if (!user) return;
       const userRef = doc(db, "usuarios", user.email);
       await setDoc(userRef, { terminosAceptados: true, fechaAceptacion: Date.now() }, { merge: true });
+      clearTimeout(timeout);
       window.location.href = "trial.html";
     };
   </script>
