@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ginails Pro · Términos y Condiciones</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rosa:       #D4537E;
+      --rosa-light: #FBEAF0;
+      --rosa-mid:   #F4C0D1;
+      --rosa-dark:  #4B1528;
+      --text:       #1a1a1a;
+      --text-muted: #7a7a7a;
+      --border:     #e8d8de;
+      --white:      #ffffff;
+      --bg:         #fdf6f8;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 4rem;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+
+    /* Header */
+    .brand {
+      text-align: center;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .brand-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .divider-brand {
+      width: 36px; height: 1.5px;
+      background: var(--rosa-mid);
+      margin: 8px auto 0;
+    }
+
+    /* Card principal */
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--rosa-mid);
+      width: 100%;
+      max-width: 640px;
+      box-shadow: 0 8px 40px rgba(212,83,126,0.07);
+      overflow: hidden;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .card-header {
+      background: var(--rosa-light);
+      border-bottom: 1px solid var(--rosa-mid);
+      padding: 1.4rem 1.8rem;
+    }
+
+    .card-header h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+    }
+
+    .card-header p {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-top: 3px;
+    }
+
+    /* Scroll area */
+    .scroll-area {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 1.6rem 1.8rem;
+      font-size: 0.86rem;
+      line-height: 1.75;
+      color: var(--text);
+      scroll-behavior: smooth;
+    }
+
+    .scroll-area::-webkit-scrollbar { width: 4px; }
+    .scroll-area::-webkit-scrollbar-track { background: transparent; }
+    .scroll-area::-webkit-scrollbar-thumb { background: var(--rosa-mid); border-radius: 4px; }
+
+    .section {
+      margin-bottom: 1.4rem;
+    }
+
+    .section h2 {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--rosa);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .section p {
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .section ul {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .section ul li {
+      padding: 3px 0 3px 16px;
+      position: relative;
+      color: var(--text-muted);
+      font-size: 0.84rem;
+    }
+
+    .section ul li::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      color: var(--rosa);
+      font-weight: 700;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.2rem 0;
+    }
+
+    /* Footer de la card */
+    .card-footer {
+      border-top: 1px solid var(--rosa-mid);
+      padding: 1.2rem 1.8rem;
+      background: var(--white);
+    }
+
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .checkbox-row input[type="checkbox"] {
+      margin-top: 2px;
+      width: 17px;
+      height: 17px;
+      accent-color: var(--rosa);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .checkbox-row label {
+      font-size: 0.84rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      line-height: 1.5;
+    }
+
+    .checkbox-row label span {
+      color: var(--rosa);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--rosa);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.92rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    .btn-primary.enabled {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .btn-primary.enabled:hover  { opacity: 0.9; }
+    .btn-primary.enabled:active { transform: scale(0.98); }
+
+    .scroll-hint {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .scroll-hint.hidden { display: none; }
+
+    /* Progress bar de lectura */
+    .read-bar-wrap {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      margin: 0 1.8rem 0;
+      overflow: hidden;
+    }
+
+    .read-bar {
+      height: 100%;
+      width: 0%;
+      background: var(--rosa);
+      border-radius: 2px;
+      transition: width 0.2s;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="brand">
+    <div class="brand-logo">Ginails Pro</div>
+    <div class="brand-sub">Para profesionales de la estética</div>
+    <div class="divider-brand"></div>
+  </div>
+
+  <div class="card">
+
+    <div class="card-header">
+      <h1>Términos y Condiciones de Uso</h1>
+      <p>Última actualización: 21 de abril de 2026 · Leé todo el documento para continuar</p>
+    </div>
+
+    <div class="read-bar-wrap">
+      <div class="read-bar" id="read-bar"></div>
+    </div>
+
+    <div class="scroll-area" id="scroll-area">
+
+      <p style="margin-bottom:1.2rem; color: var(--text-muted); font-size:0.85rem;">
+        Bienvenida a <strong style="color:var(--rosa-dark)">Ginails Pro</strong>, una aplicación diseñada para profesionales de la estética que permite gestionar clientas, tratamientos, historial clínico, análisis y herramientas de organización del gabinete.<br><br>
+        Al acceder y utilizar la aplicación, aceptás los presentes Términos y Condiciones.
+      </p>
+
+      <div class="section">
+        <h2>1. Uso de la aplicación</h2>
+        <p>Ginails Pro es una herramienta de apoyo para profesionales de la estética. No reemplaza el criterio profesional, la formación ni la responsabilidad individual de quien la utiliza.</p>
+        <p>La usuaria es responsable de:</p>
+        <ul>
+          <li>La información que carga en la plataforma</li>
+          <li>Las decisiones que toma en base a dicha información</li>
+          <li>El uso profesional de los datos de sus clientas</li>
+        </ul>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>2. Registro y cuentas</h2>
+        <p>Para utilizar la aplicación, la usuaria debe crear una cuenta personal. La usuaria se compromete a:</p>
+        <ul>
+          <li>Brindar información real y actualizada</li>
+          <li>No compartir su cuenta con terceros</li>
+          <li>Mantener la confidencialidad de sus datos de acceso</li>
+        </ul>
+        <p>Ginails Pro no se responsabiliza por accesos no autorizados derivados del mal uso de credenciales.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>3. Datos y privacidad</h2>
+        <p>La aplicación permite almacenar información de clientas (incluyendo datos personales y de salud). La usuaria es responsable de:</p>
+        <ul>
+          <li>Obtener el consentimiento de sus clientas para el uso de sus datos</li>
+          <li>Cumplir con las normativas vigentes de protección de datos personales</li>
+        </ul>
+        <p>Ginails Pro actúa como herramienta de almacenamiento y no se responsabiliza por el uso indebido de la información cargada.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>4. Inteligencia artificial</h2>
+        <p>La aplicación puede ofrecer sugerencias, análisis y recomendaciones mediante inteligencia artificial. Estas sugerencias:</p>
+        <ul>
+          <li>Son orientativas</li>
+          <li>No constituyen diagnóstico médico</li>
+          <li>No reemplazan el criterio profesional</li>
+        </ul>
+        <p>La decisión final sobre tratamientos y procedimientos es exclusiva de la usuaria.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>5. Disponibilidad del servicio</h2>
+        <p>Durante la etapa beta:</p>
+        <ul>
+          <li>La aplicación puede presentar errores o interrupciones</li>
+          <li>Algunas funciones pueden modificarse o actualizarse</li>
+        </ul>
+        <p>Ginails Pro no garantiza disponibilidad continua del servicio en esta etapa.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>6. Limitación de responsabilidad</h2>
+        <p>Ginails Pro no será responsable por:</p>
+        <ul>
+          <li>Decisiones profesionales tomadas por la usuaria</li>
+          <li>Resultados de tratamientos realizados</li>
+          <li>Pérdida de información por causas externas o fallas técnicas</li>
+        </ul>
+        <p>El uso de la aplicación es bajo exclusiva responsabilidad de la usuaria.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>7. Planes y pagos</h2>
+        <p>El acceso a la aplicación puede incluir:</p>
+        <ul>
+          <li>Períodos de prueba gratuitos</li>
+          <li>Planes mensuales o anuales pagos</li>
+        </ul>
+        <p>Las condiciones específicas serán informadas al momento de contratación.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>8. Modificaciones</h2>
+        <p>Ginails Pro se reserva el derecho de:</p>
+        <ul>
+          <li>Modificar funcionalidades</li>
+          <li>Actualizar estos términos</li>
+          <li>Cambiar condiciones de uso</li>
+        </ul>
+        <p>Las usuarias serán notificadas ante cambios relevantes.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>9. Aceptación</h2>
+        <p>El uso de la aplicación implica la aceptación total de estos Términos y Condiciones.</p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>10. Contacto</h2>
+        <p>Para consultas o soporte escribinos por WhatsApp:</p>
+        <p><a href="https://wa.me/5493563413890" style="color:var(--rosa); text-decoration:none; font-weight:500;">+54 9 3563 41-3890</a></p>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <h2>11. Acceso anticipado (Beta Testers)</h2>
+        <p>Ginails Pro podrá ofrecer acceso anticipado a determinadas usuarias en modalidad de prueba (en adelante, "Beta Testers"). Al participar en esta modalidad, la usuaria acepta que:</p>
+        <ul>
+          <li>La aplicación se encuentra en desarrollo y puede presentar errores, fallas o interrupciones</li>
+          <li>Algunas funcionalidades pueden no estar completas o pueden modificarse sin previo aviso</li>
+          <li>Los datos cargados podrían verse afectados por cambios, actualizaciones o fallas técnicas</li>
+        </ul>
+        <p>El acceso beta tiene como finalidad:</p>
+        <ul>
+          <li>Probar funcionalidades</li>
+          <li>Detectar errores</li>
+          <li>Recibir feedback para mejorar la aplicación</li>
+        </ul>
+        <p>Ginails Pro se reserva el derecho de:</p>
+        <ul>
+          <li>Modificar o deshabilitar funciones en cualquier momento</li>
+          <li>Limitar, ampliar o finalizar el acceso beta sin previo aviso</li>
+          <li>Revocar accesos en caso de uso indebido</li>
+        </ul>
+        <p>La participación como Beta Tester no garantiza acceso permanente ni condiciones futuras del servicio. En caso de ofrecerse un período de prueba gratuito, su duración y condiciones serán informadas oportunamente.</p>
+        <p>Al utilizar la aplicación en esta modalidad, la usuaria reconoce y acepta los riesgos asociados a un producto en desarrollo.</p>
+      </div>
+
+    </div>
+
+    <div class="card-footer">
+      <div class="scroll-hint" id="scroll-hint">
+        ↓ Scrolleá para leer todo el documento
+      </div>
+      <div class="checkbox-row">
+        <input type="checkbox" id="acepto" disabled />
+        <label for="acepto">
+          Leí y acepto los <span>Términos y Condiciones de Uso</span> de Ginails Pro
+        </label>
+      </div>
+      <button class="btn-primary" id="btn-continuar" onclick="continuar()">
+        Continuar
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+      authDomain:        "ginails-cosmetologia.firebaseapp.com",
+      projectId:         "ginails-cosmetologia",
+      storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+      messagingSenderId: "35237686180",
+      appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Si no está logueada → volver al login
+    onAuthStateChanged(auth, (user) => {
+      if (!user) window.location.href = "login.html";
+    });
+  </script>
+
+  <script>
+    const scrollArea  = document.getElementById("scroll-area");
+    const readBar     = document.getElementById("read-bar");
+    const checkbox    = document.getElementById("acepto");
+    const btnContinuar = document.getElementById("btn-continuar");
+    const scrollHint  = document.getElementById("scroll-hint");
+
+    let scrolledToEnd = false;
+
+    scrollArea.addEventListener("scroll", () => {
+      const { scrollTop, scrollHeight, clientHeight } = scrollArea;
+      const pct = scrollTop / (scrollHeight - clientHeight);
+      readBar.style.width = Math.min(pct * 100, 100) + "%";
+
+      if (pct > 0.05) scrollHint.classList.add("hidden");
+
+      if (pct >= 0.98 && !scrolledToEnd) {
+        scrolledToEnd = true;
+        checkbox.disabled = false;
+      }
+    });
+
+    checkbox.addEventListener("change", () => {
+      btnContinuar.classList.toggle("enabled", checkbox.checked);
+    });
+
+    function continuar() {
+      if (!checkbox.checked) return;
+      // Guardar en localStorage que aceptó los términos
+      localStorage.setItem("terminos_aceptados", "true");
+      window.location.href = "trial.html";
+    }
+
+    window.continuar = continuar;
+  </script>
+
+</body>
+</html>
