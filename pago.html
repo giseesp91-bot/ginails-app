@@ -375,7 +375,7 @@
   <button class="btn-logout" onclick="cerrarSesion()">Cerrar sesión</button>
 
   <!-- MercadoPago SDK -->
-  <script src="https://sdk.mercadopago.com/js/v2"></script>
+ 
 
   <!-- Firebase -->
   <script type="module">
@@ -442,9 +442,7 @@
       const nombre = window._userName || "Usuaria";
 
       try {
-        const mp = new MercadoPago("APP_USR-8cc7cc91-3d3f-4717-8548-32ef14e153d9", {
-          locale: "es-AR"
-        });
+       
 
         // Crear preferencia de pago via worker
         const res = await fetch("/api/crear-pago", {
