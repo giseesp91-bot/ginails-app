@@ -7,7 +7,10 @@ export default {
       const email = url.searchParams.get('email');
       const scriptUrl = `https://script.google.com/macros/s/AKfycbzCWb5QInEh90gHLKmqc0d_Bg3CWDY2Xet9BOUK7pDQ35xJJILnBVn3vtpyWCQwglCi/exec?email=${encodeURIComponent(email)}`;
       
-      const resp = await fetch(scriptUrl);
+      const resp = await fetch(scriptUrl, {
+        redirect: 'follow',
+        headers: { 'User-Agent': 'Mozilla/5.0' }
+      });
       const data = await resp.json();
       
       return new Response(JSON.stringify(data), {
