@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ginails Pro · Bienvenida</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rosa:       #D4537E;
+      --rosa-light: #FBEAF0;
+      --rosa-mid:   #F4C0D1;
+      --rosa-dark:  #4B1528;
+      --text:       #1a1a1a;
+      --text-muted: #7a7a7a;
+      --border:     #e8d8de;
+      --white:      #ffffff;
+      --bg:         #fdf6f8;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: -100px;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.25;
+      pointer-events: none;
+    }
+
+    /* Loading state */
+    #pantalla-cargando {
+      text-align: center;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--rosa-mid);
+      border-top-color: var(--rosa);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Pantalla NO autorizada */
+    #pantalla-no-autorizada {
+      display: none;
+      text-align: center;
+      max-width: 400px;
+      animation: fadeUp 0.4s ease both;
+    }
+
+    .icono-lock {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+    }
+
+    /* Pantalla AUTORIZADA - trial */
+    #pantalla-trial {
+      display: none;
+      width: 100%;
+      max-width: 480px;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 1.8rem;
+    }
+
+    .brand-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      letter-spacing: 0.04em;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .divider-brand {
+      width: 36px; height: 1.5px;
+      background: var(--rosa-mid);
+      margin: 8px auto 0;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--rosa-mid);
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(212,83,126,0.07);
+    }
+
+    /* Hero del trial */
+    .trial-hero {
+      background: var(--rosa-light);
+      border-bottom: 1px solid var(--rosa-mid);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .trial-badge {
+      display: inline-block;
+      background: var(--rosa);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+
+    .trial-dias {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 5rem;
+      font-weight: 600;
+      color: var(--rosa);
+      line-height: 1;
+    }
+
+    .trial-dias-label {
+      font-size: 1rem;
+      color: var(--rosa-dark);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .trial-sublabel {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+    }
+
+    /* Vencimiento */
+    .vencimiento {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 1rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .vencimiento strong {
+      color: var(--rosa-dark);
+    }
+
+    /* Features */
+    .features {
+      padding: 1.6rem 1.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .features-title {
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 7px 0;
+      font-size: 0.88rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .feature-item:last-child { border-bottom: none; }
+
+    .feature-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--rosa);
+      flex-shrink: 0;
+    }
+
+    /* Footer */
+    .card-footer {
+      padding: 1.4rem 1.8rem;
+    }
+
+    .bienvenida-nombre {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    .bienvenida-nombre strong {
+      color: var(--rosa-dark);
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: var(--rosa);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 0.8rem;
+    }
+
+    .btn-primary:hover  { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 11px;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--rosa-mid);
+      color: var(--rosa);
+    }
+
+    /* Card no autorizada */
+    .card-bloqueada {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--rosa-mid);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(212,83,126,0.07);
+    }
+
+    .card-bloqueada h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      color: var(--rosa-dark);
+      margin-bottom: 0.6rem;
+    }
+
+    .card-bloqueada p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.4rem;
+    }
+
+    .btn-wa {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #25D366;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .btn-wa:hover { opacity: 0.9; }
+
+    .btn-salir {
+      display: block;
+      margin-top: 1rem;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      background: none;
+      border: none;
+      font-family: 'DM Sans', sans-serif;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CARGANDO -->
+  <div id="pantalla-cargando">
+    <div class="spinner"></div>
+    <p style="font-size:0.85rem; color:var(--text-muted);">Verificando acceso...</p>
+  </div>
+
+  <!-- NO AUTORIZADA -->
+  <div id="pantalla-no-autorizada">
+    <div class="brand">
+      <div class="brand-logo">Ginails Pro</div>
+      <div class="brand-sub">Para profesionales de la estética</div>
+      <div class="divider-brand"></div>
+    </div>
+    <div class="card-bloqueada">
+      <div class="icono-lock">🔒</div>
+      <h2>Acceso no disponible</h2>
+      <p>Tu email no está en la lista de beta testers por el momento.<br>Si querés solicitar acceso, escribinos por WhatsApp.</p>
+      <a href="https://wa.me/5493563413890" class="btn-wa">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.855L.057 23.57a.75.75 0 00.918.919l5.815-1.525A11.95 11.95 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.75a9.71 9.71 0 01-4.953-1.355l-.355-.212-3.68.965.982-3.589-.232-.369A9.712 9.712 0 012.25 12C2.25 6.615 6.615 2.25 12 2.25S21.75 6.615 21.75 12 17.385 21.75 12 21.75z"/>
+        </svg>
+        Solicitar acceso
+      </a>
+      <button class="btn-salir" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- TRIAL ACTIVO -->
+  <div id="pantalla-trial">
+    <div class="brand">
+      <div class="brand-logo">Ginails Pro</div>
+      <div class="brand-sub">Para profesionales de la estética</div>
+      <div class="divider-brand"></div>
+    </div>
+
+    <div class="card">
+      <div class="trial-hero">
+        <div class="trial-badge">Acceso Beta · Prueba gratuita</div>
+        <div class="trial-dias">7</div>
+        <div class="trial-dias-label">días gratis</div>
+        <div class="trial-sublabel">Sin cargo · Sin tarjeta requerida</div>
+        <div class="vencimiento">
+          Tu prueba vence el <strong id="fecha-vencimiento"></strong>
+        </div>
+      </div>
+
+      <div class="features">
+        <div class="features-title">Incluido en tu prueba</div>
+        <div class="feature-item"><div class="feature-dot"></div>Gestión de clientas y turnos</div>
+        <div class="feature-item"><div class="feature-dot"></div>Historial clínico completo</div>
+        <div class="feature-item"><div class="feature-dot"></div>Análisis con inteligencia artificial</div>
+        <div class="feature-item"><div class="feature-dot"></div>Herramientas de organización del gabinete</div>
+        <div class="feature-item"><div class="feature-dot"></div>Sincronización con Google Calendar</div>
+        <div class="feature-item"><div class="feature-dot"></div>Recordatorios por WhatsApp</div>
+      </div>
+
+      <div class="card-footer">
+        <p class="bienvenida-nombre">Bienvenida, <strong id="nombre-usuaria"></strong> 🌸</p>
+        <button class="btn-primary" onclick="irAlDashboard()">Empezar a usar Ginails Pro</button>
+        <button class="btn-secondary" onclick="cerrarSesion()">Cerrar sesión</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+      authDomain:        "ginails-cosmetologia.firebaseapp.com",
+      projectId:         "ginails-cosmetologia",
+      storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+      messagingSenderId: "35237686180",
+      appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const API_URL = "https://script.google.com/macros/s/AKfycbzCWb5QInEh90gHLKmqc0d_Bg3CWDY2Xet9BOUK7pDQ35xJJILnBVn3vtpyWCQwglCi/exec";
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Verificar si aceptó términos
+      if (!localStorage.getItem("terminos_aceptados")) {
+        window.location.href = "terminos.html";
+        return;
+      }
+
+      // Verificar email en planilla
+      try {
+        const res  = await fetch(`${API_URL}?email=${encodeURIComponent(user.email)}`);
+        const data = await res.json();
+
+        document.getElementById("pantalla-cargando").style.display = "none";
+
+        if (data.autorizada) {
+          // Calcular fecha de vencimiento
+          const inicio = localStorage.getItem("trial_inicio") || Date.now();
+          localStorage.setItem("trial_inicio", inicio);
+          const vence = new Date(Number(inicio) + 7 * 24 * 60 * 60 * 1000);
+          const opciones = { day: "numeric", month: "long", year: "numeric" };
+          document.getElementById("fecha-vencimiento").textContent = vence.toLocaleDateString("es-AR", opciones);
+
+          // Nombre de la usuaria
+          const nombre = user.displayName || user.email.split("@")[0];
+          document.getElementById("nombre-usuaria").textContent = nombre;
+
+          document.getElementById("pantalla-trial").style.display = "block";
+        } else {
+          document.getElementById("pantalla-no-autorizada").style.display = "block";
+        }
+      } catch (err) {
+        document.getElementById("pantalla-cargando").style.display = "none";
+        document.getElementById("pantalla-no-autorizada").style.display = "block";
+      }
+    });
+
+    window.cerrarSesion = async () => {
+      await signOut(auth);
+      localStorage.removeItem("terminos_aceptados");
+      localStorage.removeItem("trial_inicio");
+      window.location.href = "login.html";
+    };
+
+    window.irAlDashboard = () => {
+      window.location.href = "index.html";
+    };
+  </script>
+
+</body>
+</html>
