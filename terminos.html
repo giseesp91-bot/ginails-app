@@ -468,14 +468,16 @@
   
   // Timeout de seguridad
   const timeout = setTimeout(() => {
+    
     window.location.href = "trial.html";
   }, 5000);
 
       // Chequear si ya aceptó los términos en Firestore
       const userRef  = doc(db, "usuarios", user.email);
       const userSnap = await getDoc(userRef);
+      clearTimeout(timeout);
       if (userSnap.exists() && userSnap.data().terminosAceptados) {
-        clearTimeout(timeout);
+        
         window.location.href = "trial.html";
         return;
       }
