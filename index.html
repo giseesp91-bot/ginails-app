@@ -1498,13 +1498,38 @@ let misPrecios = JSON.parse(localStorage.getItem('ginails_precios2') || JSON.str
 
 const WORKER_URL = "https://ginails-ia.gis-eesp91.workers.dev";
 
-// ===================== INIT (localStorage) =====================
-// Firebase removido temporalmente por CSP en Cloudflare — se reintegra con login
-window.addEventListener('DOMContentLoaded', () => {
-  initLocal();
-  hideLoading();
-});
+// ===================== INIT CON FIREBASE AUTH =====================
+let userEmail = null;
 
+window.addEventListener('DOMContentLoaded', async () => {
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+  const { getAuth, onAuthStateChanged } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  fs = firestoreModule;
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+    authDomain:        "ginails-cosmetologia.firebaseapp.com",
+    projectId:         "ginails-cosmetologia",
+    storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+    messagingSenderId: "35237686180",
+    appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  db = fs.getFirestore(app);
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "login.html"; return; }
+    userEmail = user.email;
+    useFirebase = true;
+    document.getElementById('fb-status').textContent = '☁️ ' + user.email;
+    document.getElementById('fb-status').className = 'fb-badge fb-ok';
+    await loadFirebase();
+    hideLoading();
+  });
+});
 
 function hideLoading(){
   const ls=document.getElementById('loading-screen');
@@ -1514,7 +1539,7 @@ function hideLoading(){
 
 function initLocal(){
   useFirebase=false;
-  document.getElementById('fb-status').textContent='💾 Datos guardados';
+  document.getElementById('fb-status').textContent='💾 Datos locales';
   document.getElementById('fb-status').className='fb-badge fb-ok';
   clientas=JSON.parse(localStorage.getItem('g_clientas')||'{}');
   sesiones=JSON.parse(localStorage.getItem('g_sesiones')||'{}');
@@ -1526,42 +1551,31 @@ function initLocal(){
 }
 
 async function loadFirebase(){
+  const base = `usuarios/${userEmail}`;
   const cols=[['clientas',clientas],['sesiones',sesiones],['planes',planes],
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
   for(const[col,obj] of cols){
-    const snap=await fs.getDocs(fs.collection(db,col));
+    const snap=await fs.getDocs(fs.collection(db, base, col));
     snap.forEach(d=>obj[d.id]=d.data());
   }
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
 }
 
 async function saveDoc(col,id,data){
-  if(useFirebase){await fs.setDoc(fs.doc(db,col,id),data);}
-  else{
+  if(useFirebase){
+    await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id), data);
+  } else {
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){map[col][id]=data;localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
 }
 async function delDoc(col,id){
-  if(useFirebase){await fs.deleteDoc(fs.doc(db,col,id));}
-  else{
+  if(useFirebase){
+    await fs.deleteDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id));
+  } else {
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){delete map[col][id];localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
-}
-
-function uid(){return Date.now().toString(36)+Math.random().toString(36).substr(2,5);}
-function v(id){const el=document.getElementById(id);return el?el.value:'';}
-function vb(id){const el=document.getElementById(id);return el?el.checked:false;}
-function getChecked(sel){return Array.from(document.querySelectorAll(sel+' input[type="checkbox"]:checked')).map(i=>i.parentElement.textContent.trim());}
-
-function updateStats(){
-  document.getElementById('stat-clientas').textContent=Object.keys(clientas).length;
-  document.getElementById('stat-sesiones').textContent=Object.keys(sesiones).length;
-  const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
-  const gastado=Object.values(gastosD).reduce((s,x)=>s+(x.monto||0),0);
-  const gan=cobrado-gastado;
-  document.getElementById('stat-ganancia').textContent=(gan>=0?'+':'')+('$'+gan.toLocaleString('es-AR'));
 }
 
 // ===================== NAV =====================
