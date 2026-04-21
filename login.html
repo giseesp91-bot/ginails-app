@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ginails Pro · Ingresar</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --rosa:       #D4537E;
+      --rosa-light: #FBEAF0;
+      --rosa-mid:   #F4C0D1;
+      --rosa-dark:  #4B1528;
+      --text:       #1a1a1a;
+      --text-muted: #7a7a7a;
+      --border:     #e8d8de;
+      --white:      #ffffff;
+      --bg:         #fdf6f8;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* fondo decorativo */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.45;
+      pointer-events: none;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -100px; left: -100px;
+      width: 360px; height: 360px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.3;
+      pointer-events: none;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--rosa-mid);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 400px;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 8px 40px rgba(212,83,126,0.08);
+      animation: fadeUp 0.5s ease both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .brand {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .brand-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      letter-spacing: 0.04em;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .divider-brand {
+      width: 40px; height: 1.5px;
+      background: var(--rosa-mid);
+      margin: 10px auto 0;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      background: var(--bg);
+      border-radius: 10px;
+      padding: 3px;
+      margin-bottom: 1.5rem;
+      border: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 8px;
+      border: none;
+      background: transparent;
+      border-radius: 8px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 400;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active {
+      background: var(--white);
+      color: var(--rosa);
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(212,83,126,0.12);
+    }
+
+    /* Forms */
+    .form-panel { display: none; }
+    .form-panel.active { display: block; }
+
+    .field {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+      letter-spacing: 0.02em;
+    }
+
+    input[type="email"],
+    input[type="password"],
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: var(--rosa);
+    }
+
+    .forgot {
+      text-align: right;
+      margin-bottom: 1.2rem;
+    }
+
+    .forgot a {
+      font-size: 0.78rem;
+      color: var(--rosa);
+      text-decoration: none;
+      opacity: 0.8;
+    }
+
+    .forgot a:hover { opacity: 1; }
+
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      background: var(--rosa);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-bottom: 1rem;
+    }
+
+    .btn-primary:hover  { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .separator {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .separator::before,
+    .separator::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .separator span {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .btn-google {
+      width: 100%;
+      padding: 11px;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .btn-google:hover {
+      background: var(--bg);
+      border-color: var(--rosa-mid);
+    }
+
+    .btn-google svg {
+      width: 18px; height: 18px; flex-shrink: 0;
+    }
+
+    /* Error */
+    .error-msg {
+      display: none;
+      background: #fff0f3;
+      border: 1px solid #f4c0d1;
+      color: #993356;
+      font-size: 0.8rem;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .error-msg.show { display: block; }
+
+    /* Loading state */
+    .btn-primary.loading {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .btn-primary.loading::after {
+      content: ' ·';
+      animation: dots 1s infinite;
+    }
+
+    @keyframes dots {
+      0%   { content: ' ·'; }
+      33%  { content: ' · ·'; }
+      66%  { content: ' · · ·'; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="brand">
+    <div class="brand-logo">Ginails Pro</div>
+    <div class="brand-sub">Para profesionales de la estética</div>
+    <div class="divider-brand"></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="switchTab('login')">Iniciar sesión</button>
+    <button class="tab-btn" onclick="switchTab('registro')">Crear cuenta</button>
+  </div>
+
+  <div id="error-msg" class="error-msg"></div>
+
+  <!-- LOGIN -->
+  <div id="panel-login" class="form-panel active">
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input type="email" id="login-email" placeholder="hola@ginails.com" />
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="login-pass" placeholder="••••••••" />
+    </div>
+    <div class="forgot"><a href="#" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a></div>
+    <button class="btn-primary" id="btn-login" onclick="loginEmail()">Ingresar</button>
+    <div class="separator"><span>o</span></div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Continuar con Google
+    </button>
+  </div>
+
+  <!-- REGISTRO -->
+  <div id="panel-registro" class="form-panel">
+    <div class="field">
+      <label>Nombre</label>
+      <input type="text" id="reg-nombre" placeholder="Tu nombre" />
+    </div>
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input type="email" id="reg-email" placeholder="hola@ginails.com" />
+    </div>
+    <div class="field">
+      <label>Contraseña</label>
+      <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" />
+    </div>
+    <button class="btn-primary" id="btn-registro" onclick="registrarse()">Crear cuenta</button>
+    <div class="separator"><span>o</span></div>
+    <button class="btn-google" onclick="loginGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      Registrarse con Google
+    </button>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!--  FIREBASE SDK                              -->
+<!-- ═══════════════════════════════════════════ -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import {
+    getAuth,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    signInWithPopup,
+    GoogleAuthProvider,
+    sendPasswordResetEmail,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+    authDomain:        "ginails-cosmetologia.firebaseapp.com",
+    projectId:         "ginails-cosmetologia",
+    storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+    messagingSenderId: "35237686180",
+    appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+  };
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const provider = new GoogleAuthProvider();
+
+  // Si ya está logueada → redirigir directo
+  onAuthStateChanged(auth, (user) => {
+    if (user) window.location.href = "terminos.html";
+  });
+
+  // ── Helpers ──────────────────────────────────
+  function showError(msg) {
+    const el = document.getElementById("error-msg");
+    el.textContent = msg;
+    el.classList.add("show");
+  }
+
+  function hideError() {
+    document.getElementById("error-msg").classList.remove("show");
+  }
+
+  function setLoading(btnId, on) {
+    const btn = document.getElementById(btnId);
+    btn.classList.toggle("loading", on);
+  }
+
+  // ── Login email ───────────────────────────────
+  window.loginEmail = async () => {
+    hideError();
+    const email = document.getElementById("login-email").value.trim();
+    const pass  = document.getElementById("login-pass").value;
+    if (!email || !pass) { showError("Completá todos los campos."); return; }
+    setLoading("btn-login", true);
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      window.location.href = "terminos.html";
+    } catch (e) {
+      setLoading("btn-login", false);
+      showError(traducirError(e.code));
+    }
+  };
+
+  // ── Registro email ────────────────────────────
+  window.registrarse = async () => {
+    hideError();
+    const nombre = document.getElementById("reg-nombre").value.trim();
+    const email  = document.getElementById("reg-email").value.trim();
+    const pass   = document.getElementById("reg-pass").value;
+    if (!nombre || !email || !pass) { showError("Completá todos los campos."); return; }
+    if (pass.length < 6) { showError("La contraseña debe tener al menos 6 caracteres."); return; }
+    setLoading("btn-registro", true);
+    try {
+      await createUserWithEmailAndPassword(auth, email, pass);
+      window.location.href = "terminos.html";
+    } catch (e) {
+      setLoading("btn-registro", false);
+      showError(traducirError(e.code));
+    }
+  };
+
+  // ── Login Google ──────────────────────────────
+  window.loginGoogle = async () => {
+    hideError();
+    try {
+      await signInWithPopup(auth, provider);
+      window.location.href = "terminos.html";
+    } catch (e) {
+      showError(traducirError(e.code));
+    }
+  };
+
+  // ── Recuperar contraseña ──────────────────────
+  window.recuperarPassword = async () => {
+    const email = document.getElementById("login-email").value.trim();
+    if (!email) { showError("Escribí tu correo arriba para recuperar la contraseña."); return; }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showError("✓ Te enviamos un email para restablecer tu contraseña.");
+      document.getElementById("error-msg").style.background = "#f0fff4";
+      document.getElementById("error-msg").style.borderColor = "#9fe1cb";
+      document.getElementById("error-msg").style.color = "#085041";
+    } catch (e) {
+      showError(traducirError(e.code));
+    }
+  };
+
+  // ── Traducción de errores ─────────────────────
+  function traducirError(code) {
+    const errores = {
+      "auth/user-not-found":       "No existe una cuenta con ese correo.",
+      "auth/wrong-password":       "Contraseña incorrecta.",
+      "auth/email-already-in-use": "Ese correo ya está registrado.",
+      "auth/invalid-email":        "El formato del correo no es válido.",
+      "auth/weak-password":        "La contraseña es muy débil.",
+      "auth/popup-closed-by-user": "Cerraste la ventana de Google antes de terminar.",
+      "auth/network-request-failed": "Error de conexión. Revisá tu internet.",
+    };
+    return errores[code] || "Ocurrió un error. Intentá de nuevo.";
+  }
+</script>
+
+<script>
+  // Tab switcher (no necesita Firebase)
+  function switchTab(tab) {
+    document.getElementById("panel-login").classList.toggle("active", tab === "login");
+    document.getElementById("panel-registro").classList.toggle("active", tab === "registro");
+    document.querySelectorAll(".tab-btn").forEach((btn, i) => {
+      btn.classList.toggle("active", (i === 0 && tab === "login") || (i === 1 && tab === "registro"));
+    });
+    document.getElementById("error-msg").classList.remove("show");
+  }
+</script>
+
+</body>
+</html>
