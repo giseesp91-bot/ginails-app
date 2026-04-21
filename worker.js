@@ -1,6 +1,9 @@
 // ⬇️ AGREGÁ ACÁ LOS EMAILS DE TUS BETA TESTERS
+const OWNER_EMAIL = "gis.eesp91@gmail.com";
+
 const BETA_EMAILS = [
   "gis.eesp91@gmail.com",
+  // otras beta testers acá
 ];
 
 export default {
