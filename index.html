@@ -1562,7 +1562,11 @@ async function loadFirebase(){
     const snap=await fs.getDocs(fs.collection(db, base, col));
     snap.forEach(d=>obj[d.id]=d.data());
   }
-  renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
+ if(typeof updateStats==='function')updateStats();
+if(typeof renderClientas==='function')renderClientas();
+if(typeof renderInsumos==='function')renderInsumos();
+if(typeof renderPreciosSection==='function')renderPreciosSection();
+if(typeof initPresItems==='function')initPresItems();
 }
 
 async function saveDoc(col,id,data){
