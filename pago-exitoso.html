@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ginails Pro · Pago exitoso</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --rosa:       #D4537E;
+      --rosa-light: #FBEAF0;
+      --rosa-mid:   #F4C0D1;
+      --rosa-dark:  #4B1528;
+      --text:       #1a1a1a;
+      --text-muted: #7a7a7a;
+      --border:     #e8d8de;
+      --white:      #ffffff;
+      --bg:         #fdf6f8;
+    }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -120px; right: -120px;
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f4c0d1 0%, transparent 70%);
+      opacity: 0.4;
+      pointer-events: none;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      border: 1px solid var(--rosa-mid);
+      padding: 2.5rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(212,83,126,0.08);
+      animation: fadeUp 0.5s ease both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .icono {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      animation: pop 0.4s ease 0.3s both;
+    }
+    @keyframes pop {
+      from { transform: scale(0); }
+      to   { transform: scale(1); }
+    }
+    .brand-logo {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: var(--rosa-dark);
+      margin-bottom: 0.3rem;
+    }
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.8rem;
+      color: var(--rosa-dark);
+      margin-bottom: 0.6rem;
+    }
+    p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 1.2rem 0;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 13px;
+      background: var(--rosa);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn-primary:hover  { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand-logo">Ginails Pro</div>
+    <div class="divider"></div>
+    <div class="icono">🌸</div>
+    <h1>¡Pago exitoso!</h1>
+    <p>Tu suscripción está activa. Ya podés usar Ginails Pro sin límites.</p>
+    <button class="btn-primary" onclick="window.location.href='index.html'">
+      Ir a mi cuenta
+    </button>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+      authDomain:        "ginails-cosmetologia.firebaseapp.com",
+      projectId:         "ginails-cosmetologia",
+      storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+      messagingSenderId: "35237686180",
+      appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) { window.location.href = "login.html"; return; }
+
+      // Marcar en Firestore que pagó
+      const params = new URLSearchParams(window.location.search);
+      const ref    = params.get("external_reference") || "";
+      const plan   = ref.split("|")[1] || "mensual";
+
+      await setDoc(doc(db, "usuarios", user.email), {
+        planActivo:   plan,
+        fechaPago:    Date.now(),
+        suscripcion:  "activa"
+      }, { merge: true });
+    });
+  </script>
+</body>
+</html>
