@@ -416,7 +416,7 @@
     const app  = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const API_URL = "https://script.google.com/macros/s/AKfycbzCWb5QInEh90gHLKmqc0d_Bg3CWDY2Xet9BOUK7pDQ35xJJILnBVn3vtpyWCQwglCi/exec";
+    const API_URL = "https://ginailspro-app.gis-eesp91.workers.dev/api/verificar-email";
 
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
