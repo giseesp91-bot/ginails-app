@@ -1,0 +1,24 @@
+{
+  "name": "Ginails Pro",
+  "short_name": "Ginails Pro",
+  "description": "Herramienta de apoyo para profesionales de la estética",
+  "start_url": "/login.html",
+  "display": "standalone",
+  "background_color": "#fdf6f8",
+  "theme_color": "#4B1528",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
