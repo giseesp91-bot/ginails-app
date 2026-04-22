@@ -3,9 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#4B1528" />
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
   <title>Ginails Pro · Términos y Condiciones</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -464,22 +461,17 @@
     const db   = getFirestore(app);
 
     onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = "login.html"; return; }
-  
-  // Timeout de seguridad
-  const timeout = setTimeout(() => {
-    
-    window.location.href = "trial.html";
-  }, 5000);
-
-      // Chequear si ya aceptó los términos en Firestore
-      const userRef  = doc(db, "usuarios", user.email);
-      const userSnap = await getDoc(userRef);
-      clearTimeout(timeout);
-      if (userSnap.exists() && userSnap.data().terminosAceptados) {
-        
-        window.location.href = "trial.html";
-        return;
+      if (!user) { window.location.href = "login.html"; return; }
+      try {
+        const userRef  = doc(db, "usuarios", user.email);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().terminosAceptados) {
+          window.location.href = "trial.html";
+        }
+        // si no aceptó → mostrar términos normalmente (no hacer nada)
+      } catch(e) {
+        // error de Firestore → mostrar términos igual
+        console.log("Firestore error, mostrando terminos", e);
       }
     });
 
@@ -488,7 +480,6 @@
       if (!user) return;
       const userRef = doc(db, "usuarios", user.email);
       await setDoc(userRef, { terminosAceptados: true, fechaAceptacion: Date.now() }, { merge: true });
-      
       window.location.href = "trial.html";
     };
   </script>
