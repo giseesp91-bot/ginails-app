@@ -1,29 +1,24 @@
 const OWNER_EMAIL = "gis.eesp91@gmail.com";
 
-const BETA_EMAILS = [
-  "gis.eesp91@gmail.com",
-  "gis.e91@hotmail.com",
-];
-
 const MP_ACCESS_TOKEN = "APP_USR-206002900110129-040911-e9f1c65cad33e33720702c71a3f53cb5-125485692";
 
 const PLANES = {
   mensual: {
-    reason:         "Ginails Pro · Plan Mensual",
+    reason: "Ginails Pro · Plan Mensual",
     auto_recurring: {
-      frequency:         1,
-      frequency_type:    "months",
+      frequency: 1,
+      frequency_type: "months",
       transaction_amount: 5000,
-      currency_id:       "ARS"
+      currency_id: "ARS"
     }
   },
   anual: {
-    reason:         "Ginails Pro · Plan Anual",
+    reason: "Ginails Pro · Plan Anual",
     auto_recurring: {
-      frequency:         12,
-      frequency_type:    "months",
+      frequency: 12,
+      frequency_type: "months",
       transaction_amount: 40000,
-      currency_id:       "ARS"
+      currency_id: "ARS"
     }
   }
 };
@@ -32,12 +27,11 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
 
-    // Verificar email beta
+    // Verificar acceso - cualquiera puede entrar, owner tiene acceso ilimitado
     if (url.pathname === '/api/verificar-email') {
       const email = url.searchParams.get('email') || '';
-      const autorizada = BETA_EMAILS.map(e=>e.toLowerCase().trim()).includes(email.toLowerCase().trim());
       const esOwner = email.toLowerCase().trim() === OWNER_EMAIL.toLowerCase();
-      return new Response(JSON.stringify({ autorizada, esOwner }), {
+      return new Response(JSON.stringify({ autorizada: true, esOwner }), {
         headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
       });
     }
@@ -46,19 +40,16 @@ export default {
     if (url.pathname === '/api/crear-pago' && request.method === 'POST') {
       const body = await request.json();
       const { plan, email, nombre } = body;
-
       const planConfig = PLANES[plan];
       if (!planConfig) {
         return new Response(JSON.stringify({ error: 'Plan no válido' }), { status: 400 });
       }
-
       const suscripcion = {
         ...planConfig,
         payer_email: email,
         back_url: `https://ginailspro-app.gis-eesp91.workers.dev/pago-exitoso.html`,
         external_reference: `${email}|${plan}`
       };
-
       const mpRes = await fetch("https://api.mercadopago.com/preapproval_plan", {
         method: "POST",
         headers: {
@@ -67,9 +58,7 @@ export default {
         },
         body: JSON.stringify(suscripcion)
       });
-
       const mpData = await mpRes.json();
-
       if (mpData.init_point) {
         return new Response(JSON.stringify({ init_point: mpData.init_point }), {
           headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
