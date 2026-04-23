@@ -493,12 +493,20 @@
 
     let scrolledToEnd = false;
 
+    // En móvil, habilitar el checkbox automáticamente después de 4 segundos
+    setTimeout(() => {
+      if (!scrolledToEnd) {
+        scrolledToEnd = true;
+        checkbox.disabled = false;
+      }
+    }, 4000);
+
     scrollArea.addEventListener("scroll", () => {
       const { scrollTop, scrollHeight, clientHeight } = scrollArea;
       const pct = scrollTop / (scrollHeight - clientHeight);
       readBar.style.width = Math.min(pct * 100, 100) + "%";
       if (pct > 0.05) scrollHint.classList.add("hidden");
-      if (pct >= 0.98 && !scrolledToEnd) {
+      if (pct >= 0.85 && !scrolledToEnd) {
         scrolledToEnd = true;
         checkbox.disabled = false;
       }
