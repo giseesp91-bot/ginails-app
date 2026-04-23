@@ -2,6 +2,7 @@ const OWNER_EMAIL = "gis.eesp91@gmail.com";
 
 const BETA_EMAILS = [
   "gis.eesp91@gmail.com",
+  "gis.e91@hotmail.com",
 ];
 
 const MP_ACCESS_TOKEN = "APP_USR-206002900110129-040911-e9f1c65cad33e33720702c71a3f53cb5-125485692";
