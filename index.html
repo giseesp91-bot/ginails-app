@@ -162,7 +162,7 @@ input[type="file"]{display:none;}
 
 <!-- INICIO -->
 <div id="inicio" class="section active">
-  <div class="section-title">🌸 Bienvenida, Gise</div>
+ <div class="section-title" id="saludo-inicio">🌸 Bienvenida/o </div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:16px">
     <div class="card" style="text-align:center;cursor:pointer;padding:14px" onclick="showSection('clientas',null)">
       <div style="font-size:1.6rem">👤</div>
@@ -2455,6 +2455,10 @@ function cargarConfig() {
   if (miConfig.nombre) { const el = document.getElementById('cfg-nombre'); if(el) el.value = miConfig.nombre; }
   if (miConfig.insta) { const el = document.getElementById('cfg-insta'); if(el) el.value = miConfig.insta; }
   if (miConfig.ciudad) { const el = document.getElementById('cfg-ciudad'); if(el) el.value = miConfig.ciudad; }
+  if(miConfig.nombre){
+  const s = document.getElementById('saludo-inicio');
+  if(s) s.textContent = '🌸 Bienvenida, ' + miConfig.nombre;
+}
 }
 
 function guardarConfig() {
@@ -2468,7 +2472,9 @@ function guardarConfig() {
   const prev = document.getElementById('config-preview');
   if(prev){prev.style.display='block';prev.innerHTML=`✅ <strong>¡Guardado!</strong><br><br>Vista previa del mensaje:<br><br><em>"Hola [clienta] 🌸<br>Antes de tu turno en <strong>${miConfig.salon}</strong> te comparto este cuestionario..."</em>`;}
   alert('✅ Configuración guardada!');
-}
+  document.getElementById('saludo-inicio').textContent = '🌸 Bienvenida, ' + (miConfig.nombre || '');
+} 
+ 
 
 // ===================== WHATSAPP FORM =====================
 function enviarFormWhatsApp(){
