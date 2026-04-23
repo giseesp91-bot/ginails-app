@@ -3,9 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="manifest" href="/manifest.json" />
-<meta name="theme-color" content="#4B1528" />
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('/sw.js');</script>
   <title>Ginails Pro · Ingresar</title>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
   <style>
@@ -289,63 +286,25 @@
     <div class="divider-brand"></div>
   </div>
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('login')">Iniciar sesión</button>
-    <button class="tab-btn" onclick="switchTab('registro')">Crear cuenta</button>
-  </div>
+  <p style="text-align:center;font-size:0.85rem;color:var(--text-muted);margin-bottom:1.5rem;line-height:1.6;">
+    Ingresá con tu cuenta de Google para acceder a la plataforma.
+  </p>
 
   <div id="error-msg" class="error-msg"></div>
 
-  <!-- LOGIN -->
-  <div id="panel-login" class="form-panel active">
-    <div class="field">
-      <label>Correo electrónico</label>
-      <input type="email" id="login-email" placeholder="hola@ginails.com" />
-    </div>
-    <div class="field">
-      <label>Contraseña</label>
-      <input type="password" id="login-pass" placeholder="••••••••" />
-    </div>
-    <div class="forgot"><a href="#" onclick="recuperarPassword()">¿Olvidaste tu contraseña?</a></div>
-    <button class="btn-primary" id="btn-login" onclick="loginEmail()">Ingresar</button>
-    <div class="separator"><span>o</span></div>
-    <button class="btn-google" onclick="loginGoogle()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Continuar con Google
-    </button>
-  </div>
+  <button class="btn-google" onclick="loginGoogle()" style="padding:14px;font-size:0.95rem;font-weight:500;">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" width="22" height="22">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    Continuar con Google
+  </button>
 
-  <!-- REGISTRO -->
-  <div id="panel-registro" class="form-panel">
-    <div class="field">
-      <label>Nombre</label>
-      <input type="text" id="reg-nombre" placeholder="Tu nombre" />
-    </div>
-    <div class="field">
-      <label>Correo electrónico</label>
-      <input type="email" id="reg-email" placeholder="hola@ginails.com" />
-    </div>
-    <div class="field">
-      <label>Contraseña</label>
-      <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" />
-    </div>
-    <button class="btn-primary" id="btn-registro" onclick="registrarse()">Crear cuenta</button>
-    <div class="separator"><span>o</span></div>
-    <button class="btn-google" onclick="loginGoogle()">
-      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
-        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-      </svg>
-      Registrarse con Google
-    </button>
-  </div>
+  <p style="text-align:center;font-size:0.75rem;color:var(--text-muted);margin-top:1.2rem;line-height:1.5;">
+    Al ingresar aceptás los <a href="terminos.html" style="color:var(--rosa);text-decoration:none;">Términos y Condiciones</a> de Ginails Pro
+  </p>
 
 </div>
 
@@ -398,39 +357,7 @@
     btn.classList.toggle("loading", on);
   }
 
-  // ── Login email ───────────────────────────────
-  window.loginEmail = async () => {
-    hideError();
-    const email = document.getElementById("login-email").value.trim();
-    const pass  = document.getElementById("login-pass").value;
-    if (!email || !pass) { showError("Completá todos los campos."); return; }
-    setLoading("btn-login", true);
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      window.location.href = "terminos.html";
-    } catch (e) {
-      setLoading("btn-login", false);
-      showError(traducirError(e.code));
-    }
-  };
-
-  // ── Registro email ────────────────────────────
-  window.registrarse = async () => {
-    hideError();
-    const nombre = document.getElementById("reg-nombre").value.trim();
-    const email  = document.getElementById("reg-email").value.trim();
-    const pass   = document.getElementById("reg-pass").value;
-    if (!nombre || !email || !pass) { showError("Completá todos los campos."); return; }
-    if (pass.length < 6) { showError("La contraseña debe tener al menos 6 caracteres."); return; }
-    setLoading("btn-registro", true);
-    try {
-      await createUserWithEmailAndPassword(auth, email, pass);
-      window.location.href = "terminos.html";
-    } catch (e) {
-      setLoading("btn-registro", false);
-      showError(traducirError(e.code));
-    }
-  };
+  // Solo Google login
 
   // ── Login Google ──────────────────────────────
   window.loginGoogle = async () => {
