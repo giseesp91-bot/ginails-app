@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ginails · Cosmetología Pro</title>
-<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com; connect-src *; font-src *; img-src * data:;">
+<meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com https://*.firebaseapp.com https://*.firebase.com; connect-src *; font-src *; img-src * data:; frame-src *;">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -1440,7 +1440,6 @@ input[type="file"]{display:none;}
 <script>
 // ===================== ESTADO GLOBAL =====================
 let db=null,fs=null,useFirebase=false;
-let userEmail=null;
 let clientaActualId=null,iaTextoActual='';
 let clientas={},sesiones={},planes={},gastosD={},presupuestos={},serviciosCustom={};
 let presItems=[];
@@ -1499,12 +1498,74 @@ let misPrecios = JSON.parse(localStorage.getItem('ginails_precios2') || JSON.str
 
 const WORKER_URL = "https://ginails-ia.gis-eesp91.workers.dev";
 
-// ===================== INIT (localStorage) =====================
-// Firebase removido temporalmente por CSP en Cloudflare — se reintegra con login
-window.addEventListener('DOMContentLoaded', () => {
-  initLocal();
-  hideLoading();
-});
+// ===================== INIT CON FIREBASE AUTH =====================
+let userEmail = null;
+
+(async () => {
+  const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+  const { getAuth, onAuthStateChanged, signOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+  const firestoreModule = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+  fs = firestoreModule;
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+    authDomain:        "ginails-cosmetologia.firebaseapp.com",
+    projectId:         "ginails-cosmetologia",
+    storageBucket:     "ginails-cosmetologia.firebasestorage.app",
+    messagingSenderId: "35237686180",
+    appId:             "1:35237686180:web:029e58bbe90034e8b2af31"
+  };
+
+  const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  db = fs.getFirestore(app);
+
+  window.cerrarSesion = async () => {
+    await signOut(auth);
+    window.location.href = "login.html";
+  };
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = "login.html"; return; }
+    userEmail = user.email;
+    useFirebase = true;
+    document.getElementById('fb-status').textContent = '☁️ ' + user.email;
+    document.getElementById('fb-status').className = 'fb-badge fb-ok';
+    await loadFirebase();
+    await cargarConfigFirebase();
+    hideLoading();
+
+    // Detectar formulario público
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('form') === '1') {
+      mostrarFormPublico(params.get('ref'));
+    }
+
+    // Formulario clienta via link viejo
+    if (params.get('form') === '1' && !params.get('ref')) {
+      document.querySelector('header').style.display='none';
+      document.querySelector('nav').style.display='none';
+      document.querySelector('main').style.display='none';
+      document.getElementById('modal-form-clienta').classList.add('open');
+      document.getElementById('modal-form-clienta').style.position='fixed';
+      document.getElementById('modal-form-clienta').style.background='var(--cream)';
+      const nombre = params.get('nombre');
+      if(nombre){
+        const titulo = document.querySelector('#modal-form-clienta .modal-title');
+        if(titulo) titulo.textContent = `🌸 Ficha previa para ${nombre}`;
+      }
+    }
+
+    // WA inputs
+    ['wa-nombre','wa-mensaje-extra'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.addEventListener('input',actualizarPreviewWA);
+    });
+
+    // Formularios recibidos
+    checkFormulariosRecibidos();
+  });
+})();
 
 
 function hideLoading(){
@@ -1524,7 +1585,6 @@ function initLocal(){
   presupuestos=JSON.parse(localStorage.getItem('g_presupuestos')||'{}');
   serviciosCustom=JSON.parse(localStorage.getItem('g_servicios_custom')||'{}');
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
-  aplicarSaludo();
 }
 
 async function loadFirebase(){
@@ -2316,30 +2376,7 @@ function enviarFormClientaWsp(){
 }
 
 // Detectar si se abrió el formulario de clienta via link
-window.addEventListener('DOMContentLoaded',()=>{
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('form')==='1'){
-    // Mostrar solo el formulario de clienta
-    document.querySelector('header').style.display='none';
-    document.querySelector('nav').style.display='none';
-    document.querySelector('main').style.display='none';
-    document.getElementById('modal-form-clienta').classList.add('open');
-    document.getElementById('modal-form-clienta').style.position='fixed';
-    document.getElementById('modal-form-clienta').style.background='var(--cream)';
-    const nombre = params.get('nombre');
-    if(nombre){
-      const titulo = document.querySelector('#modal-form-clienta .modal-title');
-      if(titulo) titulo.textContent = `🌸 Ficha previa para ${nombre}`;
-    }
-    // Verificar si hay respuestas pendientes para mostrar a la cosmetóloga
-    const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
-    if(respuestas.length && !params.get('form')){
-      // Notificar a la cosmetóloga (solo en modo normal)
-    }
-  }
-  // Verificar respuestas pendientes de formularios
-  checkFormulariosRecibidos();
-});
+// (merged into main DOMContentLoaded above)
 
 function checkFormulariosRecibidos(){
   const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
@@ -2418,6 +2455,18 @@ function aplicarSaludo() {
   if (s) s.textContent = miConfig.nombre ? '🌸 Bienvenida, ' + miConfig.nombre : '🌸 Bienvenida/o';
 }
 
+async function cargarConfigFirebase() {
+  if (!useFirebase || !userEmail) return;
+  try {
+    const snap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'perfil'));
+    if (snap.exists()) {
+      miConfig = { ...miConfig, ...snap.data() };
+      localStorage.setItem('ginails_config', JSON.stringify(miConfig));
+    }
+  } catch(e) { console.log('Config load error', e); }
+  aplicarSaludo();
+}
+
 function cargarConfig() {
   if (miConfig.salon) { const el = document.getElementById('cfg-salon'); if(el) el.value = miConfig.salon; }
   if (miConfig.nombre) { const el = document.getElementById('cfg-nombre'); if(el) el.value = miConfig.nombre; }
@@ -2434,11 +2483,10 @@ async function guardarConfig() {
     ciudad: v('cfg-ciudad').trim()
   };
   localStorage.setItem('ginails_config', JSON.stringify(miConfig));
-  // Guardar en Firestore si está disponible
-  if (useFirebase && db && fs && userEmail) {
+  if (useFirebase && userEmail) {
     try {
       await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'perfil'), miConfig);
-    } catch(e) { console.log('Config Firestore error:', e); }
+    } catch(e) { console.log('Config save error', e); }
   }
   const prev = document.getElementById('config-preview');
   if(prev){prev.style.display='block';prev.innerHTML=`✅ <strong>¡Guardado!</strong><br><br>Vista previa del mensaje:<br><br><em>"Hola [clienta] 🌸<br>Antes de tu turno en <strong>${miConfig.salon}</strong> te comparto este cuestionario..."</em>`;}
@@ -2476,19 +2524,7 @@ function actualizarPreviewWA() {
   if (prev) prev.innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const waInputs = ['wa-nombre', 'wa-mensaje-extra'];
-  waInputs.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', actualizarPreviewWA);
-  });
-
-  // Detectar si es un formulario público
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('form') === '1') {
-    mostrarFormPublico(params.get('ref'));
-  }
-});
+// (merged into main DOMContentLoaded)
 
 function abrirWhatsApp() {
   const tel = document.getElementById('wa-telefono').value.replace(/\D/g, '');
