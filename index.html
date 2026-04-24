@@ -1534,6 +1534,36 @@ window.addEventListener('DOMContentLoaded', async () => {
     await loadFirebase();
     await cargarConfigFirebase();
     hideLoading();
+
+    // Detectar formulario público
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('form') === '1') {
+      mostrarFormPublico(params.get('ref'));
+    }
+
+    // Formulario clienta via link viejo
+    if (params.get('form') === '1' && !params.get('ref')) {
+      document.querySelector('header').style.display='none';
+      document.querySelector('nav').style.display='none';
+      document.querySelector('main').style.display='none';
+      document.getElementById('modal-form-clienta').classList.add('open');
+      document.getElementById('modal-form-clienta').style.position='fixed';
+      document.getElementById('modal-form-clienta').style.background='var(--cream)';
+      const nombre = params.get('nombre');
+      if(nombre){
+        const titulo = document.querySelector('#modal-form-clienta .modal-title');
+        if(titulo) titulo.textContent = `🌸 Ficha previa para ${nombre}`;
+      }
+    }
+
+    // WA inputs
+    ['wa-nombre','wa-mensaje-extra'].forEach(id=>{
+      const el=document.getElementById(id);
+      if(el)el.addEventListener('input',actualizarPreviewWA);
+    });
+
+    // Formularios recibidos
+    checkFormulariosRecibidos();
   });
 });
 
@@ -2346,30 +2376,7 @@ function enviarFormClientaWsp(){
 }
 
 // Detectar si se abrió el formulario de clienta via link
-window.addEventListener('DOMContentLoaded',()=>{
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('form')==='1'){
-    // Mostrar solo el formulario de clienta
-    document.querySelector('header').style.display='none';
-    document.querySelector('nav').style.display='none';
-    document.querySelector('main').style.display='none';
-    document.getElementById('modal-form-clienta').classList.add('open');
-    document.getElementById('modal-form-clienta').style.position='fixed';
-    document.getElementById('modal-form-clienta').style.background='var(--cream)';
-    const nombre = params.get('nombre');
-    if(nombre){
-      const titulo = document.querySelector('#modal-form-clienta .modal-title');
-      if(titulo) titulo.textContent = `🌸 Ficha previa para ${nombre}`;
-    }
-    // Verificar si hay respuestas pendientes para mostrar a la cosmetóloga
-    const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
-    if(respuestas.length && !params.get('form')){
-      // Notificar a la cosmetóloga (solo en modo normal)
-    }
-  }
-  // Verificar respuestas pendientes de formularios
-  checkFormulariosRecibidos();
-});
+// (merged into main DOMContentLoaded above)
 
 function checkFormulariosRecibidos(){
   const respuestas = JSON.parse(localStorage.getItem('ginails_form_respuestas')||'[]');
@@ -2517,19 +2524,7 @@ function actualizarPreviewWA() {
   if (prev) prev.innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  const waInputs = ['wa-nombre', 'wa-mensaje-extra'];
-  waInputs.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', actualizarPreviewWA);
-  });
-
-  // Detectar si es un formulario público
-  const params = new URLSearchParams(window.location.search);
-  if (params.get('form') === '1') {
-    mostrarFormPublico(params.get('ref'));
-  }
-});
+// (merged into main DOMContentLoaded)
 
 function abrirWhatsApp() {
   const tel = document.getElementById('wa-telefono').value.replace(/\D/g, '');
