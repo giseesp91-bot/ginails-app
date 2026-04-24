@@ -1590,25 +1590,28 @@ function initLocal(){
 }
 
 async function loadFirebase(){
+  const base = `usuarios/${userEmail}`;
   const cols=[['clientas',clientas],['sesiones',sesiones],['planes',planes],
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
   for(const[col,obj] of cols){
-    const snap=await fs.getDocs(fs.collection(db,col));
+    const snap=await fs.getDocs(fs.collection(db, base, col));
     snap.forEach(d=>obj[d.id]=d.data());
   }
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
 }
 
 async function saveDoc(col,id,data){
-  if(useFirebase){await fs.setDoc(fs.doc(db,col,id),data);}
-  else{
+  if(useFirebase){
+    await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id), data);
+  } else {
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){map[col][id]=data;localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
 }
 async function delDoc(col,id){
-  if(useFirebase){await fs.deleteDoc(fs.doc(db,col,id));}
-  else{
+  if(useFirebase){
+    await fs.deleteDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id));
+  } else {
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){delete map[col][id];localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
