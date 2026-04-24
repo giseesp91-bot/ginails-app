@@ -162,7 +162,7 @@ input[type="file"]{display:none;}
 
 <!-- INICIO -->
 <div id="inicio" class="section active">
- <div class="section-title" id="saludo-inicio">🌸 Bienvenida/o </div>
+  <div class="section-title">🌸 Bienvenida, Gise</div>
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:16px">
     <div class="card" style="text-align:center;cursor:pointer;padding:14px" onclick="showSection('clientas',null)">
       <div style="font-size:1.6rem">👤</div>
@@ -1520,7 +1520,6 @@ window.addEventListener('DOMContentLoaded', async () => {
   const auth = getAuth(app);
   db = fs.getFirestore(app);
 
-  // Botón cerrar sesión si existe
   window.cerrarSesion = async () => {
     await signOut(auth);
     window.location.href = "login.html";
@@ -1533,6 +1532,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('fb-status').textContent = '☁️ ' + user.email;
     document.getElementById('fb-status').className = 'fb-badge fb-ok';
     await loadFirebase();
+    await cargarConfigFirebase();
     hideLoading();
   });
 });
@@ -1558,32 +1558,25 @@ function initLocal(){
 }
 
 async function loadFirebase(){
-  const base = `usuarios/${userEmail}`;
   const cols=[['clientas',clientas],['sesiones',sesiones],['planes',planes],
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
   for(const[col,obj] of cols){
-    const snap=await fs.getDocs(fs.collection(db, base, col));
+    const snap=await fs.getDocs(fs.collection(db,col));
     snap.forEach(d=>obj[d.id]=d.data());
   }
-  if(typeof updateStats==='function')updateStats();
-  if(typeof renderClientas==='function')renderClientas();
-  if(typeof renderInsumos==='function')renderInsumos();
-  if(typeof renderPreciosSection==='function')renderPreciosSection();
-  if(typeof initPresItems==='function')initPresItems();
+  renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
 }
 
 async function saveDoc(col,id,data){
-  if(useFirebase){
-    await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id), data);
-  } else {
+  if(useFirebase){await fs.setDoc(fs.doc(db,col,id),data);}
+  else{
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){map[col][id]=data;localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
 }
 async function delDoc(col,id){
-  if(useFirebase){
-    await fs.deleteDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id));
-  } else {
+  if(useFirebase){await fs.deleteDoc(fs.doc(db,col,id));}
+  else{
     const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
     if(map[col]){delete map[col][id];localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
@@ -2450,18 +2443,32 @@ function eliminarFormRecibido(idx){
 // ===================== CONFIGURACIÓN =====================
 let miConfig = JSON.parse(localStorage.getItem('ginails_config') || '{}');
 
+function aplicarSaludo() {
+  const s = document.getElementById('saludo-inicio');
+  if (s) s.textContent = miConfig.nombre ? '🌸 Bienvenida, ' + miConfig.nombre : '🌸 Bienvenida';
+}
+
+async function cargarConfigFirebase() {
+  if (!useFirebase || !userEmail) return;
+  try {
+    const snap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'perfil'));
+    if (snap.exists()) {
+      miConfig = { ...miConfig, ...snap.data() };
+      localStorage.setItem('ginails_config', JSON.stringify(miConfig));
+    }
+  } catch(e) { console.log('Config load error', e); }
+  aplicarSaludo();
+}
+
 function cargarConfig() {
   if (miConfig.salon) { const el = document.getElementById('cfg-salon'); if(el) el.value = miConfig.salon; }
   if (miConfig.nombre) { const el = document.getElementById('cfg-nombre'); if(el) el.value = miConfig.nombre; }
   if (miConfig.insta) { const el = document.getElementById('cfg-insta'); if(el) el.value = miConfig.insta; }
   if (miConfig.ciudad) { const el = document.getElementById('cfg-ciudad'); if(el) el.value = miConfig.ciudad; }
-  if(miConfig.nombre){
-  const s = document.getElementById('saludo-inicio');
-  if(s) s.textContent = '🌸 Bienvenida/o, ' + miConfig.nombre;
-}
+  aplicarSaludo();
 }
 
-function guardarConfig() {
+async function guardarConfig() {
   miConfig = {
     salon: v('cfg-salon').trim() || 'mi estética',
     nombre: v('cfg-nombre').trim(),
@@ -2469,12 +2476,16 @@ function guardarConfig() {
     ciudad: v('cfg-ciudad').trim()
   };
   localStorage.setItem('ginails_config', JSON.stringify(miConfig));
+  if (useFirebase && userEmail) {
+    try {
+      await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'perfil'), miConfig);
+    } catch(e) { console.log('Config save error', e); }
+  }
   const prev = document.getElementById('config-preview');
   if(prev){prev.style.display='block';prev.innerHTML=`✅ <strong>¡Guardado!</strong><br><br>Vista previa del mensaje:<br><br><em>"Hola [clienta] 🌸<br>Antes de tu turno en <strong>${miConfig.salon}</strong> te comparto este cuestionario..."</em>`;}
   alert('✅ Configuración guardada!');
-  document.getElementById('saludo-inicio').textContent = '🌸 Bienvenida/o, ' + (miConfig.nombre || '');
-} 
- 
+  aplicarSaludo();
+}
 
 // ===================== WHATSAPP FORM =====================
 function enviarFormWhatsApp(){
