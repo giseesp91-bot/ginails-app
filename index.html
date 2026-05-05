@@ -1545,11 +1545,7 @@ document.addEventListener('DOMContentLoaded', () => {
     await cargarConfigFirebase();
     hideLoading();
 
-    // Detectar formulario público
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('form') === '1') {
-      mostrarFormPublico(params.get('ref'));
-    }
+  
 
     // Formulario clienta via link viejo
     if (params.get('form') === '1' && !params.get('ref')) {
