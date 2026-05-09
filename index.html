@@ -2308,10 +2308,53 @@ function renderGastos(){
     </div>
     <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
       <span style="font-weight:700;color:var(--danger)">-$${g.monto.toLocaleString('es-AR')}</span>
-      <button onclick="eliminarGasto('${g.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.95rem">×</button>
+      <button onclick="abrirEditarGasto('${g.id}')" style="background:none;border:1.5px solid var(--border);border-radius:7px;color:var(--muted);cursor:pointer;font-size:0.78rem;padding:3px 8px">✏️</button>
+<button onclick="eliminarGasto('${g.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.95rem">×</button>;color:var(--muted);cursor:pointer;font-size:0.95rem">×</button>
     </div>
   </div>`).join('');
 }
+function abrirEditarGasto(id){
+  const g = gastosD[id];
+  if(!g) return;
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay open';
+  modal.innerHTML = `<div class="modal">
+    <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">✕</button>
+    <div class="modal-title">✏️ Editar Gasto</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Descripción *</label><input type="text" id="eg-desc" value="${g.desc}" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%"></div>
+      <div class="form-group"><label>Monto ($) *</label><input type="number" id="eg-monto" value="${g.monto}" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%"></div>
+      <div class="form-group"><label>Categoría</label>
+        <select id="eg-cat" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+          <option ${g.categoria==='Productos cosméticos'?'selected':''}>Productos cosméticos</option>
+          <option ${g.categoria==='Insumos / descartables'?'selected':''}>Insumos / descartables</option>
+          <option ${g.categoria==='Reutilizables'?'selected':''}>Reutilizables</option>
+          <option ${g.categoria==='Aparatología'?'selected':''}>Aparatología</option>
+          <option ${g.categoria==='Kits cejas / pestañas'?'selected':''}>Kits cejas / pestañas</option>
+          <option ${g.categoria==='Capacitación / cursos'?'selected':''}>Capacitación / cursos</option>
+          <option ${g.categoria==='Otros'?'selected':''}>Otros</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Notas</label><input type="text" id="eg-notas" value="${g.notas||''}" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%"></div>
+    </div>
+    <div class="btn-row" style="margin-top:12px">
+      <button class="btn btn-primary" onclick="guardarEdicionGasto('${id}')">💾 Guardar</button>
+      <button class="btn btn-secondary" onclick="this.closest('.modal-overlay').remove()">Cancelar</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+async function guardarEdicionGasto(id){
+  const desc = document.getElementById('eg-desc').value.trim();
+  const monto = parseFloat(document.getElementById('eg-monto').value);
+  if(!desc || !monto){ alert('Completá descripción y monto'); return; }
+  gastosD[id] = { ...gastosD[id], desc, monto, categoria: document.getElementById('eg-cat').value, notas: document.getElementById('eg-notas').value };
+  await saveDoc('gastos', id, gastosD[id]);
+  document.querySelectorAll('.modal-overlay').forEach(m => { if(m.querySelector('#eg-desc')) m.remove(); });
+  renderGastos(); actualizarResumen();
+  alert('✅ Gasto actualizado!');
+}  
 async function eliminarGasto(id){if(!confirm('¿Eliminar?'))return;delete gastosD[id];await delDoc('gastos',id);renderGastos();actualizarResumen();}
 function actualizarResumen(){
   const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
