@@ -380,6 +380,34 @@ input[type="file"]{display:none;}
     </div>
   </div>
   <div class="card">
+    <div class="card-title">🌸 Salud Hormonal & Menstrual</div>
+    <div class="alert alert-info" style="margin-bottom:10px">💡 Esta información influye directamente en el estado de la piel, sensibilidad y resultados de los tratamientos.</div>
+    <div class="form-grid">
+      <div class="form-group"><label>Menstruación</label>
+        <select id="nc-menstruacion"><option value="">Seleccionar</option><option>Regular</option><option>Irregular</option><option>No menstrúa / menopausia</option></select>
+      </div>
+      <div class="form-group"><label>Estado hormonal actual</label>
+        <select id="nc-estado-hormonal"><option value="">Seleccionar</option><option>Ciclo menstrual activo</option><option>Embarazo</option><option>Lactancia</option><option>Perimenopausia</option><option>Menopausia</option><option>Sin ciclo activo</option></select>
+      </div>
+      <div class="form-group full"><label>Método anticonceptivo / cuidado</label>
+        <div class="check-group" id="anticonceptivo-check">
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> Pastillas anticonceptivas</label>
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> DIU</label>
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> Implante subdérmico</label>
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> Parche hormonal</label>
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> Preservativo</label>
+          <label class="check-item"><input type="checkbox" class="nc-anticon"> Ninguno</label>
+        </div>
+      </div>
+      <div class="form-group full"><label>Otro método o aclaración</label>
+        <input type="text" id="nc-anticon-otro" placeholder="Especificar si usás otro método o querés aclarar algo...">
+      </div>
+      <div class="form-group full"><label>Observaciones hormonales</label>
+        <textarea id="nc-obs-hormonal" placeholder="Ej: ciclo irregular desde hace 3 meses, acné hormonal premenstrual, cambios en piel según fase del ciclo, tratamiento hormonal específico..."></textarea>
+      </div>
+    </div>
+  </div>
+  <div class="card">
     <div class="card-title">🎯 Objetivo & Consentimiento</div>
     <div class="form-grid">
       <div class="form-group full"><label>¿Qué quiere lograr la clienta?</label><textarea id="nc-objetivo" placeholder="Objetivo principal, expectativas, qué la motivó a venir..."></textarea></div>
@@ -1585,6 +1613,43 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = "login.html";
       return;
     }
+
+    const OWNER_EMAIL = "gis.eesp91@gmail.com";
+    const DIAS_TRIAL = 7;
+
+    // Owner siempre tiene acceso
+    if (user.email.toLowerCase() !== OWNER_EMAIL.toLowerCase()) {
+      // Verificar suscripción o trial
+      try {
+        const userRef = fs.doc(db, "usuarios", user.email);
+        const userSnap = await fs.getDoc(userRef);
+        const userData = userSnap.exists() ? userSnap.data() : {};
+
+        const suscripcionActiva = userData.suscripcionActiva === true;
+        const suscripcionVence = userData.suscripcionVence ? new Date(userData.suscripcionVence) : null;
+        const suscripcionVigente = suscripcionActiva && suscripcionVence && suscripcionVence > new Date();
+
+        if (!suscripcionVigente) {
+          // Verificar trial
+          const trialInicio = userData.trialInicio;
+          if (!trialInicio) {
+            // Primera vez — ir a trial.html para registrar inicio
+            window.location.href = "trial.html";
+            return;
+          }
+          const diasPasados = (Date.now() - trialInicio) / (1000 * 60 * 60 * 24);
+          if (diasPasados >= DIAS_TRIAL) {
+            // Trial vencido → pago
+            window.location.href = "pago.html";
+            return;
+          }
+        }
+      } catch(e) {
+        console.log('Auth check error:', e);
+        // En caso de error dejar pasar para no bloquear
+      }
+    }
+
     userEmail = user.email;
     useFirebase = true;
     document.getElementById('fb-status').textContent = '☁️ ' + user.email;
@@ -1770,6 +1835,11 @@ async function guardarClienta(){
     estres:v('nc-estres'),tabaco:v('nc-tabaco'),skincare:v('nc-skincare'),
     cejas:v('nc-cejas'),pestanas:v('nc-pestanas'),
     prevTinte:v('nc-prev-tinte'),extensiones:v('nc-extensiones'),alegTinte:v('nc-aleg-tinte'),
+    menstruacion:v('nc-menstruacion'),
+    estadoHormonal:v('nc-estado-hormonal'),
+    anticonceptivos:Array.from(document.querySelectorAll('.nc-anticon:checked')).map(i=>i.parentElement.textContent.trim()),
+    anticonceptivoOtro:v('nc-anticon-otro'),
+    obsHormonal:v('nc-obs-hormonal'),
     objetivo:v('nc-objetivo'),obs:v('nc-obs'),
     consentimiento:vb('nc-consentimiento'),
     notas:[],fotos:[],analisisIA:[],
@@ -1847,6 +1917,15 @@ function abrirFicha(id){
       ${c.alegTinte?`<div style="margin-top:4px"><span class="field-label">Alergias tinte: </span><span style="color:var(--danger);font-size:0.84rem">${c.alegTinte}</span></div>`:''}
     </div>
     ${c.medicacion?`<div class="alert alert-warning">💊 Medicación: ${c.medicacion}</div>`:''}
+    ${(c.estadoHormonal||c.menstruacion||c.obsHormonal)?`<div class="ficha-section" style="background:#fff0f7;border:1px solid #f4c0d1">
+      <h4>🌸 Salud Hormonal</h4>
+      <div class="field-row">
+        ${c.menstruacion?`<div><div class="field-label">Menstruación</div><div class="field-value">${c.menstruacion}</div></div>`:''}
+        ${c.estadoHormonal?`<div><div class="field-label">Estado hormonal</div><div class="field-value">${c.estadoHormonal}</div></div>`:''}
+      </div>
+      ${(c.anticonceptivos||[]).length?`<div style="margin-top:5px"><span class="field-label">Anticonceptivos: </span><span style="font-size:0.84rem">${c.anticonceptivos.join(', ')}${c.anticonceptivoOtro?' · '+c.anticonceptivoOtro:''}</span></div>`:''}
+      ${c.obsHormonal?`<div style="margin-top:5px;font-size:0.83rem;color:var(--muted)">${c.obsHormonal}</div>`:''}
+    </div>`:''}
     ${c.obs?`<div class="ficha-section"><h4>📝 Obs</h4><p style="font-size:0.84rem">${c.obs}</p></div>`:''}
     ${(c.analisisIA||[]).length?`<div class="ficha-section" style="background:#f0fdf4">
       <h4>🤖 Análisis IA guardado</h4>
@@ -2067,6 +2146,14 @@ REGLAS CLÍNICAS OBLIGATORIAS A RESPETAR:
 9. MENOS ES MÁS: No sobrecargar. Priorizar eficacia sobre cantidad.
 10. SI NO ES APTO → DECIRLO CLARAMENTE con explicación.
 
+REGLAS HORMONALES A CONSIDERAR:
+- Embarazo → CONTRAINDICADO: peelings químicos, retinoides, alta frecuencia, galvánica, algunos despigmentantes (kójico, arbutina). Permitido: limpieza suave, hidratación, mascarillas calmantes.
+- Lactancia → evitar retinoides y activos que puedan absorberse sistémicamente.
+- Anticonceptivos orales → pueden causar melasma hormonal. Si hay manchas: SPF estricto OBLIGATORIO, evitar calor en zona.
+- Menopausia / perimenopausia → piel más seca, menos producción de colágeno, mayor sensibilidad. Priorizar hidratación profunda y anti-edad.
+- Fase premenstrual (días 21-28 del ciclo) → piel más sensible, propensa al acné hormonal. Evitar peelings agresivos en esta fase.
+- Si menciona acné hormonal cíclico → relacionar con fase del ciclo, no tratar como acné común.
+
 PERFIL DE LA CLIENTA:
 - Nombre: ${c.nombre}
 - Tipo de piel: ${c.tpiel} | Fototipo: ${c.fototipo}
@@ -2080,6 +2167,9 @@ PERFIL DE LA CLIENTA:
 - Exposición solar: ${c.solar} | Usa SPF: ${c.fps}
 - Rutina actual: ${c.skincare||'ninguna'}
 - Estado cejas: ${c.cejas} | Estado pestañas: ${c.pestanas}
+- Menstruación: ${c.menstruacion||'no especificado'} | Estado hormonal: ${c.estadoHormonal||'no especificado'}
+- Anticonceptivos: ${(c.anticonceptivos||[]).join(', ')||c.anticonceptivoOtro||'no especificado'}
+- Observaciones hormonales: ${c.obsHormonal||'ninguna'}
 - Objetivo de la clienta: ${c.objetivo||'no especificado'}
 - Sesiones previas realizadas: ${sesCli.length}
 - Rechazos a productos anteriores: ${rechazos||'ninguno'}
@@ -2662,6 +2752,22 @@ function mostrarFormPublico(clientaId) {
         <select id="fp-pestanas"><option value="">Seleccionar</option><option>Abundantes y sanas</option><option>Escasas / finas</option><option>Muy lacias</option><option>Frágiles</option></select>
       </div>
       <div class="form-group full"><label>¿Hiciste algún tratamiento estético antes?</label><textarea id="fp-tratprev" placeholder="¿Cuáles? ¿Cómo te fue?" style="min-height:55px"></textarea></div>
+      <div class="form-group full" style="border-top:1.5px solid var(--border);padding-top:12px;margin-top:4px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">🌸 Salud hormonal (opcional)</div>
+      </div>
+      <div class="form-group"><label>¿Tu menstruación es regular?</label>
+        <select id="fp-menstruacion" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+          <option value="">Seleccionar</option><option>Regular</option><option>Irregular</option><option>No menstrúo / menopausia</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Estado hormonal actual</label>
+        <select id="fp-estado-hormonal" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+          <option value="">Seleccionar</option><option>Ciclo menstrual activo</option><option>Embarazo</option><option>Lactancia</option><option>Perimenopausia</option><option>Menopausia</option>
+        </select>
+      </div>
+      <div class="form-group full"><label>Método anticonceptivo (si usás)</label>
+        <input type="text" id="fp-anticonceptivo" placeholder="Ej: pastillas, DIU, implante, ninguno..." style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+      </div>
       <div class="form-group full"><label>¿Algo más que quieras contarme?</label><textarea id="fp-obs" placeholder="Cualquier detalle que creas importante..." style="min-height:55px"></textarea></div>
     </div>`;
   // Store clientaId for later
@@ -2687,6 +2793,9 @@ async function enviarFormPublico() {
     cejas: document.getElementById('fp-cejas')?.value || '',
     pestanas: document.getElementById('fp-pestanas')?.value || '',
     tratprev: document.getElementById('fp-tratprev')?.value || '',
+    menstruacion: document.getElementById('fp-menstruacion')?.value || '',
+    estadoHormonal: document.getElementById('fp-estado-hormonal')?.value || '',
+    anticonceptivo: document.getElementById('fp-anticonceptivo')?.value || '',
     obs: document.getElementById('fp-obs')?.value || '',
     completadoPorClienta: true,
     fechaFormulario: new Date().toLocaleString('es-AR'),
