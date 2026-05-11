@@ -2593,10 +2593,9 @@ function actualizarPreviewWA() {
   const salon = document.getElementById('wa-salon')?.value || 'tu cosmetóloga';
   const nombre = document.getElementById('wa-nombre')?.value || 'clienta';
   const extra = document.getElementById('wa-mensaje-extra')?.value || '';
-  // Guardar nombre del salón automáticamente
   if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
-  const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}`;
   const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con *${salon}* te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos junt@s en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
   const prev = document.getElementById('wa-preview');
   if (prev) prev.innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
@@ -2612,7 +2611,7 @@ function abrirWhatsApp() {
   const extra = document.getElementById('wa-mensaje-extra').value;
   if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
-  const link = `${baseUrl}?form=1&ref=${clientaActualId}`;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}`;
   const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con ${salon} te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos junt@s en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
@@ -2621,7 +2620,9 @@ function abrirWhatsApp() {
 
 function mostrarFormPublico(clientaId) {
   window._formPublicoClientaId = clientaId;
-  window._cosmetologaEmail = userEmail || '';
+  // Leer email de cosmetóloga desde la URL
+  const params = new URLSearchParams(window.location.search);
+  window._cosmetologaEmail = params.get('cosm') ? decodeURIComponent(params.get('cosm')) : (userEmail || '');
   document.getElementById('modal-form-publico').classList.add('open');
   document.getElementById('form-publico-contenido').innerHTML = `
     <div class="form-grid">
