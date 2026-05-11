@@ -2393,7 +2393,7 @@ function generarFormWsp(){
 
 function getLinkForm(nombre){
   const base = window.location.href.split('?')[0];
-  const params = new URLSearchParams({form:'1', nombre: nombre||''});
+  const params = new URLSearchParams({form:'1', nombre: nombre||'', cosm: userEmail||''});
   return base + '?' + params.toString();
 }
 
@@ -2620,9 +2620,9 @@ function abrirWhatsApp() {
 
 function mostrarFormPublico(clientaId) {
   window._formPublicoClientaId = clientaId;
-  // Leer email de cosmetóloga desde la URL
   const params = new URLSearchParams(window.location.search);
-  window._cosmetologaEmail = params.get('cosm') ? decodeURIComponent(params.get('cosm')) : (userEmail || '');
+  const cosmParam = params.get('cosm');
+  window._cosmetologaEmail = cosmParam ? decodeURIComponent(cosmParam) : (userEmail || '');
   document.getElementById('modal-form-publico').classList.add('open');
   document.getElementById('form-publico-contenido').innerHTML = `
     <div class="form-grid">
