@@ -2355,7 +2355,7 @@ function enviarFormWsp(){
   const link = getLinkForm(nombre);
   const msgCustom = v('wsp-mensaje').trim();
   const msg = msgCustom ||
-    `Hola ${nombre}! 🌸 Soy tu cosmetóloga. Antes de tu turno te pido que completes esta ficha previa para poder preparar tu tratamiento personalizado. ¡Es rápida y fácil!\n\n${link}\n\nCompletá lo que puedas — lo que no sepas lo vemos juntas en el gabinete. ¡Nos vemos pronto! 💕`;
+    `Hola ${nombre}! 🌸 Soy tu cosmetóloga. Antes de tu turno te pido que completes esta ficha previa para poder preparar tu tratamiento personalizado. ¡Es rápida y fácil!\n\n${link}\n\nCompletá lo que puedas — lo que no sepas lo vemos junt@s en el gabinete. ¡Nos vemos pronto! 💕`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   window.open(url,'_blank');
   const prev = document.getElementById('wsp-link-preview');
