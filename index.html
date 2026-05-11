@@ -156,6 +156,7 @@ input[type="file"]{display:none;}
   <button class="nav-btn" onclick="showSection('gastos',this)">📊 Gastos</button>
   <button class="nav-btn" onclick="showSection('compras',this)">🛍️ Compras</button>
   <button class="nav-btn" onclick="showSection('config',this)">⚙️ Config</button>
+  <button class="nav-btn" onclick="showSection('crm',this)" id="nav-crm">📊 CRM <span id="crm-badge" style="display:none;background:var(--danger);color:white;border-radius:20px;padding:1px 6px;font-size:0.65rem;margin-left:3px">0</span></button>
 </nav>
 
 <main>
@@ -189,6 +190,50 @@ input[type="file"]{display:none;}
     </div>
   </div>
   <div class="alert alert-info" id="fb-config-alert" style="display:none">⚠️ Firebase no configurado — modo local activo.</div>
+  <div id="crm-alertas-inicio"></div>
+</div>
+
+<!-- CRM -->
+<div id="crm" class="section">
+  <div class="section-title">📊 CRM · Gestión Profesional</div>
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('crm-tab-alertas',this)">🔔 Alertas</button>
+    <button class="tab" onclick="showTab('crm-tab-clientes',this)">👥 Clientas</button>
+    <button class="tab" onclick="showTab('crm-tab-consumo',this)">💰 Consumo</button>
+    <button class="tab" onclick="showTab('crm-tab-cabina',this)">🛋️ Cabina</button>
+    <button class="tab" onclick="showTab('crm-tab-formularios',this)">📋 Formularios</button>
+  </div>
+  <div id="crm-tab-alertas" class="tab-content active">
+    <div class="alert alert-info">💡 El sistema detecta automáticamente situaciones que requieren atención.</div>
+    <div id="crm-alertas-panel"><div class="empty-state"><div class="icon">🔔</div><p>Cargando alertas...</p></div></div>
+  </div>
+  <div id="crm-tab-clientes" class="tab-content">
+    <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
+      <select id="crm-filtro" onchange="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+        <option value="todas">Todas</option>
+        <option value="inactivas">Inactivas +30 días</option>
+        <option value="activas">Con plan activo</option>
+        <option value="sin-plan">Sin plan</option>
+        <option value="vip">Mayor consumo</option>
+      </select>
+      <input type="text" id="crm-buscar" placeholder="🔍 Buscar..." oninput="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light);flex:1">
+    </div>
+    <div id="crm-lista-clientas"></div>
+  </div>
+  <div id="crm-tab-consumo" class="tab-content">
+    <div id="crm-consumo-panel"></div>
+  </div>
+  <div id="crm-tab-cabina" class="tab-content">
+    <div class="card" style="background:linear-gradient(135deg,var(--deep),#5c2f29);color:white;padding:14px">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--blush);margin-bottom:10px">🛋️ Modo Cabina Rápida</div>
+      <input type="text" id="cabina-buscar" placeholder="Nombre de la clienta..." oninput="renderCabinaBuscar()" style="width:100%;padding:8px 11px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem">
+    </div>
+    <div id="cabina-resultado"></div>
+  </div>
+  <div id="crm-tab-formularios" class="tab-content">
+    <div class="alert alert-info">📋 Formularios enviados por tus clientas desde WhatsApp.</div>
+    <div id="crm-formularios-panel"><div class="empty-state"><div class="icon">📋</div><p>Cargando formularios...</p></div></div>
+  </div>
 </div>
 
 <!-- NUEVA CLIENTA -->
@@ -1212,6 +1257,7 @@ input[type="file"]{display:none;}
       <button class="tab" onclick="showModalTab('mf-historial',this)">📅 Historial</button>
       <button class="tab" onclick="showModalTab('mf-fotos',this)">📸 Fotos</button>
       <button class="tab" onclick="showModalTab('mf-notas',this)">📝 Notas</button>
+      <button class="tab" onclick="showModalTab('mf-crm',this)">📊 CRM</button>
     </div>
     <div id="mf-datos" class="tab-content active"><div id="modal-contenido"></div></div>
     <div id="mf-plan" class="tab-content"><div id="modal-plan"></div></div>
@@ -1226,10 +1272,12 @@ input[type="file"]{display:none;}
       <hr class="sep">
       <div id="lista-notas"></div>
     </div>
+    <div id="mf-crm" class="tab-content"><div id="modal-crm-contenido"></div></div>
     <div class="btn-row" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-ficha')">← Volver</button>
       <button class="btn btn-success btn-sm" onclick="abrirIA()">🤖 IA Analizar</button>
       <button class="btn btn-gold btn-sm" onclick="enviarFormWhatsApp()">📲 WhatsApp</button>
+      <button class="btn btn-secondary btn-sm" onclick="recordatorioWhatsApp(clientaActualId)">📲 Recordatorio</button>
       <button class="btn btn-danger btn-sm" onclick="eliminarClientaActual()">🗑️ Eliminar</button>
     </div>
     <div id="modal-ia-result"></div>
@@ -1614,6 +1662,8 @@ async function loadFirebase(){
     }
   } catch(e){ console.log('Insumos load error', e); }
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
+  initCRM();
+  await checkFormulariosFirebase();
 }
 
 async function saveDoc(col,id,data){
@@ -1660,6 +1710,7 @@ function showSection(id,btn){
   if(id==='presupuestos'){poblarSelectClientas();renderPresupuestos();setHoy('pres-fecha');initPresItems();}
   if(id==='gastos'){renderGastos();actualizarResumen();setHoy('gasto-fecha');}
   if(id==='servicios')renderServiciosCustom();
+  if(id==='crm'){renderCRMAlertas();renderCRMClientas();renderCRMConsumo();renderCRMFormularios();}
 }
 function showTab(id,btn){
   // Find the parent section containing both tabs and tab-contents
@@ -1686,6 +1737,7 @@ function showModalTab(id,btn){
   if(id==='mf-historial')renderHistorialModal();
   if(id==='mf-fotos')renderFotosModal();
   if(id==='mf-notas')renderNotasModal();
+  if(id==='mf-crm')renderCRMFicha(clientaActualId);
 }
 function toggleServ(h){
   const body = h.nextElementSibling;
@@ -2568,6 +2620,8 @@ function abrirWhatsApp() {
 }
 
 function mostrarFormPublico(clientaId) {
+  window._formPublicoClientaId = clientaId;
+  window._cosmetologaEmail = userEmail || '';
   document.getElementById('modal-form-publico').classList.add('open');
   document.getElementById('form-publico-contenido').innerHTML = `
     <div class="form-grid">
@@ -2626,12 +2680,42 @@ async function enviarFormPublico() {
     tratprev: document.getElementById('fp-tratprev')?.value || '',
     obs: document.getElementById('fp-obs')?.value || '',
     completadoPorClienta: true,
-    fechaFormulario: new Date().toLocaleString('es-AR')
+    fechaFormulario: new Date().toLocaleString('es-AR'),
+    clientaRefId: window._formPublicoClientaId || '',
+    cosmetologaEmail: window._cosmetologaEmail || ''
   };
 
-  // Guardar en Firebase como formulario pendiente
-  const id = uid();
-  await saveDoc('formularios_pendientes', id, { ...datos, clientaRefId: window._formPublicoClientaId });
+  try {
+    // Guardar en Firestore directamente (sin auth requerida por reglas)
+    const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const { getFirestore, doc, setDoc, collection, addDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
+      authDomain: "ginails-cosmetologia.firebaseapp.com",
+      projectId: "ginails-cosmetologia",
+      storageBucket: "ginails-cosmetologia.firebasestorage.app",
+      messagingSenderId: "35237686180",
+      appId: "1:35237686180:web:029e58bbe90034e8b2af31"
+    };
+
+    const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+    const dbPublico = getFirestore(app);
+
+    // Guardar en colección pública (sin auth)
+    await addDoc(collection(dbPublico, 'formularios_publicos'), datos);
+
+    // También guardar en cuenta de la cosmetóloga si tenemos su email
+    if(window._cosmetologaEmail) {
+      await addDoc(collection(dbPublico, `usuarios/${window._cosmetologaEmail}/formularios_pendientes`), datos);
+    }
+  } catch(e) {
+    console.log('Firebase error, guardando en backup:', e);
+    // Backup: guardar en localStorage por si falla Firebase
+    const backup = JSON.parse(localStorage.getItem('ginails_form_backup') || '[]');
+    backup.push(datos);
+    localStorage.setItem('ginails_form_backup', JSON.stringify(backup));
+  }
 
   document.getElementById('modal-form-publico').innerHTML = `
     <div style="text-align:center;padding:30px">
@@ -2640,6 +2724,290 @@ async function enviarFormPublico() {
       <p style="color:var(--muted);font-size:0.9rem;line-height:1.7">Tus datos llegaron correctamente.<br>¡Nos vemos en el turno! 💕</p>
     </div>`;
 }
+// ===================== CRM MODULE =====================
+
+function diasDesdeUltimaVisita(clientaId){
+  const s=Object.values(sesiones).filter(x=>x.clientaId===clientaId);
+  if(!s.length)return null;
+  const u=s.sort((a,b)=>b.fechaTs-a.fechaTs)[0];
+  return Math.floor((Date.now()-u.fechaTs)/(1000*60*60*24));
+}
+function ticketPromedio(clientaId){
+  const s=Object.values(sesiones).filter(x=>x.clientaId===clientaId&&x.precio>0);
+  if(!s.length)return 0;
+  return Math.round(s.reduce((a,x)=>a+x.precio,0)/s.length);
+}
+function totalConsumido(clientaId){
+  return Object.values(sesiones).filter(s=>s.clientaId===clientaId).reduce((a,x)=>a+(x.precio||0),0);
+}
+function serviciosFavoritos(clientaId){
+  const s=Object.values(sesiones).filter(x=>x.clientaId===clientaId);
+  const c={};s.forEach(x=>{c[x.tratamiento]=(c[x.tratamiento]||0)+1;});
+  return Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3);
+}
+function frecuenciaPromedio(clientaId){
+  const s=Object.values(sesiones).filter(x=>x.clientaId===clientaId).sort((a,b)=>a.fechaTs-b.fechaTs);
+  if(s.length<2)return null;
+  const d=[];for(let i=1;i<s.length;i++)d.push((s[i].fechaTs-s[i-1].fechaTs)/(1000*60*60*24));
+  return Math.round(d.reduce((a,b)=>a+b,0)/d.length);
+}
+
+function getAlertas(){
+  const alertas=[];
+  Object.values(clientas).forEach(c=>{
+    const dias=diasDesdeUltimaVisita(c.id);
+    const plan=Object.values(planes).find(p=>p.clientaId===c.id&&p.activo);
+    const ses=Object.values(sesiones).filter(s=>s.clientaId===c.id);
+    const freq=frecuenciaPromedio(c.id);
+    if(dias!==null&&dias>=45) alertas.push({tipo:'peligro',icono:'🔴',clientaId:c.id,nombre:c.nombre,msg:`Hace ${dias} días que no viene`,detalle:'Podría haberse ido a otra profesional'});
+    else if(dias!==null&&dias>=30) alertas.push({tipo:'warning',icono:'🟡',clientaId:c.id,nombre:c.nombre,msg:`Hace ${dias} días sin visita`,detalle:`Su frecuencia habitual es cada ${freq||30} días`});
+    if(plan){
+      const sesPlan=ses.filter(s=>s.planId===plan.id);
+      const prog=Math.round((sesPlan.length/plan.totalSesiones)*100);
+      if(prog>0&&prog<100&&dias!==null&&dias>20) alertas.push({tipo:'warning',icono:'⏸️',clientaId:c.id,nombre:c.nombre,msg:`Plan pausado: ${plan.servicio}`,detalle:`${sesPlan.length}/${plan.totalSesiones} sesiones — ${prog}%`});
+      if(prog>=80&&prog<100) alertas.push({tipo:'info',icono:'🎯',clientaId:c.id,nombre:c.nombre,msg:`Casi termina el plan de ${plan.servicio}`,detalle:'Momento ideal para proponer el siguiente tratamiento'});
+    }
+    if(!plan&&ses.length>=2) alertas.push({tipo:'info',icono:'💡',clientaId:c.id,nombre:c.nombre,msg:'Sin plan activo',detalle:`Tiene ${ses.length} sesiones — ideal para proponer un plan`});
+    if(freq&&freq<=15&&ses.length>=4) alertas.push({tipo:'exito',icono:'⭐',clientaId:c.id,nombre:c.nombre,msg:'Clienta muy activa',detalle:`Viene cada ${freq} días — candidata para plan VIP`});
+  });
+  return alertas.sort((a,b)=>({peligro:0,warning:1,info:2,exito:3}[a.tipo]||9)-({peligro:0,warning:1,info:2,exito:3}[b.tipo]||9));
+}
+
+function renderCRMAlertas(){
+  const alertas=getAlertas();
+  const urgentes=alertas.filter(a=>a.tipo==='peligro'||a.tipo==='warning').length;
+  const badge=document.getElementById('crm-badge');
+  if(badge){badge.textContent=urgentes;badge.style.display=urgentes>0?'inline':'none';}
+  const inicioPanel=document.getElementById('crm-alertas-inicio');
+  if(inicioPanel){
+    if(urgentes>0){
+      inicioPanel.innerHTML=`<div class="card" style="border-color:var(--rose);background:#fff8f6;cursor:pointer;margin-top:10px" onclick="showSection('crm',document.getElementById('nav-crm'))">
+        <div class="card-title" style="color:var(--danger)">🔔 ${urgentes} alerta${urgentes>1?'s':''} pendiente${urgentes>1?'s':''}</div>
+        ${alertas.slice(0,3).map(a=>`<div style="display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.83rem"><span>${a.icono}</span><div><strong>${a.nombre}</strong> — ${a.msg}</div></div>`).join('')}
+        ${alertas.length>3?`<div style="font-size:0.78rem;color:var(--muted);margin-top:7px;text-align:right">Ver todas →</div>`:''}
+      </div>`;
+    }else{inicioPanel.innerHTML='';}
+  }
+  const panel=document.getElementById('crm-alertas-panel');
+  if(!panel)return;
+  if(!alertas.length){panel.innerHTML=`<div class="empty-state"><div class="icon">✅</div><p>¡Todo en orden! Sin alertas por ahora.</p></div>`;return;}
+  const col={peligro:'#fde8e8',warning:'#fff8e3',info:'#e8f4fd',exito:'#e8f7ee'};
+  const bord={peligro:'var(--danger)',warning:'var(--gold)',info:'#4a90d9',exito:'var(--success)'};
+  panel.innerHTML=alertas.map(a=>`<div style="background:${col[a.tipo]};border-left:4px solid ${bord[a.tipo]};border-radius:9px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px">
+    <span style="font-size:1.2rem;flex-shrink:0">${a.icono}</span>
+    <div style="flex:1"><div style="font-weight:700;font-size:0.87rem">${a.nombre}</div><div style="font-size:0.83rem;margin-top:2px">${a.msg}</div><div style="font-size:0.76rem;color:var(--muted);margin-top:2px">${a.detalle}</div></div>
+    <button onclick="recordatorioWhatsApp('${a.clientaId}')" style="background:var(--success);color:white;border:none;border-radius:7px;padding:4px 9px;font-size:0.72rem;cursor:pointer;flex-shrink:0">📲 WA</button>
+  </div>`).join('');
+}
+
+function renderCRMClientas(){
+  const cont=document.getElementById('crm-lista-clientas');if(!cont)return;
+  const filtro=document.getElementById('crm-filtro')?.value||'todas';
+  const busq=(document.getElementById('crm-buscar')?.value||'').toLowerCase();
+  let lista=Object.values(clientas).map(c=>({...c,dias:diasDesdeUltimaVisita(c.id),plan:Object.values(planes).find(p=>p.clientaId===c.id&&p.activo),total:totalConsumido(c.id),cant:Object.values(sesiones).filter(s=>s.clientaId===c.id).length}));
+  if(filtro==='inactivas')lista=lista.filter(c=>c.dias===null||c.dias>=30);
+  if(filtro==='activas')lista=lista.filter(c=>c.plan);
+  if(filtro==='sin-plan')lista=lista.filter(c=>!c.plan&&c.cant>0);
+  if(filtro==='vip')lista=lista.sort((a,b)=>b.total-a.total).slice(0,10);
+  if(busq)lista=lista.filter(c=>c.nombre.toLowerCase().includes(busq));
+  if(filtro!=='vip')lista=lista.sort((a,b)=>(b.dias===null?-1:b.dias)-(a.dias===null?-1:a.dias));
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><div class="icon">👥</div><p>Sin resultados</p></div>`;return;}
+  cont.innerHTML=lista.map(c=>`<div class="client-card" onclick="abrirFicha('${c.id}')">
+    <div class="client-avatar">${c.nombre[0].toUpperCase()}</div>
+    <div style="flex:1">
+      <div style="font-weight:700;font-size:0.87rem">${c.nombre}</div>
+      <div style="font-size:0.76rem;color:${c.dias===null?'var(--muted)':c.dias>=45?'var(--danger)':c.dias>=30?'#8a6a10':'var(--success)'};margin-top:2px">📅 ${c.dias===null?'Sin visitas':`Hace ${c.dias} días`}</div>
+      <div style="font-size:0.74rem;color:var(--muted)">${c.plan?'🎯 '+c.plan.servicio:'Sin plan activo'}</div>
+      ${c.total>0?`<div style="font-size:0.74rem;color:var(--gold)">💰 $${c.total.toLocaleString('es-AR')}</div>`:''}
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span style="font-size:0.72rem;background:var(--light);border-radius:7px;padding:2px 7px">${c.cant} ses.</span>
+      <button onclick="event.stopPropagation();recordatorioWhatsApp('${c.id}')" style="background:var(--success);color:white;border:none;border-radius:7px;padding:3px 8px;font-size:0.7rem;cursor:pointer">📲</button>
+    </div>
+  </div>`).join('');
+}
+
+function renderCRMConsumo(){
+  const cont=document.getElementById('crm-consumo-panel');if(!cont)return;
+  const totalCob=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
+  const totalSes=Object.values(sesiones).length;
+  const ticket=totalSes>0?Math.round(totalCob/totalSes):0;
+  const sc={};Object.values(sesiones).forEach(s=>{if(s.tratamiento)sc[s.tratamiento]=(sc[s.tratamiento]||0)+1;});
+  const topServ=Object.entries(sc).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const topCli=Object.values(clientas).map(c=>({...c,total:totalConsumido(c.id),cant:Object.values(sesiones).filter(s=>s.clientaId===c.id).length})).sort((a,b)=>b.total-a.total).slice(0,5);
+  cont.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px">
+    <div class="card" style="text-align:center;padding:13px"><div style="font-size:1.4rem">💰</div><div style="font-size:1.1rem;font-weight:700;color:var(--rose)">$${totalCob.toLocaleString('es-AR')}</div><div style="font-size:0.72rem;color:var(--muted)">Total cobrado</div></div>
+    <div class="card" style="text-align:center;padding:13px"><div style="font-size:1.4rem">🎫</div><div style="font-size:1.1rem;font-weight:700;color:var(--gold)">$${ticket.toLocaleString('es-AR')}</div><div style="font-size:0.72rem;color:var(--muted)">Ticket promedio</div></div>
+  </div>
+  <div class="card"><div class="card-title">⭐ Servicios más realizados</div>
+    ${topServ.length?topServ.map(([s,n],i)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border)"><span style="font-size:0.8rem;font-weight:700;color:var(--muted);width:18px">${i+1}</span><div style="flex:1;font-size:0.85rem">${s}</div><span class="badge badge-rose">${n}x</span></div>`).join(''):'<p style="color:var(--muted);font-size:0.84rem">Sin sesiones aún</p>'}
+  </div>
+  <div class="card"><div class="card-title">👑 Clientas top</div>
+    ${topCli.filter(c=>c.total>0).length?topCli.filter(c=>c.total>0).map((c,i)=>`<div style="display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--border);cursor:pointer" onclick="abrirFicha('${c.id}')"><span style="font-size:0.8rem;font-weight:700;color:var(--muted);width:18px">${i+1}</span><div class="client-avatar" style="width:30px;height:30px;font-size:0.8rem">${c.nombre[0].toUpperCase()}</div><div style="flex:1"><div style="font-size:0.85rem;font-weight:600">${c.nombre}</div><div style="font-size:0.73rem;color:var(--muted)">${c.cant} sesiones</div></div><span style="font-weight:700;color:var(--gold);font-size:0.85rem">$${c.total.toLocaleString('es-AR')}</span></div>`).join(''):'<p style="color:var(--muted);font-size:0.84rem">Sin sesiones con precio aún</p>'}
+  </div>`;
+}
+
+function renderCabinaBuscar(){
+  const busq=(document.getElementById('cabina-buscar')?.value||'').toLowerCase().trim();
+  const cont=document.getElementById('cabina-resultado');if(!cont)return;
+  if(!busq){cont.innerHTML='';return;}
+  const lista=Object.values(clientas).filter(c=>c.nombre.toLowerCase().includes(busq));
+  if(!lista.length){cont.innerHTML=`<div class="alert alert-warning" style="margin-top:10px">Sin resultados</div>`;return;}
+  if(lista.length===1){renderCabinaFicha(lista[0].id);return;}
+  cont.innerHTML=`<div style="margin-top:10px">${lista.slice(0,5).map(c=>`<div class="client-card" onclick="renderCabinaFicha('${c.id}')" style="margin-bottom:6px"><div class="client-avatar" style="width:32px;height:32px;font-size:0.85rem">${c.nombre[0].toUpperCase()}</div><div style="flex:1;font-size:0.87rem;font-weight:600">${c.nombre}</div><span style="color:var(--muted);font-size:1rem">›</span></div>`).join('')}</div>`;
+}
+
+function renderCabinaFicha(clientaId){
+  const c=clientas[clientaId];if(!c)return;
+  const cont=document.getElementById('cabina-resultado');
+  const plan=Object.values(planes).find(p=>p.clientaId===clientaId&&p.activo);
+  const ses=Object.values(sesiones).filter(s=>s.clientaId===clientaId).sort((a,b)=>b.fechaTs-a.fechaTs);
+  const ultima=ses[0];
+  const rechazos=ses.filter(s=>s.tuvoRechazo);
+  const dias=diasDesdeUltimaVisita(clientaId);
+  const analisis=(c.analisisIA||[]).slice(-1)[0];
+  const flags=[];
+  if((c.condiciones||[]).length)flags.push({bg:'#fde8e8',bord:'var(--danger)',txt:'🔴 CONDICIONES: '+c.condiciones.join(', ')});
+  if(c.medicacion)flags.push({bg:'#fff8e3',bord:'var(--gold)',txt:'🟡 Medicación: '+c.medicacion});
+  if(rechazos.length)flags.push({bg:'#fff8e3',bord:'var(--gold)',txt:'🟡 Rechazó: '+rechazos.map(s=>s.rechazoProd).filter(Boolean).join(', ')});
+  if(c.alergias)flags.push({bg:'#fde8e8',bord:'var(--danger)',txt:'🔴 Alergias: '+c.alergias});
+  if(!flags.length)flags.push({bg:'#e8f7ee',bord:'var(--success)',txt:'🟢 Sin contraindicaciones conocidas'});
+  const sesPlan=plan?ses.filter(s=>s.planId===plan.id):[];
+  const prog=plan?Math.min(100,Math.round((sesPlan.length/plan.totalSesiones)*100)):0;
+  cont.innerHTML=`<div class="card" style="margin-top:12px;border:2px solid var(--rose)">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:12px">
+      <div class="client-avatar" style="width:46px;height:46px;font-size:1.2rem">${c.nombre[0].toUpperCase()}</div>
+      <div><div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--deep)">${c.nombre}</div>
+      <div style="font-size:0.76rem;color:var(--muted)">${c.tpiel||'Piel no especificada'} · ${(c.fototipo||'—').split('–')[0].trim()}</div>
+      ${dias!==null?`<div style="font-size:0.74rem;color:${dias>=30?'var(--danger)':'var(--success)'}">Última visita: hace ${dias} días</div>`:''}
+      </div>
+    </div>
+    <div style="margin-bottom:11px">
+      <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">🚦 Seguridad</div>
+      ${flags.map(f=>`<div style="background:${f.bg};border-left:4px solid ${f.bord};border-radius:7px;padding:7px 10px;margin-bottom:5px;font-size:0.82rem">${f.txt}</div>`).join('')}
+    </div>
+    ${plan?`<div style="background:linear-gradient(135deg,#fdf4f2,#f0fdf4);border-radius:9px;padding:10px 12px;margin-bottom:10px">
+      <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🎯 Plan activo</div>
+      <div style="font-weight:700;font-size:0.9rem">${plan.servicio}</div>
+      <div style="font-size:0.76rem;color:var(--muted)">${sesPlan.length}/${plan.totalSesiones} sesiones · ${prog}%</div>
+      <div class="progress-bar-wrap" style="margin-top:5px"><div class="progress-bar" style="width:${prog}%"></div></div>
+    </div>`:`<div class="alert alert-warning" style="margin-bottom:10px">Sin plan activo</div>`}
+    ${ultima?`<div style="background:var(--light);border-radius:9px;padding:10px 12px;margin-bottom:10px">
+      <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">📅 Última sesión</div>
+      <div style="font-size:0.85rem;font-weight:600">${ultima.tratamiento}</div>
+      <div style="font-size:0.76rem;color:var(--muted)">${ultima.fecha}</div>
+      ${ultima.notaProxima?`<div style="font-size:0.8rem;color:var(--success);margin-top:4px">📌 ${ultima.notaProxima}</div>`:''}
+    </div>`:''}
+    ${analisis?`<div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;margin-bottom:10px">
+      <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🤖 Último análisis IA</div>
+      <div style="font-size:0.78rem;line-height:1.6;max-height:100px;overflow-y:auto">${(analisis.texto||'').substring(0,300)}...</div>
+    </div>`:''}
+    <div class="btn-row">
+      <button class="btn btn-gold btn-sm" onclick="recordatorioWhatsApp('${clientaId}')">📲 Recordatorio</button>
+      <button class="btn btn-primary btn-sm" onclick="clientaActualId='${clientaId}';abrirModalSesion()">➕ Sesión</button>
+    </div>
+  </div>`;
+}
+
+function renderCRMFicha(clientaId){
+  const cont=document.getElementById('modal-crm-contenido');if(!cont||!clientaId)return;
+  const c=clientas[clientaId];if(!c){cont.innerHTML='';return;}
+  const ses=Object.values(sesiones).filter(s=>s.clientaId===clientaId).sort((a,b)=>b.fechaTs-a.fechaTs);
+  const dias=diasDesdeUltimaVisita(clientaId);
+  const ticket=ticketPromedio(clientaId);
+  const total=totalConsumido(clientaId);
+  const freq=frecuenciaPromedio(clientaId);
+  const favs=serviciosFavoritos(clientaId);
+  const rechazos=ses.filter(s=>s.tuvoRechazo);
+  const plan=Object.values(planes).find(p=>p.clientaId===clientaId&&p.activo);
+  cont.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
+    <div style="background:var(--light);border-radius:10px;padding:11px;text-align:center"><div style="font-size:1.3rem;font-weight:700;color:var(--rose)">${ses.length}</div><div style="font-size:0.72rem;color:var(--muted)">Sesiones totales</div></div>
+    <div style="background:var(--light);border-radius:10px;padding:11px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--gold)">$${total.toLocaleString('es-AR')}</div><div style="font-size:0.72rem;color:var(--muted)">Total invertido</div></div>
+    <div style="background:var(--light);border-radius:10px;padding:11px;text-align:center"><div style="font-size:1rem;font-weight:700;color:var(--sage)">$${ticket.toLocaleString('es-AR')}</div><div style="font-size:0.72rem;color:var(--muted)">Ticket promedio</div></div>
+    <div style="background:var(--light);border-radius:10px;padding:11px;text-align:center"><div style="font-size:1rem;font-weight:700;color:${dias===null?'var(--muted)':dias>=30?'var(--danger)':'var(--success)'}">${dias===null?'—':dias+'d'}</div><div style="font-size:0.72rem;color:var(--muted)">Días sin visita</div></div>
+  </div>
+  ${freq?`<div class="alert alert-info" style="margin-bottom:10px">📅 Viene cada <strong>${freq} días</strong> en promedio${dias?` · Próxima recomendada en ${Math.max(0,freq-dias)} días`:''}.</div>`:''}
+  ${favs.length?`<div class="card" style="margin-bottom:10px"><div class="card-title">⭐ Tratamientos favoritos</div>${favs.map(([s,n])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:0.83rem"><span>${s}</span><span class="badge badge-rose">${n}x</span></div>`).join('')}</div>`:''}
+  ${plan?`<div class="card" style="margin-bottom:10px;background:#f0fdf4;border-color:var(--success)"><div class="card-title" style="color:var(--success)">🎯 Plan activo: ${plan.servicio}</div></div>`:`<div class="alert alert-warning" style="margin-bottom:10px">💡 Sin plan activo — oportunidad para proponer tratamiento.</div>`}
+  ${rechazos.length?`<div class="card" style="background:#fff8f8;border-color:var(--danger);margin-bottom:10px"><div class="card-title" style="color:var(--danger)">⚠️ Rechazos (${rechazos.length})</div>${rechazos.map(s=>`<div style="font-size:0.81rem;padding:4px 0;border-bottom:1px solid var(--border)"><strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}</div>`).join('')}</div>`:''}
+  <div class="card"><div class="card-title">🎯 Acciones sugeridas</div>
+    ${dias!==null&&dias>=30?`<div style="padding:6px 0;font-size:0.83rem">📲 Enviar recordatorio de turno</div>`:''}
+    ${!plan&&ses.length>=2?`<div style="padding:6px 0;font-size:0.83rem">🎯 Proponer plan de tratamiento</div>`:''}
+    ${ticket>=20000?`<div style="padding:6px 0;font-size:0.83rem">⭐ Ofrecer combo con descuento</div>`:''}
+    <button class="btn btn-gold btn-sm" style="margin-top:8px" onclick="recordatorioWhatsApp('${clientaId}')">📲 Recordatorio WA</button>
+  </div>`;
+}
+
+async function renderCRMFormularios(){
+  const cont=document.getElementById('crm-formularios-panel');if(!cont)return;
+  if(!useFirebase||!userEmail){cont.innerHTML=`<div class="empty-state"><div class="icon">📋</div><p>Requiere conexión a Firebase</p></div>`;return;}
+  try{
+    const snap=await fs.getDocs(fs.collection(db,`usuarios/${userEmail}/formularios_pendientes`));
+    const lista=[];snap.forEach(d=>lista.push({id:d.id,...d.data()}));
+    if(!lista.length){cont.innerHTML=`<div class="empty-state"><div class="icon">📋</div><p>Sin formularios recibidos aún</p></div>`;return;}
+    cont.innerHTML=lista.sort((a,b)=>b.fechaTs-a.fechaTs).map(r=>`<div style="background:var(--light);border-radius:10px;padding:13px;margin-bottom:10px;border:1px solid var(--border)">
+      <div style="font-weight:700;font-size:0.95rem;margin-bottom:8px">🌸 ${r.nombre} <span style="font-size:0.75rem;color:var(--muted);font-weight:400">· ${r.fechaFormulario||'—'}</span></div>
+      ${r.condiciones?`<div style="font-size:0.83rem"><strong>Condiciones:</strong> ${r.condiciones}</div>`:''}
+      ${r.objetivo?`<div style="font-size:0.83rem;margin-top:4px"><strong>Objetivo:</strong> ${r.objetivo}</div>`:''}
+      <div class="btn-row" style="margin-top:8px">
+        <button class="btn btn-primary btn-sm" onclick="cargarFormEnFichaNueva('${r.id}')">📋 Cargar en ficha</button>
+        <button class="btn btn-danger btn-sm" onclick="descartarFormulario('${r.id}')">🗑️ Descartar</button>
+      </div>
+    </div>`).join('');
+  }catch(e){cont.innerHTML=`<div class="alert alert-warning">Error cargando formularios</div>`;}
+}
+
+async function cargarFormEnFichaNueva(docId){
+  const snap=await fs.getDoc(fs.doc(db,`usuarios/${userEmail}/formularios_pendientes`,docId));
+  if(!snap.exists())return;
+  const r=snap.data();
+  showSection('nueva-clienta',null);
+  setTimeout(()=>{
+    const m={'nc-nombre':r.nombre,'nc-edad':r.edad,'nc-ocup':r.ocup,'nc-medicacion':r.condiciones,'nc-alergias':r.alergias||'','nc-skincare':r.skincare||'','nc-tratprev':r.tratprev||'','nc-objetivo':r.objetivo||''};
+    Object.entries(m).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&val)el.value=val;});
+    alert('✅ Datos cargados. Completá el resto de la ficha.');
+  },300);
+}
+
+async function descartarFormulario(docId){
+  if(!confirm('¿Descartar este formulario?'))return;
+  await delDoc('formularios_pendientes',docId);
+  renderCRMFormularios();
+}
+
+function recordatorioWhatsApp(clientaId){
+  const c=clientas[clientaId];
+  if(!c||!c.tel){alert('La clienta no tiene teléfono cargado');return;}
+  const plan=Object.values(planes).find(p=>p.clientaId===clientaId&&p.activo);
+  const ses=Object.values(sesiones).filter(s=>s.clientaId===clientaId).sort((a,b)=>b.fechaTs-a.fechaTs);
+  const ultima=ses[0];
+  let msg=`Hola ${c.nombre} 🌸\n\n`;
+  if(plan){msg+=`Te recuerdo que tenés pendiente tu sesión de *${plan.servicio}*.\n`;if(ultima)msg+=`Tu última visita fue el ${ultima.fecha}.\n`;msg+=`\n¿Coordinamos tu próximo turno? 💕`;}
+  else{msg+=`¿Cómo estás? Ya es hora de tu próxima sesión 🌸\n¿Coordinamos turno?`;}
+  let tel=c.tel.replace(/\D/g,'');
+  if(tel.startsWith('0'))tel=tel.substring(1);
+  if(!tel.startsWith('54'))tel='54'+tel;
+  window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+async function checkFormulariosFirebase(){
+  if(!useFirebase||!userEmail)return;
+  try{
+    const snap=await fs.getDocs(fs.collection(db,`usuarios/${userEmail}/formularios_pendientes`));
+    const pendientes=[];snap.forEach(d=>pendientes.push({id:d.id,...d.data()}));
+    if(!pendientes.length)return;
+    if(document.getElementById('notif-formularios'))return;
+    const inicio=document.getElementById('inicio');if(!inicio)return;
+    const notif=document.createElement('div');
+    notif.id='notif-formularios';notif.className='alert alert-success';notif.style.cursor='pointer';
+    notif.innerHTML=`📲 <strong>${pendientes.length} formulario${pendientes.length>1?'s':''} recibido${pendientes.length>1?'s':''}!</strong> Tocá para ver`;
+    notif.onclick=()=>showSection('crm',document.getElementById('nav-crm'));
+    inicio.insertBefore(notif,inicio.firstChild);
+  }catch(e){console.log('Error formularios:',e);}
+}
+
+function initCRM(){renderCRMAlertas();}
+
 </script>
 </body>
 </html>
