@@ -2296,7 +2296,7 @@ async function loadFirebase(){
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
   for(const[col,obj] of cols){
     const snap=await fs.getDocs(fs.collection(db, base, col));
-    snap.forEach(d=>obj[d.id]=d.data());
+    snap.forEach(d=>{ obj[d.id]={...d.data(), id:d.id}; });
   }
   // Cargar insumos desde Firebase
   try {
@@ -3273,7 +3273,7 @@ function actualizarPreviewWA() {
   const extra = document.getElementById('wa-mensaje-extra')?.value || '';
   if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
-  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}`;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}&nombre=${encodeURIComponent(c.nombre||'')}`;
   const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con *${salon}* te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos junt@s en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
   const prev = document.getElementById('wa-preview');
   if (prev) prev.innerHTML = msg.replace(/\n/g, '<br>').replace(/\*(.*?)\*/g, '<strong>$1</strong>');
@@ -3289,7 +3289,7 @@ function abrirWhatsApp() {
   const extra = document.getElementById('wa-mensaje-extra').value;
   if (salon) localStorage.setItem('ginails_salon_nombre', salon);
   const baseUrl = window.location.origin + window.location.pathname;
-  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}`;
+  const link = `${baseUrl}?form=1&ref=${clientaActualId}&cosm=${encodeURIComponent(userEmail||'')}&nombre=${encodeURIComponent(nombre||'')}`;
   const msg = `Hola ${nombre} 🌸\n\nAntes de tu turno con ${salon} te comparto este cuestionario para ir adelantando tu ficha.\n\nCompletá lo que puedas — lo que no sepás lo vemos junt@s en el gabinete 💕\n\n👉 ${link}${extra ? '\n\n' + extra : ''}\n\n¡Nos vemos pronto! 🌸`;
   const url = `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
   window.open(url, '_blank');
@@ -3301,10 +3301,12 @@ function mostrarFormPublico(clientaId) {
   const params = new URLSearchParams(window.location.search);
   const cosmParam = params.get('cosm');
   window._cosmetologaEmail = cosmParam ? decodeURIComponent(cosmParam) : (userEmail || '');
+  // Nombre desde URL param
+  const nombreParam = params.get('nombre') ? decodeURIComponent(params.get('nombre')) : '';
   document.getElementById('modal-form-publico').classList.add('open');
   document.getElementById('form-publico-contenido').innerHTML = `
     <div class="form-grid">
-      <div class="form-group"><label>Tu nombre completo</label><input type="text" id="fp-nombre" placeholder="Nombre y apellido"></div>
+      <div class="form-group"><label>Tu nombre completo</label><input type="text" id="fp-nombre" placeholder="Nombre y apellido" value="${nombreParam}"></div>
       <div class="form-group"><label>Tu teléfono / WhatsApp</label><input type="tel" id="fp-tel" placeholder="Ej: 3516123456"></div>
       <div class="form-group"><label>Tu edad</label><input type="number" id="fp-edad" min="1" max="99" placeholder="Años"></div>
       <div class="form-group"><label>Ocupación</label><input type="text" id="fp-ocup" placeholder="A qué te dedicás"></div>
@@ -3693,12 +3695,14 @@ async function cargarFormEnFichaNueva(docId){
   if(!snap.exists()) return;
   const r = snap.data();
 
-  // Buscar clienta existente por nombre o teléfono
-  const clientaExistente = Object.values(clientas).find(c => {
-    const mismoNombre = c.nombre?.toLowerCase().trim() === r.nombre?.toLowerCase().trim();
-    const mismoTel = r.tel && c.tel && c.tel.replace(/\D/g,'') === r.tel.replace(/\D/g,'');
-    return mismoNombre || mismoTel;
-  });
+  // Buscar clienta: primero por ID directo, luego por nombre o teléfono
+  const clientaExistente = 
+    (r.clientaRefId && clientas[r.clientaRefId]) ||
+    Object.values(clientas).find(c => {
+      const mismoNombre = c.nombre?.toLowerCase().trim() === r.nombre?.toLowerCase().trim();
+      const mismoTel = r.tel && c.tel && c.tel.replace(/\D/g,'') === r.tel.replace(/\D/g,'');
+      return mismoNombre || mismoTel;
+    });
 
   // Mapa COMPLETO: campo del formulario → campo de la ficha
   const mapa = {
@@ -3742,6 +3746,12 @@ async function cargarFormEnFichaNueva(docId){
     Object.assign(clientaExistente, actualizar);
     await saveDoc('clientas', clientaExistente.id, clientaExistente);
     await delDoc('formularios_pendientes', docId);
+
+    // Forzar recarga desde Firebase para asegurar sincronización
+    if(useFirebase && userEmail){
+      const snap2 = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/clientas`, clientaExistente.id));
+      if(snap2.exists()) clientas[clientaExistente.id] = {...snap2.data(), id: clientaExistente.id};
+    }
 
     document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
     renderCRMFormularios();
@@ -3807,11 +3817,61 @@ async function checkFormulariosFirebase(){
     const snap=await fs.getDocs(fs.collection(db,`usuarios/${userEmail}/formularios_pendientes`));
     const pendientes=[];snap.forEach(d=>pendientes.push({id:d.id,...d.data()}));
     if(!pendientes.length)return;
+
+    // Auto-sincronizar los que tienen clientaRefId válido
+    let autoSincronizados=0;
+    for(const r of pendientes){
+      const c = (r.clientaRefId && clientas[r.clientaRefId]) ||
+        Object.values(clientas).find(x => x.nombre?.toLowerCase().trim()===r.nombre?.toLowerCase().trim());
+      if(!c) continue;
+
+      const siempreActualizar=['fps','alim','agua','sueno','estres','cejas','pestanas',
+        'menstruacion','estadoHormonal','anticonceptivoOtro','objetivo','obs','obsHormonal'];
+      const mapa={
+        tel:r.tel, edad:r.edad, ocup:r.ocup, insta:r.insta,
+        medicacion:r.condiciones, alergias:r.alergias,
+        fps:r.fps, alim:r.alim, agua:r.agua, sueno:r.sueno,
+        estres:r.estres, cejas:r.cejas, pestanas:r.pestanas,
+        skincare:r.skincare, tratprev:r.tratprev,
+        objetivo:r.objetivo, obs:r.obs,
+        menstruacion:r.menstruacion, estadoHormonal:r.estadoHormonal,
+        anticonceptivoOtro:r.anticonceptivo, obsHormonal:r.obsHormonal
+      };
+      const actualizar={};
+      Object.entries(mapa).forEach(([campo,valor])=>{
+        if(valor!==undefined&&valor!==null&&valor!==''){
+          if(siempreActualizar.includes(campo)||!c[campo]) actualizar[campo]=valor;
+        }
+      });
+      if(Object.keys(actualizar).length>0){
+        Object.assign(c, actualizar);
+        await saveDoc('clientas', c.id, c);
+      }
+      await delDoc('formularios_pendientes', r.id);
+      autoSincronizados++;
+    }
+
+    if(autoSincronizados>0){
+      renderClientas();
+      // Mostrar notificación de sincronización exitosa
+      const inicio=document.getElementById('inicio');if(!inicio)return;
+      const notif=document.createElement('div');
+      notif.className='alert alert-success';
+      notif.innerHTML=`✅ <strong>${autoSincronizados} formulario${autoSincronizados>1?'s':''}</strong> sincronizado${autoSincronizados>1?'s':''} automáticamente con ${autoSincronizados>1?'las fichas':'la ficha'}.`;
+      inicio.insertBefore(notif,inicio.firstChild);
+      setTimeout(()=>notif.remove(), 5000);
+      return;
+    }
+
+    // Si quedan formularios sin clienta → mostrar notificación para revisión manual
+    const snap2=await fs.getDocs(fs.collection(db,`usuarios/${userEmail}/formularios_pendientes`));
+    const restantes=[];snap2.forEach(d=>restantes.push({id:d.id,...d.data()}));
+    if(!restantes.length)return;
     if(document.getElementById('notif-formularios'))return;
     const inicio=document.getElementById('inicio');if(!inicio)return;
     const notif=document.createElement('div');
     notif.id='notif-formularios';notif.className='alert alert-success';notif.style.cursor='pointer';
-    notif.innerHTML=`📲 <strong>${pendientes.length} formulario${pendientes.length>1?'s':''} recibido${pendientes.length>1?'s':''}!</strong> Tocá para ver`;
+    notif.innerHTML=`📲 <strong>${restantes.length} formulario${restantes.length>1?'s':''} recibido${restantes.length>1?'s':''}!</strong> Tocá para ver`;
     notif.onclick=()=>showSection('crm',document.getElementById('nav-crm'));
     inicio.insertBefore(notif,inicio.firstChild);
   }catch(e){console.log('Error formularios:',e);}
