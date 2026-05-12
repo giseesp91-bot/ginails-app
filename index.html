@@ -3729,11 +3729,14 @@ async function cargarFormEnFichaNueva(docId){
     // Solo actualizar campos vacíos (no pisar lo que ya completó)
     const actualizar = {};
     Object.entries(mapa).forEach(([campo, valor]) => {
-      if(valor && !clientaExistente[campo]) actualizar[campo] = valor;
-    });
-    // fps, alim, agua, sueno, estres, cejas, pestanas, menstruacion, estadoHormonal → siempre actualizar si vienen del form
-    ['fps','alim','agua','sueno','estres','cejas','pestanas','menstruacion','estadoHormonal','anticonceptivoOtro'].forEach(campo => {
-      if(mapa[campo]) actualizar[campo] = mapa[campo];
+      if(valor !== undefined && valor !== null && valor !== '') {
+        // Para hábitos y hormonal: siempre actualizar con lo del formulario
+        const siempreActualizar = ['fps','alim','agua','sueno','estres','cejas','pestanas',
+          'menstruacion','estadoHormonal','anticonceptivoOtro','objetivo','obs','obsHormonal'];
+        if(siempreActualizar.includes(campo) || !clientaExistente[campo]) {
+          actualizar[campo] = valor;
+        }
+      }
     });
 
     Object.assign(clientaExistente, actualizar);
