@@ -3689,32 +3689,89 @@ async function renderCRMFormularios(){
 }
 
 async function cargarFormEnFichaNueva(docId){
-  const snap=await fs.getDoc(fs.doc(db,`usuarios/${userEmail}/formularios_pendientes`,docId));
-  if(!snap.exists())return;
-  const r=snap.data();
-  showSection('nueva-clienta',null);
-  setTimeout(()=>{
-    const m={
-      'nc-nombre':r.nombre,'nc-tel':r.tel||'','nc-edad':r.edad,'nc-ocup':r.ocup,
-      'nc-medicacion':r.condiciones,'nc-alergias':r.alergias||'',
-      'nc-skincare':r.skincare||'','nc-tratprev':r.tratprev||'',
-      'nc-objetivo':r.objetivo||'','nc-obs':r.obs||'',
-      'nc-obs-hormonal':r.obsHormonal||''
-    };
-    Object.entries(m).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&val)el.value=val;});
-    // Selects
-    const selects={
-      'nc-fps':r.fps,'nc-agua':r.agua,'nc-sueno':r.sueno,
-      'nc-alim':r.alim,'nc-estres':r.estres,'nc-cejas':r.cejas,
-      'nc-pestanas':r.pestanas,'nc-menstruacion':r.menstruacion,
-      'nc-estado-hormonal':r.estadoHormonal
-    };
-    Object.entries(selects).forEach(([id,val])=>{const el=document.getElementById(id);if(el&&val)el.value=val;});
-    // Anticonceptivo texto libre
-    const anticon=document.getElementById('nc-anticon-otro');
-    if(anticon&&r.anticonceptivo)anticon.value=r.anticonceptivo;
-    alert('✅ Datos cargados. Revisá y completá lo que falta.');
-  },300);
+  const snap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/formularios_pendientes`, docId));
+  if(!snap.exists()) return;
+  const r = snap.data();
+
+  // Buscar si ya existe una clienta con ese nombre o teléfono
+  const clientaExistente = Object.values(clientas).find(c => {
+    const mismoNombre = c.nombre?.toLowerCase().trim() === r.nombre?.toLowerCase().trim();
+    const mismoTel = r.tel && c.tel && c.tel.replace(/\D/g,'') === r.tel.replace(/\D/g,'');
+    return mismoNombre || mismoTel;
+  });
+
+  if(clientaExistente){
+    // Fusionar datos del formulario con la ficha existente
+    const actualizar = {};
+    if(r.tel && !clientaExistente.tel) actualizar.tel = r.tel;
+    if(r.edad && !clientaExistente.edad) actualizar.edad = r.edad;
+    if(r.ocup && !clientaExistente.ocup) actualizar.ocup = r.ocup;
+    if(r.insta && !clientaExistente.insta) actualizar.insta = r.insta;
+    if(r.condiciones && !clientaExistente.medicacion) actualizar.medicacion = r.condiciones;
+    if(r.alergias && !clientaExistente.alergias) actualizar.alergias = r.alergias;
+    if(r.fps) actualizar.fps = r.fps;
+    if(r.alim) actualizar.alim = r.alim;
+    if(r.agua) actualizar.agua = r.agua;
+    if(r.sueno) actualizar.sueno = r.sueno;
+    if(r.estres) actualizar.estres = r.estres;
+    if(r.cejas) actualizar.cejas = r.cejas;
+    if(r.pestanas) actualizar.pestanas = r.pestanas;
+    if(r.skincare && !clientaExistente.skincare) actualizar.skincare = r.skincare;
+    if(r.tratprev && !clientaExistente.tratprev) actualizar.tratprev = r.tratprev;
+    if(r.objetivo && !clientaExistente.objetivo) actualizar.objetivo = r.objetivo;
+    if(r.obs && !clientaExistente.obs) actualizar.obs = r.obs;
+    if(r.menstruacion) actualizar.menstruacion = r.menstruacion;
+    if(r.estadoHormonal) actualizar.estadoHormonal = r.estadoHormonal;
+    if(r.anticonceptivo) actualizar.anticonceptivoOtro = r.anticonceptivo;
+    if(r.obsHormonal) actualizar.obsHormonal = r.obsHormonal;
+
+    // Aplicar cambios en memoria y Firebase
+    Object.assign(clientaExistente, actualizar);
+    await saveDoc('clientas', clientaExistente.id, clientaExistente);
+
+    // Borrar formulario pendiente
+    await delDoc('formularios_pendientes', docId);
+    renderCRMFormularios();
+    renderClientas();
+
+    // Mostrar confirmación y abrir la ficha
+    document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+    setTimeout(()=>{
+      abrirFicha(clientaExistente.id);
+      showSection('clientas', null);
+    }, 200);
+
+    alert(`✅ Datos sincronizados con la ficha de ${clientaExistente.nombre}.\n\nCampos actualizados: ${Object.keys(actualizar).length > 0 ? Object.keys(actualizar).join(', ') : 'ninguno nuevo'}.`);
+
+  } else {
+    // No existe → abrir formulario nueva clienta precargado
+    document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+    showSection('nueva-clienta', null);
+    setTimeout(()=>{
+      const textos = {
+        'nc-nombre':r.nombre,'nc-tel':r.tel||'','nc-edad':r.edad,'nc-ocup':r.ocup,
+        'nc-medicacion':r.condiciones,'nc-alergias':r.alergias||'',
+        'nc-skincare':r.skincare||'','nc-tratprev':r.tratprev||'',
+        'nc-objetivo':r.objetivo||'','nc-obs':r.obs||'',
+        'nc-obs-hormonal':r.obsHormonal||''
+      };
+      Object.entries(textos).forEach(([id,val])=>{
+        const el=document.getElementById(id);if(el&&val)el.value=val;
+      });
+      const selects = {
+        'nc-fps':r.fps,'nc-agua':r.agua,'nc-sueno':r.sueno,
+        'nc-alim':r.alim,'nc-estres':r.estres,'nc-cejas':r.cejas,
+        'nc-pestanas':r.pestanas,'nc-menstruacion':r.menstruacion,
+        'nc-estado-hormonal':r.estadoHormonal
+      };
+      Object.entries(selects).forEach(([id,val])=>{
+        const el=document.getElementById(id);if(el&&val)el.value=val;
+      });
+      const anticon=document.getElementById('nc-anticon-otro');
+      if(anticon&&r.anticonceptivo) anticon.value=r.anticonceptivo;
+      alert(`✅ Datos precargados para ${r.nombre}.\nNo existe ficha — completá los datos que faltan y guardá.`);
+    }, 300);
+  }
 }
 
 async function descartarFormulario(docId){
