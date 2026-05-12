@@ -3305,6 +3305,7 @@ function mostrarFormPublico(clientaId) {
   document.getElementById('form-publico-contenido').innerHTML = `
     <div class="form-grid">
       <div class="form-group"><label>Tu nombre completo</label><input type="text" id="fp-nombre" placeholder="Nombre y apellido"></div>
+      <div class="form-group"><label>Tu teléfono / WhatsApp</label><input type="tel" id="fp-tel" placeholder="Ej: 3516123456"></div>
       <div class="form-group"><label>Tu edad</label><input type="number" id="fp-edad" min="1" max="99" placeholder="Años"></div>
       <div class="form-group"><label>Ocupación</label><input type="text" id="fp-ocup" placeholder="A qué te dedicás"></div>
       <div class="form-group"><label>Instagram (opcional)</label><input type="text" id="fp-insta" placeholder="@usuario"></div>
@@ -3360,6 +3361,7 @@ async function enviarFormPublico() {
 
   const datos = {
     nombre,
+    tel: document.getElementById('fp-tel')?.value || '',
     edad: document.getElementById('fp-edad')?.value || '',
     ocup: document.getElementById('fp-ocup')?.value || '',
     insta: document.getElementById('fp-insta')?.value || '',
@@ -3647,6 +3649,7 @@ async function renderCRMFormularios(){
     <div style="background:var(--light);border-radius:10px;padding:13px;margin-bottom:12px;border:1px solid var(--border)">
       <div style="font-weight:700;font-size:0.95rem;margin-bottom:10px">🌸 ${r.nombre||'—'}
         <span style="font-size:0.75rem;color:var(--muted);font-weight:400">· ${r.fechaFormulario||'—'}</span>
+        ${r.tel?`<span style="font-size:0.78rem;color:var(--success);margin-left:6px">📱 ${r.tel}</span>`:''}
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:8px;font-size:0.8rem">
@@ -3692,7 +3695,7 @@ async function cargarFormEnFichaNueva(docId){
   showSection('nueva-clienta',null);
   setTimeout(()=>{
     const m={
-      'nc-nombre':r.nombre,'nc-edad':r.edad,'nc-ocup':r.ocup,
+      'nc-nombre':r.nombre,'nc-tel':r.tel||'','nc-edad':r.edad,'nc-ocup':r.ocup,
       'nc-medicacion':r.condiciones,'nc-alergias':r.alergias||'',
       'nc-skincare':r.skincare||'','nc-tratprev':r.tratprev||'',
       'nc-objetivo':r.objetivo||'','nc-obs':r.obs||'',
