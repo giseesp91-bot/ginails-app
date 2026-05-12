@@ -2296,7 +2296,7 @@ async function loadFirebase(){
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
   for(const[col,obj] of cols){
     const snap=await fs.getDocs(fs.collection(db, base, col));
-    snap.forEach(d=>{ obj[d.id]={...d.data(), id:d.id}; });
+    snap.forEach(d=>obj[d.id]=d.data());
   }
   // Cargar insumos desde Firebase
   try {
