@@ -1865,6 +1865,7 @@ input[type="file"]{display:none;}
       <button class="tab" onclick="showModalTab('mf-historial',this)">📅 Historial</button>
       <button class="tab" onclick="showModalTab('mf-fotos',this)">📸 Fotos</button>
       <button class="tab" onclick="showModalTab('mf-notas',this)">📝 Notas</button>
+      <button class="tab" onclick="showModalTab('mf-editar',this)">✏️ Editar</button>
       <button class="tab" onclick="showModalTab('mf-crm',this)">📊 CRM</button>
     </div>
     <div id="mf-datos" class="tab-content active"><div id="modal-contenido"></div></div>
@@ -1881,6 +1882,7 @@ input[type="file"]{display:none;}
       <div id="lista-notas"></div>
     </div>
     <div id="mf-crm" class="tab-content"><div id="modal-crm-contenido"></div></div>
+    <div id="mf-editar" class="tab-content"><div id="modal-editar-contenido"></div></div>
     <div class="btn-row" style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
       <button class="btn btn-secondary btn-sm" onclick="closeModal('modal-ficha')">← Volver</button>
       <button class="btn btn-success btn-sm" onclick="abrirIA()">🤖 IA Analizar</button>
@@ -2383,6 +2385,7 @@ function showModalTab(id,btn){
   if(id==='mf-fotos')renderFotosModal();
   if(id==='mf-notas')renderNotasModal();
   if(id==='mf-crm')renderCRMFicha(clientaActualId);
+  if(id==='mf-editar')renderEditarFicha(clientaActualId);
 }
 function toggleServ(h){
   const body = h.nextElementSibling;
@@ -3878,6 +3881,146 @@ async function checkFormulariosFirebase(){
 }
 
 function initCRM(){renderCRMAlertas();}
+
+function renderEditarFicha(id){
+  const cont=document.getElementById('modal-editar-contenido');
+  if(!cont||!id)return;
+  const c=clientas[id];if(!c)return;
+  cont.innerHTML=`
+  <div style="padding-bottom:8px">
+    <div class="card">
+      <div class="card-title">👤 Datos personales</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Nombre *</label><input type="text" id="ed-nombre" value="${c.nombre||''}"></div>
+        <div class="form-group"><label>Teléfono</label><input type="tel" id="ed-tel" value="${c.tel||''}"></div>
+        <div class="form-group"><label>Edad</label><input type="number" id="ed-edad" value="${c.edad||''}"></div>
+        <div class="form-group"><label>Ocupación</label><input type="text" id="ed-ocup" value="${c.ocup||''}"></div>
+        <div class="form-group"><label>Instagram</label><input type="text" id="ed-insta" value="${c.insta||''}"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🩺 Salud</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Medicación</label><input type="text" id="ed-medicacion" value="${c.medicacion||''}"></div>
+        <div class="form-group"><label>Alergias</label><input type="text" id="ed-alergias" value="${c.alergias||''}"></div>
+        <div class="form-group full"><label>Tratamientos previos</label><textarea id="ed-tratprev" style="min-height:55px">${c.tratprev||''}</textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🌿 Hábitos</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Alimentación</label>
+          <select id="ed-alim">
+            <option value="">Seleccionar</option>
+            ${['Equilibrada y variada','Alta en azúcares / harinas','Alta en grasas / frituras','Vegetariana / vegana','Muy procesada'].map(o=>`<option${c.alim===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Agua diaria</label>
+          <select id="ed-agua">
+            <option value="">Seleccionar</option>
+            ${['Buena (2L+ por día)','Regular (1-2L por día)','Baja (menos de 1L)'].map(o=>`<option${c.agua===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Sueño</label>
+          <select id="ed-sueno">
+            <option value="">Seleccionar</option>
+            ${['Buena (7-8hs)','Regular (5-7hs)','Mala (menos de 5hs)'].map(o=>`<option${c.sueno===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Estrés</label>
+          <select id="ed-estres">
+            <option value="">Seleccionar</option>
+            ${['Bajo','Moderado','Alto / crónico'].map(o=>`<option${c.estres===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Usa SPF</label>
+          <select id="ed-fps">
+            <option value="">Seleccionar</option>
+            ${['Sí, todos los días','Solo cuando va a la playa','A veces','No usa nunca'].map(o=>`<option${c.fps===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Skincare actual</label><textarea id="ed-skincare" style="min-height:55px">${c.skincare||''}</textarea></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">👁️ Cejas & Pestañas</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Estado cejas</label>
+          <select id="ed-cejas">
+            <option value="">Seleccionar</option>
+            ${['Densas y bien definidas','Escasas / poco pelo','Irregulares / asimétricas','Despobladas en la cola','Muy claras / rubias','Bien pobladas pero sin forma'].map(o=>`<option${c.cejas===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Estado pestañas</label>
+          <select id="ed-pestanas">
+            <option value="">Seleccionar</option>
+            ${['Abundantes y sanas','Escasas / finas','Muy lacias / sin curvatura','Frágiles / quebradizas','Rizadas naturalmente'].map(o=>`<option${c.pestanas===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="background:#fff0f7;border-color:#f4c0d1">
+      <div class="card-title">🌸 Salud hormonal</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Menstruación</label>
+          <select id="ed-menstruacion">
+            <option value="">Seleccionar</option>
+            ${['Regular','Irregular','No menstrúa / menopausia'].map(o=>`<option${c.menstruacion===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group"><label>Estado hormonal</label>
+          <select id="ed-estado-hormonal">
+            <option value="">Seleccionar</option>
+            ${['Ciclo menstrual activo','Embarazo','Lactancia','Perimenopausia','Menopausia'].map(o=>`<option${c.estadoHormonal===o?' selected':''}>${o}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-group full"><label>Anticonceptivo / observaciones hormonales</label>
+          <textarea id="ed-obs-hormonal" style="min-height:55px">${c.obsHormonal||c.anticonceptivoOtro||''}</textarea>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">🎯 Objetivo</div>
+      <div class="form-grid">
+        <div class="form-group full"><textarea id="ed-objetivo" style="min-height:55px">${c.objetivo||''}</textarea></div>
+        <div class="form-group full"><label>Observaciones libres</label><textarea id="ed-obs" style="min-height:55px">${c.obs||''}</textarea></div>
+      </div>
+    </div>
+    <button class="btn btn-success" style="width:100%;margin-top:4px" onclick="guardarEdicionFicha('${id}')">💾 Guardar cambios</button>
+  </div>`;
+}
+
+async function guardarEdicionFicha(id){
+  const c=clientas[id];if(!c)return;
+  const v=el=>document.getElementById(el)?.value||'';
+  c.nombre=v('ed-nombre')||c.nombre;
+  c.tel=v('ed-tel');
+  c.edad=v('ed-edad');
+  c.ocup=v('ed-ocup');
+  c.insta=v('ed-insta');
+  c.medicacion=v('ed-medicacion');
+  c.alergias=v('ed-alergias');
+  c.tratprev=v('ed-tratprev');
+  c.alim=v('ed-alim');
+  c.agua=v('ed-agua');
+  c.sueno=v('ed-sueno');
+  c.estres=v('ed-estres');
+  c.fps=v('ed-fps');
+  c.skincare=v('ed-skincare');
+  c.cejas=v('ed-cejas');
+  c.pestanas=v('ed-pestanas');
+  c.menstruacion=v('ed-menstruacion');
+  c.estadoHormonal=v('ed-estado-hormonal');
+  c.obsHormonal=v('ed-obs-hormonal');
+  c.objetivo=v('ed-objetivo');
+  c.obs=v('ed-obs');
+  await saveDoc('clientas',id,c);
+  renderClientas();
+  // Volver a tab datos y refrescar
+  showModalTab('mf-datos', document.querySelector('#modal-ficha .tab'));
+  abrirFicha(id);
+  alert('✅ Ficha actualizada!');
+}
 
 </script>
 </body>
