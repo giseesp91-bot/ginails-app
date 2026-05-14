@@ -1768,6 +1768,16 @@ input[type="file"]{display:none;}
 <!-- GASTOS -->
 <div id="gastos" class="section">
   <div class="section-title">📊 Gastos & Rentabilidad</div>
+
+  <!-- Selector de mes -->
+  <div class="card" style="padding:10px 13px;margin-bottom:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <label style="font-size:0.82rem;font-weight:600;color:var(--muted)">📅 Ver mes:</label>
+    <select id="filtro-mes" onchange="renderGastos();actualizarResumen()" style="padding:6px 10px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+      <option value="todo">Todo el tiempo</option>
+    </select>
+    <button onclick="cerrarMes()" style="margin-left:auto;background:var(--muted);color:white;border:none;border-radius:9px;padding:6px 12px;font-size:0.78rem;cursor:pointer">🗂️ Cerrar mes</button>
+  </div>
+
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px">
     <div class="card" style="text-align:center;padding:13px"><div style="font-size:1.4rem">💸</div><div id="res-gastos" style="font-size:1rem;font-weight:700;color:var(--danger)">$0</div><div style="font-size:0.71rem;color:var(--muted)">Gastado</div></div>
     <div class="card" style="text-align:center;padding:13px"><div style="font-size:1.4rem">💰</div><div id="res-cobrado" style="font-size:1rem;font-weight:700;color:var(--success)">$0</div><div style="font-size:0.71rem;color:var(--muted)">Cobrado</div></div>
@@ -3032,10 +3042,44 @@ async function guardarGasto(){
   ['gasto-desc','gasto-monto','gasto-notas'].forEach(i=>document.getElementById(i)&&(document.getElementById(i).value=''));
   renderGastos();actualizarResumen();
 }
+function getMesFiltro(){
+  return document.getElementById('filtro-mes')?.value || 'todo';
+}
+
+function poblarFiltroMes(){
+  const sel=document.getElementById('filtro-mes');if(!sel)return;
+  const meses=new Set();
+  Object.values(gastosD).forEach(g=>{if(g.fecha)meses.add(g.fecha.substring(0,7));});
+  Object.values(sesiones).forEach(s=>{
+    if(s.fecha){const p=s.fecha.split('/');if(p.length===3)meses.add(`${p[2]}-${p[1].padStart(2,'0')}`);}
+  });
+  const actual=new Date().toISOString().substring(0,7);
+  meses.add(actual);
+  const opciones=Array.from(meses).sort().reverse();
+  const valorActual=sel.value;
+  sel.innerHTML='<option value="todo">Todo el tiempo</option>'+
+    opciones.map(m=>{
+      const [y,mo]=m.split('-');
+      const nombre=new Date(y,mo-1,1).toLocaleString('es-AR',{month:'long',year:'numeric'});
+      return `<option value="${m}"${m===valorActual?' selected':''}>${nombre.charAt(0).toUpperCase()+nombre.slice(1)}</option>`;
+    }).join('');
+}
+
+function filtrarPorMes(lista,campo='fechaTs'){
+  const mes=getMesFiltro();if(mes==='todo')return lista;
+  return lista.filter(x=>{
+    if(campo==='fechaTs'&&x.fechaTs){const d=new Date(x.fechaTs);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`===mes;}
+    if(campo==='fecha'&&x.fecha){const p=x.fecha.split('/');if(p.length===3)return `${p[2]}-${p[1].padStart(2,'0')}`===mes;}
+    return false;
+  });
+}
+
 function renderGastos(){
+  poblarFiltroMes();
   const cont=document.getElementById('lista-gastos');if(!cont)return;
-  const lista=Object.values(gastosD).sort((a,b)=>b.fechaTs-a.fechaTs);
-  if(!lista.length){cont.innerHTML=`<div class="empty-state"><div class="icon">📊</div><p>Sin gastos.</p></div>`;return;}
+  const todos=Object.values(gastosD).sort((a,b)=>b.fechaTs-a.fechaTs);
+  const lista=filtrarPorMes(todos,'fechaTs');
+  if(!lista.length){cont.innerHTML=`<div class="empty-state"><div class="icon">📊</div><p>Sin gastos en este período.</p></div>`;return;}
   cont.innerHTML=lista.map(g=>`<div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)">
     <div style="flex:1"><div style="font-weight:600;font-size:0.86rem">${g.desc}</div>
       <div style="display:flex;gap:5px;align-items:center;margin-top:2px;flex-wrap:wrap">
@@ -3046,14 +3090,20 @@ function renderGastos(){
     </div>
     <div style="display:flex;align-items:center;gap:7px;flex-shrink:0">
       <span style="font-weight:700;color:var(--danger)">-$${g.monto.toLocaleString('es-AR')}</span>
+      <button onclick="abrirEditarGasto('${g.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.85rem">✏️</button>
       <button onclick="eliminarGasto('${g.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.95rem">×</button>
     </div>
   </div>`).join('');
 }
+
 async function eliminarGasto(id){if(!confirm('¿Eliminar?'))return;delete gastosD[id];await delDoc('gastos',id);renderGastos();actualizarResumen();}
+
 function actualizarResumen(){
-  const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
-  const gastado=Object.values(gastosD).reduce((s,x)=>s+(x.monto||0),0);
+  poblarFiltroMes();
+  const sesFilt=filtrarPorMes(Object.values(sesiones),'fecha');
+  const gasFilt=filtrarPorMes(Object.values(gastosD),'fechaTs');
+  const cobrado=sesFilt.reduce((s,x)=>s+(x.precio||0),0);
+  const gastado=gasFilt.reduce((s,x)=>s+(x.monto||0),0);
   const gan=cobrado-gastado;
   const elG=document.getElementById('res-gastos');
   const elC=document.getElementById('res-cobrado');
@@ -3062,6 +3112,29 @@ function actualizarResumen(){
   if(elC)elC.textContent='$'+cobrado.toLocaleString('es-AR');
   if(elN){elN.textContent=(gan>=0?'+':'')+('$'+Math.abs(gan).toLocaleString('es-AR'));elN.style.color=gan>=0?'var(--success)':'var(--danger)';}
   updateStats();
+}
+
+async function cerrarMes(){
+  const mes=getMesFiltro();
+  if(mes==='todo'){alert('Seleccioná un mes específico para cerrarlo.');return;}
+  const [y,mo]=mes.split('-');
+  const nombre=new Date(y,mo-1,1).toLocaleString('es-AR',{month:'long',year:'numeric'});
+  const gasFilt=filtrarPorMes(Object.values(gastosD),'fechaTs');
+  const sesFilt=filtrarPorMes(Object.values(sesiones),'fecha');
+  const cobrado=sesFilt.reduce((s,x)=>s+(x.precio||0),0);
+  const gastado=gasFilt.reduce((s,x)=>s+(x.monto||0),0);
+  const gan=cobrado-gastado;
+  const msg=`📊 Resumen ${nombre.charAt(0).toUpperCase()+nombre.slice(1)}:
+
+💰 Cobrado: $${cobrado.toLocaleString('es-AR')}
+💸 Gastado: $${gastado.toLocaleString('es-AR')}
+📈 Ganancia: $${gan.toLocaleString('es-AR')}
+
+¿Borrar los gastos de este mes? (Las sesiones se mantienen)`;
+  if(!confirm(msg))return;
+  for(const g of gasFilt){delete gastosD[g.id];await delDoc('gastos',g.id);}
+  renderGastos();actualizarResumen();
+  alert(`✅ ${gasFilt.length} gastos borrados. Las sesiones se mantienen.`);
 }
 
 // ===================== WHATSAPP FORM =====================
