@@ -178,7 +178,7 @@ input[type="file"]{display:none;}
     <div class="card" style="text-align:center;cursor:pointer;padding:14px" onclick="showSection('gastos',null)">
       <div style="font-size:1.6rem">💰</div>
       <div id="stat-ganancia" style="font-size:1.5rem;font-weight:700;color:var(--gold)">—</div>
-      <div style="font-size:0.73rem;color:var(--muted)">Ganancia</div>
+      <div style="font-size:0.73rem;color:var(--muted)">Ganancia este mes</div>
     </div>
   </div>
   <div class="card">
@@ -2348,10 +2348,30 @@ function getChecked(sel){return Array.from(document.querySelectorAll(sel+' input
 function updateStats(){
   document.getElementById('stat-clientas').textContent=Object.keys(clientas).length;
   document.getElementById('stat-sesiones').textContent=Object.keys(sesiones).length;
-  const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
-  const gastado=Object.values(gastosD).reduce((s,x)=>s+(x.monto||0),0);
+  // Filtrar por mes actual
+  const mesActual=new Date().toISOString().substring(0,7);
+  const sesMes=Object.values(sesiones).filter(s=>{
+    if(!s.fecha)return false;
+    const p=s.fecha.split('/');
+    return p.length===3&&`${p[2]}-${p[1].padStart(2,'0')}`===mesActual;
+  });
+  const gasMes=Object.values(gastosD).filter(g=>{
+    if(!g.fechaTs)return false;
+    const d=new Date(g.fechaTs);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`===mesActual;
+  });
+  const cobrado=sesMes.reduce((s,x)=>s+(x.precio||0),0);
+  const gastado=gasMes.reduce((s,x)=>s+(x.monto||0),0);
   const gan=cobrado-gastado;
-  document.getElementById('stat-ganancia').textContent=(gan>=0?'+':'')+('$'+gan.toLocaleString('es-AR'));
+  const el=document.getElementById('stat-ganancia');
+  if(el){
+    el.textContent=(gan>=0?'+':'')+('$'+gan.toLocaleString('es-AR'));
+    el.style.color=gan>=0?'var(--gold)':'var(--danger)';
+  }
+  // Actualizar label a "Este mes"
+  const label=el?.parentElement?.querySelector('.stat-label, div:last-child');
+  const parent=document.getElementById('stat-ganancia')?.parentElement;
+  if(parent){const divs=parent.querySelectorAll('div');if(divs.length>1)divs[divs.length-1].textContent='Ganancia este mes';}
 }
 
 // ===================== NAV =====================
