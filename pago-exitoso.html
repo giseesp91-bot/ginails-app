@@ -138,16 +138,29 @@
     onAuthStateChanged(auth, async (user) => {
       if (!user) { window.location.href = "login.html"; return; }
 
-      // Marcar en Firestore que pagó
       const params = new URLSearchParams(window.location.search);
+      const status = params.get('status') || params.get('collection_status') || 'approved';
       const ref    = params.get("external_reference") || "";
-      const plan   = ref.split("|")[1] || "mensual";
+      const plan   = ref.includes('anual') ? 'anual' : 'mensual';
+      const meses  = plan === 'anual' ? 12 : 1;
 
-      await setDoc(doc(db, "usuarios", user.email), {
-        planActivo:   plan,
-        fechaPago:    Date.now(),
-        suscripcion:  "activa"
-      }, { merge: true });
+      if(status === 'approved' || status === '') {
+        // Calcular fecha de vencimiento
+        const ahora = new Date();
+        const vence = new Date(ahora);
+        vence.setMonth(vence.getMonth() + meses);
+
+        await setDoc(doc(db, "usuarios", user.email), {
+          suscripcionActiva: true,
+          suscripcionPlan:   plan,
+          suscripcionVence:  vence.toISOString(),
+          suscripcionInicio: ahora.toISOString(),
+          email:             user.email
+        }, { merge: true });
+      } else {
+        // Pago no aprobado → volver a pago
+        window.location.href = "pago.html";
+      }
     });
   </script>
 </body>
