@@ -2004,6 +2004,35 @@ input[type="file"]{display:none;}
       <div class="form-group full"><label>Notas para la próxima sesión</label><textarea id="ses-proxima" placeholder="¿Qué cambiar? ¿Qué reforzar? ¿Qué recordar la próxima vez?"></textarea></div>
       <div class="form-group"><label>Precio cobrado ($)</label><input type="number" id="ses-precio" min="0"></div>
       <div class="form-group"><label>Forma de pago</label><select id="ses-pago"><option value="">—</option><option>Efectivo</option><option>Transferencia</option><option>Débito</option><option>Crédito</option><option>Sin cobrar</option></select></div>
+
+      <!-- REEVALUACION POST SESION -->
+      <div class="form-group full" style="border-top:1.5px solid var(--border);padding-top:12px;margin-top:4px">
+        <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">📊 Reevaluación post-sesión</div>
+      </div>
+      <div class="form-group"><label>¿Cómo reaccionó la piel?</label>
+        <select id="ses-reac-piel"><option value="">Seleccionar</option><option>Muy bien — sin reacciones</option><option>Bien — leve enrojecimiento normal</option><option>Regular — más sensible de lo esperado</option><option>Mal — reacción adversa</option></select>
+      </div>
+      <div class="form-group"><label>¿Nivel de hidratación al finalizar?</label>
+        <select id="ses-hidratacion"><option value="">Seleccionar</option><option>Excelente</option><option>Bueno</option><option>Regular</option><option>Sigue seca</option></select>
+      </div>
+      <div class="form-group"><label>¿Cómo respondió a la aparatología?</label>
+        <select id="ses-reac-aparat"><option value="">Seleccionar</option><option>Muy bien</option><option>Bien</option><option>Con sensibilidad</option><option>No se usó</option></select>
+      </div>
+      <div class="form-group"><label>¿Persistieron manchas?</label>
+        <select id="ses-manchas"><option value="">Seleccionar</option><option>Mejoraron notablemente</option><option>Mejoraron levemente</option><option>Igual</option><option>No aplica</option></select>
+      </div>
+      <div class="form-group"><label>¿La clienta cumplió domiciliario?</label>
+        <select id="ses-domiciliario"><option value="">Seleccionar</option><option>Sí, completo</option><option>Parcialmente</option><option>No</option><option>Primera sesión</option></select>
+      </div>
+      <div class="form-group"><label>¿Qué mejoró visiblemente?</label>
+        <input type="text" id="ses-mejoro" placeholder="Ej: textura, brillo, manchas, poros...">
+      </div>
+      <div class="form-group"><label>Evaluación general (1-5)</label>
+        <select id="ses-evaluacion"><option value="">—</option><option value="5">⭐⭐⭐⭐⭐ Excelente</option><option value="4">⭐⭐⭐⭐ Muy bueno</option><option value="3">⭐⭐⭐ Bueno</option><option value="2">⭐⭐ Regular</option><option value="1">⭐ A mejorar</option></select>
+      </div>
+      <div class="form-group full"><label>Nueva preocupación o cambio detectado</label>
+        <input type="text" id="ses-nueva-concern" placeholder="Algo nuevo que notaste esta sesión...">
+      </div>
     </div>
     <div class="btn-row"><button class="btn btn-primary" onclick="guardarSesion()">💾 Guardar Sesión</button><button class="btn btn-secondary" onclick="closeModal('modal-sesion')">Cancelar</button></div>
   </div>
@@ -2639,12 +2668,91 @@ async function guardarSesion(){
     tuvoRechazo,rechazoProd:tuvoRechazo?v('ses-rechazo-prod'):'',
     rechazoDesc:tuvoRechazo?v('ses-rechazo-desc'):'',
     productoReemplazo:tuvoRechazo?v('ses-reemplazo'):'',
-    notaProxima:v('ses-proxima'),precio:parseInt(v('ses-precio'))||0,pago:v('ses-pago')};
+    notaProxima:v('ses-proxima'),precio:parseInt(v('ses-precio'))||0,pago:v('ses-pago'),
+    // Reevaluación post-sesión
+    reacPiel:v('ses-reac-piel'),
+    hidratacion:v('ses-hidratacion'),
+    reacAparat:v('ses-reac-aparat'),
+    manchas:v('ses-manchas'),
+    domiciliario:v('ses-domiciliario'),
+    mejoro:v('ses-mejoro'),
+    evaluacion:v('ses-evaluacion'),
+    nuevaConcern:v('ses-nueva-concern')
+  };
   sesiones[id]=ses;await saveDoc('sesiones',id,ses);
-  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo',
+   'ses-mejoro','ses-nueva-concern'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['ses-reac-piel','ses-hidratacion','ses-reac-aparat','ses-manchas','ses-domiciliario','ses-evaluacion'].forEach(i=>{
+    const el=document.getElementById(i);if(el)el.value='';
+  });
   closeModal('modal-sesion');renderPlanModal();renderHistorialModal();renderClientas();updateStats();
-  alert('✅ Sesión registrada!');
+  // Ofrecer generar sugerencia próxima sesión
+  if(confirm('✅ Sesión guardada!\n\n¿Querés que la IA sugiera el próximo tratamiento basándose en esta sesión?')){
+    abrirSugerenciaProximaSesion(ses);
+  }
 }
+function abrirSugerenciaProximaSesion(sesActual){
+  const c = clientas[clientaActualId];
+  if(!c) return;
+  const sesCli = Object.values(sesiones).filter(s=>s.clientaId===clientaActualId).sort((a,b)=>b.fechaTs-a.fechaTs);
+
+  // Abrir modal IA con sugerencia
+  document.getElementById('ia-clienta-nombre').textContent = c.nombre;
+  document.getElementById('ia-contenido').innerHTML = `<div class="ai-box"><div class="ai-loading">🎯 Generando sugerencia para próxima sesión<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
+  document.getElementById('modal-ia').classList.add('open');
+
+  const historialResumen = sesCli.slice(0,5).map(s=>
+    `- Ses.${s.numero}: ${s.tratamiento} (${s.fecha}) | Reacción: ${s.reacPiel||s.reaccion||'no registrado'} | Mejoró: ${s.mejoro||'—'} | Eval: ${s.evaluacion||'—'}/5`
+  ).join('\n');
+
+  const prompt = `Sos una cosmetóloga experta. Analizá la evolución de esta clienta y sugerí el PRÓXIMO TRATAMIENTO IDEAL.
+
+CLIENTA: ${c.nombre}
+Tipo de piel: ${c.tpiel} | Fototipo: ${c.fototipo}
+Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
+Objetivo: ${c.objetivo||'no especificado'}
+Estado hormonal: ${c.estadoHormonal||'no especificado'}
+
+SESIÓN QUE ACABA DE TERMINAR:
+- Tratamiento: ${sesActual.tratamiento}
+- Estado piel al inicio: ${sesActual.estadoPiel||'—'}
+- Productos usados: ${sesActual.productos||'—'}
+- Reacción de la piel: ${sesActual.reacPiel||sesActual.reaccion||'—'}
+- Nivel hidratación: ${sesActual.hidratacion||'—'}
+- Manchas: ${sesActual.manchas||'—'}
+- Respuesta aparatología: ${sesActual.reacAparat||'—'}
+- Domiciliario cumplido: ${sesActual.domiciliario||'—'}
+- Qué mejoró: ${sesActual.mejoro||'—'}
+- Evaluación: ${sesActual.evaluacion||'—'}/5
+- Nueva preocupación: ${sesActual.nuevaConcern||'ninguna'}
+
+HISTORIAL RECIENTE:
+${historialResumen||'Primera sesión'}
+
+Respondé con esta estructura:
+
+**🎯 SUGERENCIA PRÓXIMA SESIÓN**
+
+**Tratamiento recomendado:** [nombre]
+**Por qué:** [justificación basada en la evolución]
+**Frecuencia ideal:** [cada cuánto tiempo]
+
+**Ajustes para la próxima:**
+[Lista de qué cambiar, qué mantener, qué reforzar]
+
+**Domiciliario a reforzar:**
+[Qué recordarle que haga en casa]
+
+**Señales de progreso a buscar:**
+[Qué deberías ver mejorado en la próxima visita]
+
+**⚠️ Atención:**
+[Algo a monitorear o tener en cuenta]`;
+
+  callIA(prompt, document.getElementById('ia-contenido'));
+  iaTextoActual = '';
+}
+
 function renderHistorialModal(){
   const cont=document.getElementById('modal-historial');
   const lista=Object.values(sesiones).filter(s=>s.clientaId===clientaActualId).sort((a,b)=>b.fechaTs-a.fechaTs);
@@ -2655,13 +2763,16 @@ function renderHistorialModal(){
       <div style="display:flex;align-items:center;gap:7px"><span class="sesion-num">${s.numero||'?'}</span>
         <div><div style="font-weight:600;font-size:0.86rem">${s.tratamiento}</div><div style="font-size:0.73rem;color:var(--muted)">${s.fecha}${s.duracion?' · '+s.duracion+' min':''}</div></div>
       </div>
-      <div style="display:flex;gap:4px">${s.precio?`<span class="badge badge-gold">$${s.precio.toLocaleString('es-AR')}</span>`:''}${s.tuvoRechazo?`<span class="badge badge-red">⚠️ Rechazo</span>`:''}</div>
+      <div style="display:flex;gap:4px">${s.precio?`<span class="badge badge-gold">$${s.precio.toLocaleString('es-AR')}</span>`:''}${s.evaluacion?`<span class="badge badge-rose">${'⭐'.repeat(parseInt(s.evaluacion))}</span>`:''}${s.tuvoRechazo?`<span class="badge badge-red">⚠️ Rechazo</span>`:''}</div>
     </div>
-    ${s.estadoPiel?`<div style="font-size:0.78rem;color:var(--muted);margin-top:5px">Estado: ${s.estadoPiel}</div>`:''}
+    ${s.estadoPiel?`<div style="font-size:0.78rem;color:var(--muted);margin-top:5px">Estado inicio: ${s.estadoPiel}</div>`:''}
     ${s.productos?`<div style="font-size:0.78rem;margin-top:4px"><strong>Usados:</strong> ${s.productos}</div>`:''}
+    ${s.reacPiel?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:6px">🟢 Reacción: ${s.reacPiel}${s.hidratacion?' · Hidratación: '+s.hidratacion:''}</div>`:''}
+    ${s.mejoro?`<div style="font-size:0.78rem;margin-top:4px;background:#f0fdf4;padding:5px;border-radius:6px">✨ Mejoró: ${s.mejoro}</div>`:''}
     ${s.reaccion?`<div style="font-size:0.78rem;margin-top:4px;background:var(--light);padding:6px;border-radius:6px">${s.reaccion}</div>`:''}
     ${s.tuvoRechazo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff0f0;padding:6px;border-radius:6px;color:var(--danger)">⚠️ <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ '+s.productoReemplazo:''}</div>`:''}
-    ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:6px;color:#1a5a3a">📌 ${s.notaProxima}</div>`:''}
+    ${s.domiciliario?`<div style="font-size:0.78rem;margin-top:4px;color:var(--muted)">🏠 Domiciliario: ${s.domiciliario}</div>`:''}
+    ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f4fd;padding:6px;border-radius:6px;color:#2a4a7a">📌 ${s.notaProxima}</div>`:''}
     <div style="text-align:right;margin-top:7px"><button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')">🗑️</button></div>
   </div>`).join('');
 }
@@ -2737,35 +2848,28 @@ async function generarAnalisisIA(c){
   const rechazos=sesCli.filter(s=>s.tuvoRechazo).map(s=>`${s.rechazoProd} (ses.${s.numero})`).join(', ');
   const insumosTengo=Object.keys(misInsumos).filter(k=>misInsumos[k]);
 
-  const prompt=`Sos una cosmetóloga experta con 15 años de experiencia clínica. Actuás como ASISTENTE PROFESIONAL de una cosmetóloga principiante. Analizás el perfil de la clienta y le decís EXACTAMENTE qué hacer en el gabinete. Hablás siempre a LA COSMETÓLOGA, nunca a la clienta. Respondé en español rioplatense, tono claro y profesional.
+  const prompt=`Sos una cosmetóloga experta con 15 años de experiencia clínica. Actuás como ASISTENTE PROFESIONAL de una cosmetóloga (puede ser principiante). Hablás siempre A LA COSMETÓLOGA, nunca a la clienta. Respondé en español rioplatense, tono claro y directo.
 
-REGLA FUNDAMENTAL DE TIEMPOS: Para CADA paso del protocolo SIEMPRE indicar:
-- ⏱ Tiempo exacto de aplicación (ej: "3-5 min")
-- Si el tiempo varía según el tipo de piel o producto, aclararlo (ej: "piel sensible: 5 min / piel resistente: 10 min")
-- Si hay señales visuales o táctiles para saber cuándo el paso está completo, mencionarlas
-- Si el fabricante puede tener instrucciones distintas, aclararlo
-- Para mascarillas: indicar el rango y por qué no conviene excederse
-- Para peelings: indicar tiempo de inicio, máximo absoluto, y señales de alarma
+REGLA DE TIEMPOS: Para CADA paso del protocolo indicar:
+- ⏱ Tiempo exacto según tipo de piel
+- Señales para saber cuándo terminar
+- Si el fabricante puede diferir, aclararlo
 
-REGLAS CLÍNICAS OBLIGATORIAS A RESPETAR:
-1. PRIORIDAD POR RIESGO: Condiciones médicas > sensibilidad/rosácea > acné activo > barrera dañada > objetivos estéticos. NUNCA tratar lo estético si hay condición activa que puede empeorar.
-2. ORDEN SIEMPRE: limpiar → equilibrar/calmar → tratar problemática → estimular → sellar/proteger.
-3. NO MEZCLAR ACTIVOS INCOMPATIBLES en una sesión. Si hay conflicto: elegir el enfoque más seguro o dividir en fases.
-4. RESPETAR BARRERA: Si está dañada/sensibilizada → PRIMERO reparar barrera antes de cualquier tratamiento activo.
-5. FOTOTIPO ALTO (IV-VI): EVITAR exfoliaciones agresivas y peelings fuertes → riesgo hiperpigmentación post-inflamatoria.
-6. MEDICACIÓN: Retinoides → NO exfoliar. Antibióticos → precaución con sensibilidad. Isotretinoína (últimos 12 meses) → CONTRAINDICADO cualquier peeling o exfoliación.
-7. COHERENCIA: El tratamiento debe coincidir con el diagnóstico y NO contradecirse.
-8. SI HAY DUDA → BAJAR INTENSIDAD. Mejor quedarse corto que provocar reacción.
-9. MENOS ES MÁS: No sobrecargar. Priorizar eficacia sobre cantidad.
-10. SI NO ES APTO → DECIRLO CLARAMENTE con explicación.
+REGLAS CLÍNICAS:
+1. PRIORIDAD: Condiciones médicas > sensibilidad > acné activo > barrera dañada > objetivos estéticos.
+2. ORDEN: limpiar → equilibrar → tratar → estimular → sellar.
+3. NO MEZCLAR activos incompatibles.
+4. BARRERA DAÑADA → reparar primero.
+5. FOTOTIPO ALTO (IV-VI) → sin exfoliaciones agresivas.
+6. MEDICACIÓN: Retinoides/isotretinoína → NO exfoliar ni peeling.
+7. DUDA → bajar intensidad. MENOS ES MÁS.
 
-REGLAS HORMONALES A CONSIDERAR:
-- Embarazo → CONTRAINDICADO: peelings químicos, retinoides, alta frecuencia, galvánica, algunos despigmentantes (kójico, arbutina). Permitido: limpieza suave, hidratación, mascarillas calmantes.
-- Lactancia → evitar retinoides y activos que puedan absorberse sistémicamente.
-- Anticonceptivos orales → pueden causar melasma hormonal. Si hay manchas: SPF estricto OBLIGATORIO, evitar calor en zona.
-- Menopausia / perimenopausia → piel más seca, menos producción de colágeno, mayor sensibilidad. Priorizar hidratación profunda y anti-edad.
-- Fase premenstrual (días 21-28 del ciclo) → piel más sensible, propensa al acné hormonal. Evitar peelings agresivos en esta fase.
-- Si menciona acné hormonal cíclico → relacionar con fase del ciclo, no tratar como acné común.
+REGLAS HORMONALES:
+- Embarazo → CONTRAINDICADO: peelings, retinoides, alta frecuencia, galvánica, despigmentantes.
+- Lactancia → evitar retinoides y activos sistémicos.
+- Anticonceptivos + manchas → SPF estricto OBLIGATORIO.
+- Menopausia/perimenopausia → priorizar hidratación y anti-edad.
+- Fase premenstrual → evitar peelings agresivos.
 
 PERFIL DE LA CLIENTA:
 - Nombre: ${c.nombre}
@@ -2774,48 +2878,57 @@ PERFIL DE LA CLIENTA:
 - Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
 - Condiciones médicas: ${(c.condiciones||[]).join(', ')||'ninguna'}
 - Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'}
-- Alergia a tintes/adhesivos: ${c.alegTinte||'ninguna'}
-- Alimentación: ${c.alim} | Agua: ${c.agua} | Sueño: ${c.sueno}
-- Estrés: ${c.estres} | Tabaco/Alcohol: ${c.tabaco||'no'}
-- Exposición solar: ${c.solar} | Usa SPF: ${c.fps}
-- Rutina actual: ${c.skincare||'ninguna'}
-- Estado cejas: ${c.cejas} | Estado pestañas: ${c.pestanas}
+- Alimentación: ${c.alim} | Agua: ${c.agua} | Sueño: ${c.sueno} | Estrés: ${c.estres}
+- Usa SPF: ${c.fps} | Rutina actual: ${c.skincare||'ninguna'}
+- Cejas: ${c.cejas} | Pestañas: ${c.pestanas}
 - Menstruación: ${c.menstruacion||'no especificado'} | Estado hormonal: ${c.estadoHormonal||'no especificado'}
 - Anticonceptivos: ${(c.anticonceptivos||[]).join(', ')||c.anticonceptivoOtro||'no especificado'}
-- Observaciones hormonales: ${c.obsHormonal||'ninguna'}
-- Objetivo de la clienta: ${c.objetivo||'no especificado'}
-- Sesiones previas realizadas: ${sesCli.length}
-- Rechazos a productos anteriores: ${rechazos||'ninguno'}
-- Notas adicionales: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
-- Insumos disponibles en el gabinete: ${insumosTengo.length?insumosTengo.join(', '):'no especificados'}
+- Obs. hormonales: ${c.obsHormonal||'ninguna'}
+- Objetivo: ${c.objetivo||'no especificado'}
+- Sesiones previas: ${sesCli.length}
+- Rechazos anteriores: ${rechazos||'ninguno'}
+- Notas: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
+- Insumos disponibles: ${insumosTengo.length?insumosTengo.join(', '):'no especificados'}
 
-RESPONDÉ con esta estructura exacta:
+RESPONDÉ con esta estructura EXACTA:
 
-**🔍 DIAGNÓSTICO PROFESIONAL**
-[Descripción del perfil cutáneo. Qué está pasando en la piel. Prioridades a trabajar. Alertas importantes.]
+---
+**🔍 DIAGNÓSTICO**
+[2-3 líneas: qué está pasando en la piel, prioridades, alertas]
 
-**✅ TRATAMIENTOS RECOMENDADOS** (en orden de prioridad)
-Para cada tratamiento:
-- **Nombre:** [nombre del servicio]
-- **Por qué:** [justificación clínica según ESTE caso]
-- **Sesiones:** [cantidad y frecuencia]
-- **Protocolo adaptado:** [pasos numerados CON las adaptaciones específicas para este caso. Para CADA paso indicar: ⏱ tiempo exacto de aplicación, si el tiempo varía según el producto aclararlo, si hay señales para saber cuándo terminar el paso mencionarlas]
-- **Activos clave a usar:** [productos con activos específicos]
-- **Aparatología:** [si corresponde]
-- **Señales de progreso:** [qué debería mejorar y cuándo]
-
+---
 **🚫 CONTRAINDICACIONES PARA ESTE CASO**
-[Qué NO podés hacer con esta clienta y por qué — sé específica y directa]
+[Lista con ❌ de qué NO hacer y por qué]
 
+---
+**✅ AJUSTES AL PROTOCOLO BASE**
+- ✔ MANTENER: [paso que se ejecuta igual]
+- ⚠ ADAPTAR: [paso] → [cómo cambia] | 📌 Motivo: [por qué]
+- ❌ OMITIR: [paso] | 📌 Motivo: [por qué]
+
+---
+**📋 PROTOCOLO FINAL PERSONALIZADO — PASO A PASO**
+[Protocolo REAL a ejecutar hoy. Numerado y completo.]
+
+PASO N — [NOMBRE EN MAYÚSCULAS]
+[Qué hacer exactamente]
+🧴 Producto: [producto específico — priorizar insumos disponibles]
+⏱ Tiempo: [tiempo según su tipo de piel]
+📌 [Advertencia si corresponde]
+
+---
 **🏠 DOMICILIARIO PERSONALIZADO**
-- Mañana: [rutina exacta con activos]
-- Noche: [rutina exacta con activos]
-- Frecuencia especial: [si aplica]
+- Mañana: [rutina con activos específicos]
+- Noche: [rutina con activos específicos]
+- Hábito clave: [1 tip para este caso]
 
-**⚠️ ADVERTENCIAS PROFESIONALES**
-[Cosas críticas a tener en cuenta antes de empezar. Tips para esta clienta específica.]
+---
+**🎯 PRÓXIMA SESIÓN**
+- Tratamiento ideal: [qué hacer la próxima vez]
+- Frecuencia: [cada cuánto]
+- Señales de progreso: [qué debería mejorar]
 
-${insumosTengo.length?'**🧴 CON TUS INSUMOS DISPONIBLES**\n[Indicá qué tratamientos podés hacer con lo que tenés y qué te faltaría para los otros]':''}`;
+${insumosTengo.length?'---\n**🧴 CON TUS INSUMOS**\n[Qué podés hacer con lo que tenés y qué te faltaría]':''}`;
 
   await callIA(prompt, document.getElementById('ia-contenido'));
   iaTextoActual=document.getElementById('ia-contenido').innerText;
