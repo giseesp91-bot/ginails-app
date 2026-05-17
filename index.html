@@ -3089,6 +3089,32 @@ function renderPreciosSection(){
   renderPreciosCat('precios-faciales',faciales);
   renderPreciosCat('precios-cejas-pesta',cejas);
   renderPreciosCat('precios-combos',combos);
+  actualizarTodosLosBadges();
+}
+
+function actualizarTodosLosBadges(){
+  const badgeMap={
+    'limpieza-profunda':'precio-limpieza-profunda',
+    'hidratacion':'precio-hidratacion',
+    'acne':'precio-acne',
+    'manchas':'precio-manchas',
+    'antiedad':'precio-antiedad',
+    'sensible':'precio-sensible',
+    'glow':'precio-glow',
+    'peeling':'precio-peeling',
+    'lifting':'precio-lifting-pestanas',
+    'laminado':'precio-laminado-cejas',
+    'henna':'precio-henna',
+    'tinte':'precio-tinte',
+    'perfilado':'precio-perfilado',
+    'combo1':'precio-combo1','combo2':'precio-combo2',
+    'combo3':'precio-combo3','combo4':'precio-combo4',
+    'combo5':'precio-combo5','combo6':'precio-combo6',
+  };
+  Object.entries(badgeMap).forEach(([id,badgeId])=>{
+    const badge=document.getElementById(badgeId);
+    if(badge&&misPrecios[id]) badge.textContent='$'+misPrecios[id].toLocaleString('es-AR');
+  });
 }
 function renderPreciosCat(contId,ids){
   const cont=document.getElementById(contId);if(!cont)return;
@@ -3106,9 +3132,31 @@ function renderPreciosCat(contId,ids){
 function actualizarPrecio(id,val){
   misPrecios[id]=parseInt(val)||0;
   localStorage.setItem('ginails_precios2',JSON.stringify(misPrecios));
-  // actualizar badge en servicios si está visible
-  const badge=document.getElementById('precio-'+id);
-  if(badge)badge.textContent='$'+misPrecios[id].toLocaleString('es-AR');
+  // Mapa de id de precio → id del badge en servicios
+  const badgeMap={
+    'limpieza-profunda':'precio-limpieza-profunda',
+    'hidratacion':'precio-hidratacion',
+    'acne':'precio-acne',
+    'manchas':'precio-manchas',
+    'antiedad':'precio-antiedad',
+    'sensible':'precio-sensible',
+    'glow':'precio-glow',
+    'peeling':'precio-peeling',
+    'lifting':'precio-lifting-pestanas',
+    'laminado':'precio-laminado-cejas',
+    'henna':'precio-henna',
+    'tinte':'precio-tinte',
+    'perfilado':'precio-perfilado',
+    'combo1':'precio-combo1',
+    'combo2':'precio-combo2',
+    'combo3':'precio-combo3',
+    'combo4':'precio-combo4',
+    'combo5':'precio-combo5',
+    'combo6':'precio-combo6',
+  };
+  const badgeId = badgeMap[id] || 'precio-'+id;
+  const badge=document.getElementById(badgeId);
+  if(badge) badge.textContent='$'+misPrecios[id].toLocaleString('es-AR');
 }
 
 // ===================== PRESUPUESTOS =====================
