@@ -1100,6 +1100,87 @@ input[type="file"]{display:none;}
       </div>
     </div>
 
+    <!-- DERMAPLANING -->
+    <div class="servicio-card">
+      <div class="serv-header" onclick="toggleServ(this)">
+        <div><h4>🪄 Dermaplaning</h4><div style="font-size:0.73rem;color:#c5a090;margin-top:2px">Todo tipo de piel · Sin acné activo · ~45 min</div></div>
+        <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-dermaplaning">$18.000</span><span class="badge badge-gold">~45 min</span></div>
+      </div>
+      <div class="serv-body" style="display:none">
+        <div class="serv-section" style="background:#fff0f7;border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+          <h5>TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
+          <div style="font-size:0.85rem;line-height:1.9">
+            <strong>Tratamiento:</strong> Exfoliación física con bisturí estéril (hoja #10)<br>
+            <strong>Frecuencia:</strong> Cada 3-4 semanas<br>
+            <strong>Objetivo:</strong> Eliminar células muertas y vello fino facial (pelusilla). Piel de seda inmediata, luminosa y lista para absorber activos.<br>
+            <strong>Duración sesión:</strong> 40-50 min
+          </div>
+        </div>
+        <div class="serv-section" style="background:#fff8f8;border-radius:9px;padding:12px;margin-bottom:10px;border-left:4px solid var(--danger)">
+          <h5 style="color:var(--danger)">⚠️ CHECK ANTES DE EMPEZAR — CONTRAINDICACIONES</h5>
+          <div style="font-size:0.83rem;line-height:1.9">
+            <div>❌ <strong>Acné activo con pústulas o nódulos</strong> → NO hacer — riesgo de diseminar bacterias</div>
+            <div>❌ <strong>Rosácea activa o inflamada</strong> → NO hacer</div>
+            <div>❌ <strong>Heridas, cortes o irritación activa</strong> → NO hacer</div>
+            <div>❌ <strong>Isotretinoína activa o últimos 6 meses</strong> → NO hacer</div>
+            <div>❌ <strong>Queratosis actínica o lesiones pigmentadas no diagnosticadas</strong> → Derivar a dermatólogo</div>
+            <div>⚠️ <strong>Embarazo/lactancia combinado con ácidos</strong> → Dermaplaning simple sí, con ácidos NO</div>
+            <div>⚠️ <strong>Piel muy sensible o cuperosis</strong> → Evaluar caso por caso, presión mínima</div>
+            <div style="margin-top:8px;background:#fdf4f2;border-radius:7px;padding:8px;font-size:0.81rem">
+              ✅ <strong>Consentimiento informado:</strong> explicar que el vello NO vuelve más grueso (mito).<br>
+              ✅ <strong>Bioseguridad:</strong> hoja estéril de uso único, descartar inmediatamente después.
+            </div>
+          </div>
+        </div>
+        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+          <h5 style="color:#2a4a7a">🗂️ Ramificación por tipo de piel</h5>
+          <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.9">
+            <strong>Normal/mixta:</strong> protocolo completo, presión media<br>
+            <strong>Seca/deshidratada:</strong> hidratar bien antes y después, presión suave<br>
+            <strong>Grasa:</strong> ideal — elimina la pelusilla que retiene el sebo<br>
+            <strong>Sensible:</strong> presión mínima, velocidad lenta, hoja bien posicionada<br>
+            <strong>Madura:</strong> excelente resultado — elimina opacidad, suaviza líneas finas
+          </div>
+        </div>
+        <div class="serv-section">
+          <h5>🔬 Protocolo paso a paso</h5>
+          <div class="paso-item"><span class="paso-num">1</span><div><strong>LIMPIEZA</strong> — doble limpieza con leche o gel suave. Piel bien limpia y sin restos de maquillaje. <strong style="color:var(--rose)">⏱ 3-4 min · La piel DEBE estar completamente seca antes de la hoja</strong></div></div>
+          <div class="paso-item"><span class="paso-num">2</span><div><strong>DESGRASE</strong> — pasar alcohol o tónico sin aceite por toda la zona a tratar. Dejar secar completamente. <strong style="color:var(--rose)">⏱ 1-2 min · Fundamental para que la hoja deslice bien y sin riesgo</strong></div></div>
+          <div class="paso-item"><span class="paso-num">3</span><div><strong>DERMAPLANING</strong> — hoja estéril #10 a 45°. Movimientos cortos y suaves en dirección contraria al crecimiento del vello. Tensar la piel con la otra mano. <strong style="color:var(--rose)">⏱ 20-25 min · Presión suave y pareja · Nunca sobre poros dilatados o lesiones · Evitar zona del labio superior si es muy sensible</strong></div></div>
+          <div class="paso-item"><span class="paso-num">4</span><div><strong>SÉRUM HIDRATANTE</strong> — aplicar inmediatamente. Hialurónico + ceramidas. La piel absorbe hasta 10x mejor post-dermaplaning. <strong style="color:var(--rose)">⏱ 2 min · Aplicar con toquecitos suaves, no masajear fuerte</strong></div></div>
+          <div class="paso-item"><span class="paso-num">5</span><div><strong>MASCARILLA CALMANTE</strong> — aloe vera, centella asiática o lámina de colágeno. <strong style="color:var(--rose)">⏱ 15 min · Puede ser fría para reducir enrojecimiento leve post-procedimiento</strong></div></div>
+          <div class="paso-item"><span class="paso-num">6</span><div><strong>LED (opcional)</strong> — 🟡 Amarillo 12 min si hay enrojecimiento · 🔴 Rojo 15 min para regeneración y colágeno. <strong style="color:var(--rose)">⏱ 12-15 min · ❌ NO azul post-dermaplaning</strong></div></div>
+          <div class="paso-item"><span class="paso-num">7</span><div><strong>CREMA BARRERA + SPF 50</strong> — crema hidratante con ceramidas y SPF 50 OBLIGATORIO. <strong style="color:var(--rose)">⏱ 2 min · SPF es indispensable — la piel queda más fotosensible</strong></div></div>
+        </div>
+        <div class="serv-section">
+          <h5>🧴 Productos recomendados</h5>
+          <div class="highlight">Limpieza: leche o gel sin fragancia · Desgrase: alcohol o tónico sin aceite · Sérum: hialurónico + ceramidas · Mascarilla: aloe vera o lámina colágeno · Finalización: crema barrera + SPF 50</div>
+        </div>
+        <div class="serv-section">
+          <h5>💡 ¿Por qué este tratamiento?</h5>
+          <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">El dermaplaning elimina físicamente la capa de células muertas y el vello facial fino que opaca la piel y dificulta la penetración de activos. El resultado es inmediato: textura perfecta, brillo natural y maquillaje que entra como nunca. Es el tratamiento ideal antes de un evento, para potenciar otras sesiones o como mantenimiento mensual.</p>
+        </div>
+        <div class="serv-section">
+          <h5>📊 Control de expectativas</h5>
+          <div class="highlight">✅ Resultado inmediato — la diferencia se nota ese mismo día<br>⚠️ Puede haber leve enrojecimiento las primeras 2-4 horas, completamente normal<br>⚠️ El vello NO vuelve más grueso — es un mito comprobado<br>🔄 Repetir cada 3-4 semanas para mantener el resultado</div>
+        </div>
+        <div class="serv-section">
+          <h5>🏠 Domiciliario</h5>
+          <div class="highlight">
+            <strong>Las primeras 24-48hs:</strong><br>
+            ❌ No maquillaje (mínimo 24hs)<br>
+            ❌ No sol directo<br>
+            ❌ No exfoliantes ni ácidos<br>
+            ❌ No agua caliente ni sauna<br>
+            ✅ SPF 50 obligatorio<br>
+            ✅ Hidratación suave<br><br>
+            <strong>Rutina mañana:</strong> limpieza suave → sérum hialurónico → crema hidratante → SPF 50<br>
+            <strong>Rutina noche:</strong> limpieza suave → sérum ceramidas → crema reparadora (sin retinol los primeros 3 días)
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- CEJAS Y PESTAÑAS -->  <!-- CEJAS Y PESTAÑAS -->
@@ -1681,23 +1762,40 @@ input[type="file"]{display:none;}
 
   <!-- MIS SERVICIOS PERSONALIZADOS -->
   <div id="tab-custom" class="tab-content">
-    <div class="alert alert-info">💡 Aquí podés cargar tus propios protocolos — los que ya usás con tus clientas o los que aprendiste en el curso.</div>
-    <div class="card">
-      <div class="card-title">➕ Nuevo Servicio Personalizado</div>
+    <div class="alert alert-info">💡 Aquí podés cargar tus propios protocolos. Los servicios aparecen en la categoría que elijas.</div>
+
+    <!-- LISTA ARRIBA -->
+    <div id="lista-servicios-custom"><div class="empty-state"><div class="icon">✏️</div><p>Todavía no cargaste servicios personalizados.</p></div></div>
+
+    <!-- FORMULARIO ABAJO -->
+    <div class="card" style="margin-top:14px">
+      <div class="card-title" id="cs-form-titulo">➕ Nuevo Servicio Personalizado</div>
+      <input type="hidden" id="cs-edit-id">
       <div class="form-grid">
         <div class="form-group"><label>Nombre del servicio *</label><input type="text" id="cs-nombre" placeholder="Nombre de tu tratamiento"></div>
+        <div class="form-group"><label>Categoría</label>
+          <select id="cs-categoria">
+            <option value="facial">🌸 Facial</option>
+            <option value="cejas">👁️ Cejas & Pestañas</option>
+            <option value="combo">🌟 Combo</option>
+            <option value="corporal">💆 Corporal</option>
+            <option value="otro">✏️ Otro</option>
+          </select>
+        </div>
         <div class="form-group"><label>Precio ($)</label><input type="number" id="cs-precio" min="0" placeholder="0"></div>
-        <div class="form-group"><label>Tipo de piel indicada</label><input type="text" id="cs-tpiel" placeholder="Ej: mixta, grasa, sensible..."></div>
         <div class="form-group"><label>Duración estimada</label><input type="text" id="cs-duracion" placeholder="Ej: 1hs, 90 min"></div>
+        <div class="form-group"><label>Tipo de piel indicada</label><input type="text" id="cs-tpiel" placeholder="Ej: mixta, grasa, sensible..."></div>
         <div class="form-group full"><label>Pasos del protocolo *</label><textarea id="cs-pasos" placeholder="Escribí los pasos uno por uno..." style="min-height:100px"></textarea></div>
         <div class="form-group full"><label>Productos que usás</label><textarea id="cs-productos" placeholder="Lista los productos que necesitás..."></textarea></div>
         <div class="form-group full"><label>Efectos / resultados esperados</label><textarea id="cs-efectos" placeholder="Qué logra este tratamiento..."></textarea></div>
         <div class="form-group full"><label>Contraindicaciones</label><textarea id="cs-contra" placeholder="Cuándo NO aplicarlo..."></textarea></div>
         <div class="form-group full"><label>Domiciliario a recomendar</label><textarea id="cs-domi" placeholder="Qué le mandás a hacer en casa..."></textarea></div>
       </div>
-      <div class="btn-row"><button class="btn btn-primary" onclick="guardarServicioCustom()">💾 Guardar Servicio</button></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="guardarServicioCustom()">💾 Guardar Servicio</button>
+        <button class="btn btn-secondary" id="cs-btn-cancelar" style="display:none" onclick="cancelarEdicionServicio()">✕ Cancelar</button>
+      </div>
     </div>
-    <div id="lista-servicios-custom"><div class="empty-state"><div class="icon">✏️</div><p>Todavía no cargaste servicios personalizados.</p></div></div>
   </div>
 </div>
 
@@ -2345,11 +2443,16 @@ function updateStats(){
 }
 
 // ===================== NAV =====================
+let _navHistory=['inicio'];
 function showSection(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
+  if(id!==_navHistory[_navHistory.length-1]){
+    _navHistory.push(id);
+    history.pushState({section:id},'');
+  }
   if(id==='clientas')renderClientas();
   if(id==='precios')renderPreciosSection();
   if(id==='insumos')renderInsumos();
@@ -2359,6 +2462,23 @@ function showSection(id,btn){
   if(id==='servicios')renderServiciosCustom();
   if(id==='crm'){renderCRMAlertas();renderCRMClientas();renderCRMConsumo();renderCRMFormularios();}
 }
+
+// Manejar botón atrás del navegador/gesto
+window.addEventListener('popstate', function(e){
+  _navHistory.pop();
+  const anterior = _navHistory[_navHistory.length-1] || 'inicio';
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById(anterior)?.classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  // Highlight nav btn
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    if(b.getAttribute('onclick')?.includes(`'${anterior}'`))b.classList.add('active');
+  });
+  // Si volvemos al inicio, agregar un estado para que el próximo atrás salga
+  if(anterior==='inicio') history.pushState({section:'inicio'},'');
+});
+// Estado inicial
+history.replaceState({section:'inicio'},'');
 function showTab(id,btn){
   // Find the parent section containing both tabs and tab-contents
   const tabsEl = btn ? btn.closest('.tabs') : null;
@@ -3019,14 +3139,50 @@ function actualizarResumenInsumos(){
 async function guardarServicioCustom(){
   const nombre=v('cs-nombre').trim();
   if(!nombre){alert('Poné el nombre del servicio');return;}
-  const id=uid();
-  const serv={id,nombre,precio:parseInt(v('cs-precio'))||0,tpiel:v('cs-tpiel'),
-    duracion:v('cs-duracion'),pasos:v('cs-pasos'),productos:v('cs-productos'),
-    efectos:v('cs-efectos'),contra:v('cs-contra'),domi:v('cs-domi'),fechaTs:Date.now()};
+  const editId=document.getElementById('cs-edit-id')?.value||'';
+  const id=editId||uid();
+  const serv={id,nombre,
+    categoria:v('cs-categoria')||'facial',
+    precio:parseInt(v('cs-precio'))||0,
+    tpiel:v('cs-tpiel'),duracion:v('cs-duracion'),
+    pasos:v('cs-pasos'),productos:v('cs-productos'),
+    efectos:v('cs-efectos'),contra:v('cs-contra'),
+    domi:v('cs-domi'),
+    fechaTs:serviciosCustom[id]?.fechaTs||Date.now()
+  };
   serviciosCustom[id]=serv;
   await saveDoc('servicios_custom',id,serv);
-  ['cs-nombre','cs-precio','cs-tpiel','cs-duracion','cs-pasos','cs-productos','cs-efectos','cs-contra','cs-domi'].forEach(i=>document.getElementById(i)&&(document.getElementById(i).value=''));
-  renderServiciosCustom();alert('✅ Servicio guardado!');
+  ['cs-nombre','cs-precio','cs-tpiel','cs-duracion','cs-pasos','cs-productos','cs-efectos','cs-contra','cs-domi'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('cs-edit-id').value='';
+  document.getElementById('cs-form-titulo').textContent='➕ Nuevo Servicio Personalizado';
+  document.getElementById('cs-btn-cancelar').style.display='none';
+  renderServiciosCustom();
+  alert(editId?'✅ Servicio actualizado!':'✅ Servicio guardado!');
+}
+
+function editarServicioCustom(id){
+  const s=serviciosCustom[id];if(!s)return;
+  document.getElementById('cs-edit-id').value=id;
+  document.getElementById('cs-nombre').value=s.nombre||'';
+  document.getElementById('cs-categoria').value=s.categoria||'facial';
+  document.getElementById('cs-precio').value=s.precio||'';
+  document.getElementById('cs-tpiel').value=s.tpiel||'';
+  document.getElementById('cs-duracion').value=s.duracion||'';
+  document.getElementById('cs-pasos').value=s.pasos||'';
+  document.getElementById('cs-productos').value=s.productos||'';
+  document.getElementById('cs-efectos').value=s.efectos||'';
+  document.getElementById('cs-contra').value=s.contra||'';
+  document.getElementById('cs-domi').value=s.domi||'';
+  document.getElementById('cs-form-titulo').textContent='✏️ Editando: '+s.nombre;
+  document.getElementById('cs-btn-cancelar').style.display='inline-flex';
+  document.getElementById('cs-form-titulo').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelarEdicionServicio(){
+  document.getElementById('cs-edit-id').value='';
+  ['cs-nombre','cs-precio','cs-tpiel','cs-duracion','cs-pasos','cs-productos','cs-efectos','cs-contra','cs-domi'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('cs-form-titulo').textContent='➕ Nuevo Servicio Personalizado';
+  document.getElementById('cs-btn-cancelar').style.display='none';
 }
 
 function renderServiciosCustom(){
@@ -3034,19 +3190,32 @@ function renderServiciosCustom(){
   if(!cont)return;
   const lista=Object.values(serviciosCustom).sort((a,b)=>b.fechaTs-a.fechaTs);
   if(!lista.length){cont.innerHTML=`<div class="empty-state"><div class="icon">✏️</div><p>Sin servicios personalizados.</p></div>`;return;}
-  cont.innerHTML=lista.map(s=>`
-    <div class="servicio-card">
-      <div class="serv-header" onclick="toggleServ(this)">
-        <div><h4>✏️ ${s.nombre}</h4><div style="font-size:0.73rem;color:#c5a090;margin-top:2px">${s.tpiel||''} ${s.duracion?'· '+s.duracion:''}</div></div>
-        <div style="display:flex;gap:5px;align-items:center">${s.precio?`<span class="precio-badge">$${s.precio.toLocaleString('es-AR')}</span>`:''}<button class="btn btn-danger btn-sm" onclick="event.stopPropagation();eliminarServicioCustom('${s.id}')">🗑️</button></div>
-      </div>
-      <div class="serv-body" style="display:none">
-        ${s.efectos?`<div class="serv-section"><h5>🎯 Efectos</h5><div class="highlight">${s.efectos}</div></div>`:''}
-        ${s.pasos?`<div class="serv-section"><h5>🔬 Protocolo</h5><div style="font-size:0.84rem;white-space:pre-wrap">${s.pasos}</div></div>`:''}
-        ${s.productos?`<div class="serv-section"><h5>🧴 Productos</h5><div class="highlight">${s.productos}</div></div>`:''}
-        ${s.contra?`<div class="serv-section"><h5>⚠️ Contraindicaciones</h5><div class="highlight" style="background:#fff0f0">${s.contra}</div></div>`:''}
-        ${s.domi?`<div class="serv-section"><h5>🏠 Domiciliario</h5><div class="highlight">${s.domi}</div></div>`:''}
-      </div>
+
+  const catLabels={facial:'🌸 Faciales',cejas:'👁️ Cejas & Pestañas',combo:'🌟 Combos',corporal:'💆 Corporal',otro:'✏️ Otros'};
+  const grupos={};
+  lista.forEach(s=>{const cat=s.categoria||'otro';if(!grupos[cat])grupos[cat]=[];grupos[cat].push(s);});
+
+  cont.innerHTML=Object.entries(grupos).map(([cat,items])=>`
+    <div style="margin-bottom:16px">
+      <div style="font-size:0.75rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px">${catLabels[cat]||cat}</div>
+      ${items.map(s=>`
+      <div class="servicio-card">
+        <div class="serv-header" onclick="toggleServ(this)">
+          <div><h4>${s.nombre}</h4><div style="font-size:0.73rem;color:#c5a090;margin-top:2px">${s.tpiel||''} ${s.duracion?'· '+s.duracion:''}</div></div>
+          <div style="display:flex;gap:5px;align-items:center">
+            ${s.precio?`<span class="precio-badge">$${s.precio.toLocaleString('es-AR')}</span>`:''}
+            <button class="btn btn-secondary btn-sm" onclick="event.stopPropagation();editarServicioCustom('${s.id}')">✏️</button>
+            <button class="btn btn-danger btn-sm" onclick="event.stopPropagation();eliminarServicioCustom('${s.id}')">🗑️</button>
+          </div>
+        </div>
+        <div class="serv-body" style="display:none">
+          ${s.efectos?`<div class="serv-section"><h5>🎯 Efectos</h5><div class="highlight">${s.efectos}</div></div>`:''}
+          ${s.pasos?`<div class="serv-section"><h5>🔬 Protocolo</h5><div style="font-size:0.84rem;white-space:pre-wrap">${s.pasos}</div></div>`:''}
+          ${s.productos?`<div class="serv-section"><h5>🧴 Productos</h5><div class="highlight">${s.productos}</div></div>`:''}
+          ${s.contra?`<div class="serv-section"><h5>⚠️ Contraindicaciones</h5><div class="highlight" style="background:#fff0f0">${s.contra}</div></div>`:''}
+          ${s.domi?`<div class="serv-section"><h5>🏠 Domiciliario</h5><div class="highlight">${s.domi}</div></div>`:''}
+        </div>
+      </div>`).join('')}
     </div>`).join('');
 }
 
