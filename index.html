@@ -19,15 +19,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);
 header{background:var(--deep);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,74,53,0.25);gap:10px;}
 .logo{display:flex;align-items:center;gap:10px;white-space:nowrap;}
 .logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
-.logo-text{font-family:'Playfair Display',serif;color:var(--blush);font-size:1.2rem;letter-spacing:1px;}
-.logo-text span{color:var(--gold);font-style:italic;}
+.logo-text{font-family:'Playfair Display',serif;color:#e8d8c0;font-size:1.2rem;letter-spacing:1px;}
+.logo-text span{color:#6a9e7a;font-style:italic;}
 .fb-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
 .fb-ok{background:#1a4a2a;color:#90e0a0;}.fb-err{background:#4a1a1a;color:#e09090;}.fb-wait{background:#3a2a0a;color:#e0c070;}
-nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:linear-gradient(180deg,rgba(45,74,53,0.98),rgba(35,60,42,0.99));border-bottom:2px solid rgba(106,158,122,0.2);}
+nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:linear-gradient(180deg,#253d2b,#1e3224);border-bottom:2px solid rgba(106,158,122,0.15);}
 nav::-webkit-scrollbar{display:none;}
-.nav-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(106,158,122,0.25);color:rgba(220,240,220,0.9);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s cubic-bezier(.4,0,.2,1);font-weight:500;letter-spacing:0.2px;}
-.nav-btn:hover{background:rgba(106,158,122,0.2);border-color:var(--sage);color:white;transform:translateY(-1px);}
-.nav-btn.active{background:linear-gradient(135deg,var(--sage),#4a8a5a);border-color:var(--sage);color:white;box-shadow:0 3px 12px rgba(106,158,122,0.4);transform:translateY(-1px);}
+.nav-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(106,158,122,0.2);color:rgba(200,232,200,0.85);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:500;}
+.nav-btn:hover{background:rgba(106,158,122,0.2);border-color:#6a9e7a;color:white;transform:translateY(-1px);}
+.nav-btn.active{background:linear-gradient(135deg,#6a9e7a,#4a8a5a);border-color:#6a9e7a;color:white;box-shadow:0 3px 12px rgba(106,158,122,0.4);}
 main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .section{display:none;animation:fadeIn 0.3s ease;}
 .section.active{display:block;}
@@ -143,7 +143,7 @@ input[type="file"]{display:none;}
 <header>
   <div style="display:flex;align-items:center;gap:10px">
     <div style="width:38px;height:38px;background:linear-gradient(135deg,#7E4A5F,#c47a6e);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:white;font-weight:700;flex-shrink:0">G</div>
-    <div class="logo">Ginails <span>Pro</span></div>
+    <div class="logo-text">Ginails <span>Pro</span></div>
   </div>
   <div class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</div>
 </header>
@@ -165,42 +165,52 @@ input[type="file"]{display:none;}
 
 <!-- INICIO -->
 <div id="inicio" class="section active">
-  <div class="section-title" id="saludo-inicio">🌸 Bienvenida/o</div>
+  <div class="saludo" style="margin-bottom:18px">
+    <div id="saludo-inicio" style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#2d4a35;display:flex;align-items:center;gap:8px">🌸 Bienvenida/o</div>
+    <p style="font-size:0.82rem;color:#7a8e7a;margin-top:3px">Resumen de tu negocio · <span style="color:#6a9e7a;font-weight:600" id="mes-label"></span></p>
+  </div>
 
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
-    <div onclick="showSection('clientas',null)" style="background:linear-gradient(135deg,#fff,#f0faf5);border-radius:18px;padding:16px 10px;text-align:center;cursor:pointer;border:1.5px solid var(--border);box-shadow:0 3px 14px rgba(106,158,122,0.1);transition:all 0.2s">
-      <div style="font-size:1.8rem;margin-bottom:4px">👤</div>
-      <div id="stat-clientas" style="font-size:1.6rem;font-weight:700;color:var(--rose);line-height:1">—</div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-top:3px;font-weight:600">Clientas</div>
+    <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08);cursor:pointer;transition:all 0.2s">
+      <div style="font-size:1.8rem;margin-bottom:6px">👤</div>
+      <div id="stat-clientas" style="font-size:1.5rem;font-weight:700;color:#c4637a;line-height:1">—</div>
+      <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Clientas</div>
     </div>
-    <div style="background:linear-gradient(135deg,#fff,#f0faf5);border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid var(--border);box-shadow:0 3px 14px rgba(106,158,122,0.1)">
-      <div style="font-size:1.8rem;margin-bottom:4px">📅</div>
-      <div id="stat-sesiones" style="font-size:1.6rem;font-weight:700;color:var(--sage);line-height:1">—</div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-top:3px;font-weight:600">Sesiones</div>
+    <div style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08)">
+      <div style="font-size:1.8rem;margin-bottom:6px">📅</div>
+      <div id="stat-sesiones" style="font-size:1.5rem;font-weight:700;color:#6a9e7a;line-height:1">—</div>
+      <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Sesiones</div>
     </div>
-    <div onclick="showSection('gastos',null)" style="background:linear-gradient(135deg,#fff,#fdfaf0);border-radius:18px;padding:16px 10px;text-align:center;cursor:pointer;border:1.5px solid var(--border);box-shadow:0 3px 14px rgba(184,151,106,0.1);transition:all 0.2s">
-      <div style="font-size:1.8rem;margin-bottom:4px">💰</div>
-      <div id="stat-ganancia" style="font-size:1.3rem;font-weight:700;color:var(--gold);line-height:1">—</div>
-      <div style="font-size:0.72rem;color:var(--muted);margin-top:3px;font-weight:600">Ganancia este mes</div>
+    <div onclick="showSection('gastos',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(184,151,106,0.08);cursor:pointer;transition:all 0.2s">
+      <div style="font-size:1.8rem;margin-bottom:6px">💰</div>
+      <div id="stat-ganancia" style="font-size:1.1rem;font-weight:700;color:#b8976a;line-height:1">—</div>
+      <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Ganancia este mes</div>
     </div>
   </div>
 
   <!-- ACCESO RAPIDO -->
-  <div class="card" style="background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid #d0e8d8">
-    <div class="card-title" style="color:var(--deep)">🚀 Acceso Rápido</div>
+  <div class="card" style="background:white;border:1.5px solid #e0ead8">
+    <div class="card-title">⚡ Acceso Rápido</div>
     <div style="display:flex;flex-direction:column;gap:10px">
-      <button onclick="showSection('nueva-clienta',null)" style="width:100%;padding:15px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(196,99,122,0.35);transition:all 0.2s">
-        ➕ Nueva Clienta
+      <button onclick="showSection('nueva-clienta',null)" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#c4637a,#a84e65);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(196,99,122,0.3);transition:all 0.2s">
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">➕</div>
+        <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Nueva Clienta</strong><small style="font-size:0.74rem;opacity:0.8;font-weight:400">Registrar nueva clienta</small></div>
+        <span style="font-size:1.2rem;opacity:0.7">›</span>
       </button>
-      <button onclick="showSection('clientas',null)" style="width:100%;padding:15px;background:white;color:var(--deep);border:2px solid var(--sage);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s">
-        👥 Ver Mis Clientas
+      <button onclick="showSection('clientas',null)" style="width:100%;padding:14px 16px;background:#f0f8f2;color:#2d4a35;border:1.5px solid #d0e8d8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
+        <div style="width:42px;height:42px;border-radius:12px;background:#e0f0e8;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">👥</div>
+        <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Mis Clientas</strong><small style="font-size:0.74rem;color:#7a8e7a;font-weight:400">Gestionar mis clientas</small></div>
+        <span style="font-size:1.2rem;color:#6a9e7a;opacity:0.8">›</span>
       </button>
-      <button onclick="showSection('servicios',null)" style="width:100%;padding:15px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s">
-        ✨ Ver Servicios & Protocolos
+      <button onclick="showSection('servicios',null)" style="width:100%;padding:14px 16px;background:#fdf8f0;color:#5a3a10;border:1.5px solid #e8dcc8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
+        <div style="width:42px;height:42px;border-radius:12px;background:#f5ead8;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">✨</div>
+        <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Servicios & Protocolos</strong><small style="font-size:0.74rem;color:#9a7a5a;font-weight:400">Explorar servicios disponibles</small></div>
+        <span style="font-size:1.2rem;color:#b8976a;opacity:0.8">›</span>
       </button>
     </div>
   </div>
+
   <div class="alert alert-info" id="fb-config-alert" style="display:none">⚠️ Firebase no configurado — modo local activo.</div>
   <div id="crm-alertas-inicio"></div>
 </div>
@@ -2601,6 +2611,13 @@ function getChecked(sel){return Array.from(document.querySelectorAll(sel+' input
 function updateStats(){
   document.getElementById('stat-clientas').textContent=Object.keys(clientas).length;
   document.getElementById('stat-sesiones').textContent=Object.keys(sesiones).length;
+  // Label del mes
+  const mesLabel = document.getElementById('mes-label');
+  if(mesLabel){
+    const ahora = new Date();
+    const nombre = ahora.toLocaleString('es-AR',{month:'long',year:'numeric'});
+    mesLabel.textContent = nombre.charAt(0).toUpperCase()+nombre.slice(1);
+  }
   const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
   const gastado=Object.values(gastosD).reduce((s,x)=>s+(x.monto||0),0);
   const gan=cobrado-gastado;
