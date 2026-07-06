@@ -2246,7 +2246,7 @@ let misInsumos = JSON.parse(localStorage.getItem('ginails_insumos') || '{}');
 // PRECIOS por defecto
 const PRECIOS_DEFAULT = {
   'limpieza-profunda':20000,'hidratacion':22000,'acne':22000,'manchas':24000,
-  'antiedad':26000,'sensible':20000,'glow':22000,'peeling':24000,
+  'antiedad':26000,'sensible':20000,'glow':22000,'peeling':24000,'dermaplaning':25000,
   'lifting':22000,'laminado':20000,'henna':15000,'tinte':10000,'perfilado':8000,
   'combo1':24000,'combo2':38000,'combo3':28000,'combo4':20000,'combo5':28000,'combo6':52000
 };
@@ -2984,6 +2984,33 @@ PERFIL DE LA CLIENTA
 - Notas: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
 - Insumos disponibles: ${insumosTengo.length?insumosTengo.join(', '):'no especificados'}
 
+HISTORIAL DE SESIONES (${sesCli.length} sesiones):
+${sesCli.slice(0,8).map((s,i)=>`Sesión ${s.numero||i+1} (${s.fecha}): ${s.tratamiento} | Estado piel: ${s.estadoPiel||'—'} | Reacción: ${s.reacPiel||s.reaccion||'—'} | Mejoró: ${s.mejoro||'—'} | Eval: ${s.evaluacion||'—'}/5 | Domiciliario: ${s.domiciliario||'—'} | Productos usados: ${s.productos||'—'} | Nota próxima: ${s.notaProxima||'—'}`).join('\n')||'Sin sesiones previas'}
+
+GUÍA DE PRODUCTOS DEL GABINETE (usá ESTOS específicamente):
+LIMPIEZA: Biobellus Leche Desmaquillante (normal/seca/sensible) · Agua micelar (grasa/acné)
+GEL LIMPIEZA: Gel de Limpieza Facial Idraet o Biobellus
+EXFOLIACIÓN SUAVE: Idraet Exfoliante Enzimático — para sensible/seca/madura ⏱5-8min
+EXFOLIACIÓN MECÁNICA: Biobellus Crema Pulidora — para normal/grasa ❌NO en sensible
+ARCILLA GRASA: Arcilla Verde granel — para grasa/mixta/comedones ⏱10-15min
+ARCILLA SENSIBLE: Caolín/Arcilla Blanca granel — para sensible/seca ⏱10-12min
+SÉRUM HIDRATACIÓN: Idraet Sérum Hialurónico 1% — para todas las pieles deshidratadas
+SÉRUM POROS/SEBO: Libra Booster Niacinamida + Zinc 10% — para grasa/mixta/acné/manchas
+SÉRUM MANCHAS/ANTIEDAD: Revox B77 Just Vitamina C 20% — con SPF obligatorio
+SÉRUM BARRERA/CALMANTE: Idraet Sérum Ceramidas 1% — para sensible/rosácea/barrera dañada
+SÉRUM ANTIEDAD NOCHE: Sérum Retinol/Péptidos — solo noche ❌NO con vitamina C
+CREMA SECA/MADURA: Biobellus Hidronutritiva Colágeno 500ml
+CREMA GRASA/MIXTA: Idraet Skin Food Watermelon Kiwi 50ml (oil-free)
+CREMA BARRERA: Crema Barrera + Ceramidas — post-peeling, post-dermaplaning, sensible
+ACEITE: Rosa Mosqueta — noche, manchas/cicatrices/antiedad ❌NO en acné activo
+MASCARILLA HIDRATANTE: Biobellus/Xioimy Lámina Colágeno ⏱15-20min
+MASCARILLA CALMANTE: Lámina Aloe Vera ⏱15min
+SPF NORMAL: Banana Boat/Isdin Fusion Water — para normal/mixta/seca
+SPF OIL-FREE: La Roche-Posay Anthelios Fluide/Isdin Oil-Free — para grasa/acné
+SPF MINERAL: Banana Boat Mineral/La Roche-Posay Mineral — para sensible/post-peeling/embarazo
+TÓNICO: Biobellus Tónico Astringente/Hamamelis — para grasa/mixta ❌NO en sensible/seca
+PEELING: Ácido Mandélico en polvo 50g + Gel Neutro (preparación casera) + bicarbonato para neutralizar
+
 ══════════════════════════════════
 ESTRUCTURA DE RESPUESTA OBLIGATORIA
 ══════════════════════════════════
@@ -3234,6 +3261,7 @@ const PRECIOS_INFO=[
   {id:'sensible',nombre:'Calmante & Barrera Protectora'},
   {id:'glow',nombre:'Revitalización & Glow'},
   {id:'peeling',nombre:'Peeling Químico Superficial'},
+  {id:'dermaplaning',nombre:'Dermaplaning'},
   {id:'lifting',nombre:'Lifting de Pestañas'},
   {id:'laminado',nombre:'Laminado de Cejas'},
   {id:'henna',nombre:'Henna de Cejas'},
@@ -3248,12 +3276,13 @@ const PRECIOS_INFO=[
 ];
 
 function renderPreciosSection(){
-  const faciales=['limpieza-profunda','hidratacion','acne','manchas','antiedad','sensible','glow','peeling'];
+  const faciales=['limpieza-profunda','hidratacion','acne','manchas','antiedad','sensible','glow','peeling','dermaplaning'];
   const cejas=['lifting','laminado','henna','tinte','perfilado'];
   const combos=['combo1','combo2','combo3','combo4','combo5','combo6'];
   renderPreciosCat('precios-faciales',faciales);
   renderPreciosCat('precios-cejas-pesta',cejas);
   renderPreciosCat('precios-combos',combos);
+  actualizarTodosLosBadges();
 }
 function renderPreciosCat(contId,ids){
   const cont=document.getElementById(contId);if(!cont)return;
@@ -3268,12 +3297,39 @@ function renderPreciosCat(contId,ids){
     </div>`;
   }).join('');
 }
+const BADGE_MAP = {
+  'limpieza-profunda':'precio-limpieza-profunda',
+  'hidratacion':'precio-hidratacion',
+  'acne':'precio-acne',
+  'manchas':'precio-manchas',
+  'antiedad':'precio-antiedad',
+  'sensible':'precio-sensible',
+  'glow':'precio-glow',
+  'peeling':'precio-peeling',
+  'dermaplaning':'precio-dermaplaning',
+  'lifting':'precio-lifting-pestanas',
+  'laminado':'precio-laminado-cejas',
+  'henna':'precio-henna',
+  'tinte':'precio-tinte',
+  'perfilado':'precio-perfilado',
+  'combo1':'precio-combo1','combo2':'precio-combo2',
+  'combo3':'precio-combo3','combo4':'precio-combo4',
+  'combo5':'precio-combo5','combo6':'precio-combo6',
+};
+
 function actualizarPrecio(id,val){
   misPrecios[id]=parseInt(val)||0;
   localStorage.setItem('ginails_precios2',JSON.stringify(misPrecios));
-  // actualizar badge en servicios si está visible
-  const badge=document.getElementById('precio-'+id);
+  const badgeId=BADGE_MAP[id]||('precio-'+id);
+  const badge=document.getElementById(badgeId);
   if(badge)badge.textContent='$'+misPrecios[id].toLocaleString('es-AR');
+}
+
+function actualizarTodosLosBadges(){
+  Object.entries(BADGE_MAP).forEach(([id,badgeId])=>{
+    const badge=document.getElementById(badgeId);
+    if(badge&&misPrecios[id]) badge.textContent='$'+misPrecios[id].toLocaleString('es-AR');
+  });
 }
 
 // ===================== PRESUPUESTOS =====================
@@ -4194,132 +4250,140 @@ function renderEditarFicha(id){
   const cont=document.getElementById('modal-editar-contenido');
   if(!cont||!id)return;
   const c=clientas[id];if(!c)return;
-  // Asegurar que el id esté en el objeto
-  c.id = c.id || id;
+  c.id=c.id||id;
+
+  const sel=(id,val,opts)=>`<select id="${id}" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+    <option value="">Seleccionar</option>
+    ${opts.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}
+  </select>`;
+
   cont.innerHTML=`
-  <div style="padding-bottom:8px">
+  <div style="padding-bottom:60px">
+
+    <!-- DATOS PERSONALES -->
     <div class="card">
       <div class="card-title">👤 Datos personales</div>
       <div class="form-grid">
         <div class="form-group"><label>Nombre *</label><input type="text" id="ed-nombre" value="${c.nombre||''}"></div>
         <div class="form-group"><label>Teléfono</label><input type="tel" id="ed-tel" value="${c.tel||''}"></div>
+        <div class="form-group"><label>Fecha de nacimiento</label><input type="date" id="ed-fnac" value="${c.fnac||''}"></div>
         <div class="form-group"><label>Edad</label><input type="number" id="ed-edad" value="${c.edad||''}"></div>
         <div class="form-group"><label>Ocupación</label><input type="text" id="ed-ocup" value="${c.ocup||''}"></div>
         <div class="form-group"><label>Instagram</label><input type="text" id="ed-insta" value="${c.insta||''}"></div>
       </div>
     </div>
+
+    <!-- ANAMNESIS -->
     <div class="card">
-      <div class="card-title">🩺 Salud</div>
+      <div class="card-title">🩺 Anamnesis & Salud</div>
       <div class="form-grid">
-        <div class="form-group"><label>Medicación</label><input type="text" id="ed-medicacion" value="${c.medicacion||''}"></div>
-        <div class="form-group"><label>Alergias</label><input type="text" id="ed-alergias" value="${c.alergias||''}"></div>
-        <div class="form-group full"><label>Tratamientos previos</label><textarea id="ed-tratprev" style="min-height:55px">${c.tratprev||''}</textarea></div>
+        <div class="form-group"><label>Medicación actual</label><input type="text" id="ed-medicacion" value="${c.medicacion||''}"></div>
+        <div class="form-group"><label>Alergias conocidas</label><input type="text" id="ed-alergias" value="${c.alergias||''}"></div>
+        <div class="form-group full"><label>Tratamientos estéticos previos</label><textarea id="ed-tratprev" style="min-height:55px">${c.tratprev||''}</textarea></div>
+        <div class="form-group full"><label>Alergias a adhesivos / tintes</label><input type="text" id="ed-aleg-tinte" value="${c.alegTinte||''}"></div>
       </div>
     </div>
+
+    <!-- ANALISIS DE PIEL -->
     <div class="card">
-      <div class="card-title">🌿 Hábitos</div>
+      <div class="card-title">🔬 Análisis de piel</div>
       <div class="form-grid">
-        <div class="form-group"><label>Alimentación</label>
-          <select id="ed-alim">
-            <option value="">Seleccionar</option>
-            ${['Equilibrada y variada','Alta en azúcares / harinas','Alta en grasas / frituras','Vegetariana / vegana','Muy procesada'].map(o=>`<option${c.alim===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Agua diaria</label>
-          <select id="ed-agua">
-            <option value="">Seleccionar</option>
-            ${['Buena (2L+ por día)','Regular (1-2L por día)','Baja (menos de 1L)'].map(o=>`<option${c.agua===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Sueño</label>
-          <select id="ed-sueno">
-            <option value="">Seleccionar</option>
-            ${['Buena (7-8hs)','Regular (5-7hs)','Mala (menos de 5hs)'].map(o=>`<option${c.sueno===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Estrés</label>
-          <select id="ed-estres">
-            <option value="">Seleccionar</option>
-            ${['Bajo','Moderado','Alto / crónico'].map(o=>`<option${c.estres===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Usa SPF</label>
-          <select id="ed-fps">
-            <option value="">Seleccionar</option>
-            ${['Sí, todos los días','Solo cuando va a la playa','A veces','No usa nunca'].map(o=>`<option${c.fps===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Skincare actual</label><textarea id="ed-skincare" style="min-height:55px">${c.skincare||''}</textarea></div>
+        <div class="form-group"><label>Tipo de piel</label>${sel('ed-tpiel',c.tpiel,['Normal','Seca','Grasa','Mixta','Sensible','Deshidratada','Madura / envejecida','Mixta grasa','Mixta seca'])}</div>
+        <div class="form-group"><label>Fototipo</label>${sel('ed-fototipo',c.fototipo,['I – Muy blanca, siempre se quema','II – Clara, casi siempre se quema','III – Intermedia, a veces se quema','IV – Morena clara, rara vez se quema','V – Morena oscura, casi nunca se quema','VI – Negra, nunca se quema'])}</div>
+        <div class="form-group"><label>Zona T</label>${sel('ed-zonat',c.zonat,['Normal','Grasa con brillo','Mixta con poros visibles','Seca'])}</div>
+        <div class="form-group"><label>Mejillas</label>${sel('ed-mejillas',c.mejillas,['Normal','Seca / tirante','Sensible / reactiva','Con manchas','Con rojeces'])}</div>
+        <div class="form-group"><label>Textura</label>${sel('ed-textura',c.textura,['Lisa y uniforme','Rugosa / áspera','Con granitos','Con poros visibles','Fina y delgada','Engrosada / seborreica'])}</div>
+        <div class="form-group"><label>Tono</label>${sel('ed-tono',c.tono,['Uniforme y luminoso','Opaco / sin brillo','Con manchas irregulares','Enrojecido / eritema','Amarillento / cansado'])}</div>
+        <div class="form-group"><label>Estado de barrera</label>${sel('ed-barrera',c.barrera,['Íntegra / saludable','Levemente comprometida','Dañada / sensibilizada','Muy comprometida / irritada'])}</div>
+        <div class="form-group full"><label>Observaciones visuales y táctiles</label><textarea id="ed-obspiel" style="min-height:55px">${c.obspiel||''}</textarea></div>
       </div>
     </div>
+
+    <!-- HABITOS -->
+    <div class="card">
+      <div class="card-title">🌿 Hábitos & Estilo de vida</div>
+      <div class="form-grid">
+        <div class="form-group"><label>Alimentación</label>${sel('ed-alim',c.alim,['Equilibrada y variada','Alta en azúcares / harinas','Alta en grasas / frituras','Vegetariana / vegana','Muy procesada','Con restricciones alimentarias'])}</div>
+        <div class="form-group"><label>Agua diaria</label>${sel('ed-agua',c.agua,['Buena (2L+ por día)','Regular (1-2L por día)','Baja (menos de 1L)'])}</div>
+        <div class="form-group"><label>Sueño</label>${sel('ed-sueno',c.sueno,['Buena (7-8hs)','Regular (5-7hs)','Mala (menos de 5hs)'])}</div>
+        <div class="form-group"><label>Ejercicio</label>${sel('ed-ejercicio',c.ejercicio,['Activa (4+ veces/semana)','Moderada (1-3 veces/semana)','Sedentaria'])}</div>
+        <div class="form-group"><label>Exposición solar</label>${sel('ed-solar',c.solar,['Alta (trabaja al aire libre)','Moderada','Baja (trabaja en interior)'])}</div>
+        <div class="form-group"><label>Usa SPF</label>${sel('ed-fps',c.fps,['Sí, todos los días','Solo cuando va a la playa','A veces','No usa nunca'])}</div>
+        <div class="form-group"><label>Estrés</label>${sel('ed-estres',c.estres,['Bajo','Moderado','Alto / crónico'])}</div>
+        <div class="form-group"><label>Tabaco / Alcohol</label>${sel('ed-tabaco',c.tabaco,['No consume ninguno','Fuma','Alcohol frecuente','Ambos'])}</div>
+        <div class="form-group full"><label>Rutina de skincare actual</label><textarea id="ed-skincare" style="min-height:55px">${c.skincare||''}</textarea></div>
+      </div>
+    </div>
+
+    <!-- CEJAS Y PESTANAS -->
     <div class="card">
       <div class="card-title">👁️ Cejas & Pestañas</div>
       <div class="form-grid">
-        <div class="form-group"><label>Estado cejas</label>
-          <select id="ed-cejas">
-            <option value="">Seleccionar</option>
-            ${['Densas y bien definidas','Escasas / poco pelo','Irregulares / asimétricas','Despobladas en la cola','Muy claras / rubias','Bien pobladas pero sin forma'].map(o=>`<option${c.cejas===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Estado pestañas</label>
-          <select id="ed-pestanas">
-            <option value="">Seleccionar</option>
-            ${['Abundantes y sanas','Escasas / finas','Muy lacias / sin curvatura','Frágiles / quebradizas','Rizadas naturalmente'].map(o=>`<option${c.pestanas===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
+        <div class="form-group"><label>Estado cejas</label>${sel('ed-cejas',c.cejas,['Densas y bien definidas','Escasas / poco pelo','Irregulares / asimétricas','Despobladas en la cola','Muy claras / rubias','Bien pobladas pero sin forma'])}</div>
+        <div class="form-group"><label>Estado pestañas</label>${sel('ed-pestanas',c.pestanas,['Abundantes y sanas','Escasas / finas','Muy lacias / sin curvatura','Frágiles / quebradizas','Rizadas naturalmente'])}</div>
+        <div class="form-group"><label>Tinte previo</label>${sel('ed-prev-tinte',c.prevTinte,['Nunca','Sí, sin problemas','Sí, con reacción leve','Sí, con reacción fuerte'])}</div>
+        <div class="form-group"><label>Extensiones</label>${sel('ed-extensiones',c.extensiones,['No','Sí, actualmente puestas','Las tuvo, ahora no'])}</div>
       </div>
     </div>
+
+    <!-- HORMONAL -->
     <div class="card" style="background:#fff0f7;border-color:#f4c0d1">
-      <div class="card-title">🌸 Salud hormonal</div>
+      <div class="card-title">🌸 Salud Hormonal</div>
       <div class="form-grid">
-        <div class="form-group"><label>Menstruación</label>
-          <select id="ed-menstruacion">
-            <option value="">Seleccionar</option>
-            ${['Regular','Irregular','No menstrúa / menopausia'].map(o=>`<option${c.menstruacion===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group"><label>Estado hormonal</label>
-          <select id="ed-estado-hormonal">
-            <option value="">Seleccionar</option>
-            ${['Ciclo menstrual activo','Embarazo','Lactancia','Perimenopausia','Menopausia'].map(o=>`<option${c.estadoHormonal===o?' selected':''}>${o}</option>`).join('')}
-          </select>
-        </div>
-        <div class="form-group full"><label>Anticonceptivo / observaciones hormonales</label>
-          <textarea id="ed-obs-hormonal" style="min-height:55px">${c.obsHormonal||c.anticonceptivoOtro||''}</textarea>
-        </div>
+        <div class="form-group"><label>Menstruación</label>${sel('ed-menstruacion',c.menstruacion,['Regular','Irregular','No menstrúa / menopausia'])}</div>
+        <div class="form-group"><label>Estado hormonal</label>${sel('ed-estado-hormonal',c.estadoHormonal,['Ciclo menstrual activo','Embarazo','Lactancia','Perimenopausia','Menopausia','Sin ciclo activo'])}</div>
+        <div class="form-group full"><label>Anticonceptivo / observaciones hormonales</label><textarea id="ed-obs-hormonal" style="min-height:55px">${c.obsHormonal||c.anticonceptivoOtro||''}</textarea></div>
       </div>
     </div>
+
+    <!-- OBJETIVO -->
     <div class="card">
-      <div class="card-title">🎯 Objetivo</div>
+      <div class="card-title">🎯 Objetivo & Observaciones</div>
       <div class="form-grid">
-        <div class="form-group full"><textarea id="ed-objetivo" style="min-height:55px">${c.objetivo||''}</textarea></div>
+        <div class="form-group full"><label>Objetivo de la clienta</label><textarea id="ed-objetivo" style="min-height:55px">${c.objetivo||''}</textarea></div>
         <div class="form-group full"><label>Observaciones libres</label><textarea id="ed-obs" style="min-height:55px">${c.obs||''}</textarea></div>
       </div>
     </div>
-    <button class="btn btn-success" style="width:100%;margin-top:4px" onclick="guardarEdicionFicha('${id}')">💾 Guardar cambios</button>
+
+    <button class="btn btn-success" style="width:100%;margin-top:4px;position:sticky;bottom:10px" onclick="guardarEdicionFicha('${id}')">💾 Guardar todos los cambios</button>
   </div>`;
 }
 
 async function guardarEdicionFicha(id){
   const c=clientas[id];if(!c)return;
-  c.id = c.id || id;
+  c.id=c.id||id;
   const v=el=>document.getElementById(el)?.value||'';
   c.nombre=v('ed-nombre')||c.nombre;
   c.tel=v('ed-tel');
+  c.fnac=v('ed-fnac');
   c.edad=v('ed-edad');
   c.ocup=v('ed-ocup');
   c.insta=v('ed-insta');
   c.medicacion=v('ed-medicacion');
   c.alergias=v('ed-alergias');
   c.tratprev=v('ed-tratprev');
+  c.alegTinte=v('ed-aleg-tinte');
+  c.tpiel=v('ed-tpiel');
+  c.fototipo=v('ed-fototipo');
+  c.zonat=v('ed-zonat');
+  c.mejillas=v('ed-mejillas');
+  c.textura=v('ed-textura');
+  c.tono=v('ed-tono');
+  c.barrera=v('ed-barrera');
+  c.obspiel=v('ed-obspiel');
   c.alim=v('ed-alim');
   c.agua=v('ed-agua');
   c.sueno=v('ed-sueno');
-  c.estres=v('ed-estres');
+  c.ejercicio=v('ed-ejercicio');
+  c.solar=v('ed-solar');
   c.fps=v('ed-fps');
+  c.estres=v('ed-estres');
+  c.tabaco=v('ed-tabaco');
   c.skincare=v('ed-skincare');
   c.cejas=v('ed-cejas');
   c.pestanas=v('ed-pestanas');
+  c.prevTinte=v('ed-prev-tinte');
+  c.extensiones=v('ed-extensiones');
   c.menstruacion=v('ed-menstruacion');
   c.estadoHormonal=v('ed-estado-hormonal');
   c.obsHormonal=v('ed-obs-hormonal');
@@ -4327,11 +4391,12 @@ async function guardarEdicionFicha(id){
   c.obs=v('ed-obs');
   await saveDoc('clientas',id,c);
   renderClientas();
-  // Volver a tab datos y refrescar
-  showModalTab('mf-datos', document.querySelector('#modal-ficha .tab'));
+  showModalTab('mf-datos',document.querySelector('#modal-ficha .tab'));
   abrirFicha(id);
   alert('✅ Ficha actualizada!');
 }
+
+
 
 </script>
 </body>
