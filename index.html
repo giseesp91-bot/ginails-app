@@ -4194,6 +4194,8 @@ function renderEditarFicha(id){
   const cont=document.getElementById('modal-editar-contenido');
   if(!cont||!id)return;
   const c=clientas[id];if(!c)return;
+  // Asegurar que el id esté en el objeto
+  c.id = c.id || id;
   cont.innerHTML=`
   <div style="padding-bottom:8px">
     <div class="card">
@@ -4300,6 +4302,7 @@ function renderEditarFicha(id){
 
 async function guardarEdicionFicha(id){
   const c=clientas[id];if(!c)return;
+  c.id = c.id || id;
   const v=el=>document.getElementById(el)?.value||'';
   c.nombre=v('ed-nombre')||c.nombre;
   c.tel=v('ed-tel');
