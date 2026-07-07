@@ -4531,6 +4531,15 @@ function renderEditarFicha(id){
     <div class="card">
       <div class="card-title">🩺 Anamnesis & Salud</div>
       <div class="form-grid">
+        <div class="form-group full"><label>Condiciones médicas / Enfermedades</label>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
+            ${['Diabetes','Hipertensión','Rosácea','Epilepsia','Marcapasos','Coagulopatía','Herpes activo','Psoriasis','Vitíligo','Enfermedad de Darier'].map(cond=>`
+            <label style="display:flex;align-items:center;gap:5px;background:${(c.condiciones||[]).includes(cond)?'#fde8e8':'var(--light)'};border:1.5px solid ${(c.condiciones||[]).includes(cond)?'var(--danger)':'var(--border)'};border-radius:20px;padding:5px 10px;font-size:0.78rem;cursor:pointer">
+              <input type="checkbox" class="ed-cond-cb" value="${cond}" ${(c.condiciones||[]).includes(cond)?'checked':''} style="accent-color:var(--danger)"> ${cond}
+            </label>`).join('')}
+          </div>
+          <input type="text" id="ed-condiciones-otro" placeholder="Otra condición o aclaración..." value="${(c.condiciones||[]).filter(x=>!['Diabetes','Hipertensión','Rosácea','Epilepsia','Marcapasos','Coagulopatía','Herpes activo','Psoriasis','Vitíligo','Enfermedad de Darier'].includes(x)).join(', ')}">
+        </div>
         <div class="form-group"><label>Medicación actual</label><input type="text" id="ed-medicacion" value="${c.medicacion||''}"></div>
         <div class="form-group"><label>Alergias conocidas</label><input type="text" id="ed-alergias" value="${c.alergias||''}"></div>
         <div class="form-group full"><label>Tratamientos estéticos previos</label><textarea id="ed-tratprev" style="min-height:55px">${c.tratprev||''}</textarea></div>
@@ -4615,6 +4624,10 @@ async function guardarEdicionFicha(id){
   c.insta=v('ed-insta');
   c.medicacion=v('ed-medicacion');
   c.alergias=v('ed-alergias');
+  const condChecked=Array.from(document.querySelectorAll('.ed-cond-cb:checked')).map(cb=>cb.value);
+  const condOtro=v('ed-condiciones-otro').trim();
+  if(condOtro)condChecked.push(...condOtro.split(',').map(x=>x.trim()).filter(Boolean));
+  c.condiciones=condChecked;
   c.tratprev=v('ed-tratprev');
   c.alegTinte=v('ed-aleg-tinte');
   c.tpiel=v('ed-tpiel');
