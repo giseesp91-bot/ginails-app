@@ -1944,12 +1944,57 @@ input[type="file"]{display:none;}
   <div class="section-title">🧴 Mis Insumos & Equipamiento</div>
   <div class="alert alert-info">✅ Tildá lo que ya tenés. La IA va a saber con qué podés trabajar y te avisa si te falta algo para un tratamiento.</div>
   <div class="tabs">
-    <button class="tab active" onclick="showTab('tab-ins-productos',this)">🧴 Productos</button>
+    <button class="tab active" onclick="showTab('tab-ins-inventario',this)">📦 Mi Inventario</button>
+    <button class="tab" onclick="showTab('tab-ins-productos',this)">🧴 Productos</button>
     <button class="tab" onclick="showTab('tab-ins-aparatos',this)">⚙️ Aparatología</button>
     <button class="tab" onclick="showTab('tab-ins-descartables',this)">🧤 Descartables</button>
     <button class="tab" onclick="showTab('tab-ins-cejas',this)">👁️ Cejas & Pestañas</button>
   </div>
-  <div id="tab-ins-productos" class="tab-content active">
+
+  <!-- MI INVENTARIO -->
+  <div id="tab-ins-inventario" class="tab-content active">
+    <div class="alert alert-info">📦 Cargá tus productos con el <strong>nombre exacto del envase</strong>. La IA solo va a recomendarte lo que tengas <strong>en stock</strong>.</div>
+
+    <div id="inventario-lista"></div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="card-title" id="inv-form-titulo">➕ Agregar producto</div>
+      <input type="hidden" id="inv-edit-id">
+      <div class="form-grid">
+        <div class="form-group"><label>Categoría *</label>
+          <select id="inv-categoria">
+            <option value="limpiadores">🧼 Limpiadores</option>
+            <option value="exfoliantes">✨ Exfoliantes & Peelings</option>
+            <option value="serums">💧 Sérums & Activos</option>
+            <option value="cremas">🧴 Cremas & Finalizadores</option>
+            <option value="mascarillas">🎭 Mascarillas & Arcillas</option>
+            <option value="tonicos">🌊 Tónicos</option>
+            <option value="spf">☀️ Protectores Solares</option>
+            <option value="aparatologia">⚙️ Aparatología</option>
+            <option value="cejas">👁️ Cejas & Pestañas</option>
+            <option value="descartables">🧤 Descartables</option>
+            <option value="otros">📦 Otros</option>
+          </select>
+        </div>
+        <div class="form-group"><label>Marca</label><input type="text" id="inv-marca" placeholder="Ej: Idraet, Biobellus..."></div>
+        <div class="form-group full"><label>Nombre tal cual el envase *</label><input type="text" id="inv-nombre" placeholder="Ej: Sérum Hialurónico 1%"></div>
+        <div class="form-group"><label>Precio (opcional)</label><input type="number" id="inv-precio" min="0" placeholder="0"></div>
+        <div class="form-group"><label>Contenido / tamaño</label><input type="text" id="inv-tamano" placeholder="Ej: 30ml, 500g"></div>
+        <div class="form-group full"><label>Notas (opcional)</label><input type="text" id="inv-notas" placeholder="Dónde lo comprás, rinde para X sesiones..."></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="guardarInventario()">💾 Guardar producto</button>
+        <button class="btn btn-secondary" id="inv-btn-cancelar" style="display:none" onclick="cancelarEdicionInventario()">✕ Cancelar</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💰 Inversión en productos</div>
+      <div id="inventario-resumen" style="font-size:0.86rem"></div>
+    </div>
+  </div>
+
+  <div id="tab-ins-productos" class="tab-content">
     <div class="card"><div class="card-title">🧴 Productos Faciales</div><div id="insumos-productos"></div></div>
   </div>
   <div id="tab-ins-aparatos" class="tab-content">
@@ -2417,6 +2462,7 @@ const INSUMOS_MASTER = {
 };
 
 let misInsumos = JSON.parse(localStorage.getItem('ginails_insumos') || '{}');
+let miInventario = JSON.parse(localStorage.getItem('ginails_inventario') || '{}');
 
 // PRECIOS por defecto
 const PRECIOS_DEFAULT = {
@@ -2580,6 +2626,11 @@ async function loadFirebase(){
       misInsumos = insnap.data() || {};
       localStorage.setItem('ginails_insumos', JSON.stringify(misInsumos));
     }
+    const invsnap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'inventario'));
+    if(invsnap.exists()){
+      miInventario = invsnap.data() || {};
+      localStorage.setItem('ginails_inventario', JSON.stringify(miInventario));
+    }
   } catch(e){ console.log('Insumos load error', e); }
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
   initCRM();
@@ -2637,7 +2688,7 @@ function showSection(id,btn){
   }
   if(id==='clientas')renderClientas();
   if(id==='precios')renderPreciosSection();
-  if(id==='insumos')renderInsumos();
+  if(id==='insumos'){renderInsumos();renderInventario();}
   if(id==='config'){cargarConfig();}
   if(id==='presupuestos'){poblarSelectClientas();renderPresupuestos();setHoy('pres-fecha');initPresItems();}
   if(id==='gastos'){renderGastos();actualizarResumen();setHoy('gasto-fecha');}
@@ -3004,259 +3055,205 @@ function abrirIA(){
   generarAnalisisIA(c);
 }
 
-async function generarAnalisisIA(c){
-  const sesCli=Object.values(sesiones).filter(s=>s.clientaId===c.id);
+// ---------- CONTEXTO COMÚN PARA LA IA ----------
+function perfilClientaTexto(c){
+  const sesCli=Object.values(sesiones).filter(s=>s.clientaId===c.id).sort((a,b)=>b.fechaTs-a.fechaTs);
   const rechazos=sesCli.filter(s=>s.tuvoRechazo).map(s=>`${s.rechazoProd} (ses.${s.numero})`).join(', ');
-  const insumosTengo=Object.keys(misInsumos).filter(k=>misInsumos[k]);
-
-  const prompt=`Sos una cosmiatra profesional real con 15+ años de experiencia en gabinete estético. Sos la ASISTENTE INTELIGENTE de una cosmetóloga (puede ser principiante o avanzada). Tu trabajo es pensar como una profesional de gabinete real: priorizás seguridad, lógica clínica, adaptación y resultados honestos. Hablás SIEMPRE a la cosmetóloga, nunca a la clienta. Respondé en español rioplatense, tono claro y directo.
-
-══════════════════════════════════
-REGLAS ABSOLUTAS — NO NEGOCIABLES
-══════════════════════════════════
-
-1. BARRERA PRIMERO: Si la barrera está comprometida → reparar antes de cualquier tratamiento activo. Sin excepciones.
-2. MÁXIMO 3 APARATOS por sesión. Elegí los más efectivos para el caso. Justificá cada uno.
-3. NO MEZCLAR activos incompatibles en una sesión.
-4. PRIORIZAR SEGURIDAD sobre resultado estético. Si hay duda → ir a lo más suave.
-5. MENOS ES MÁS: Un protocolo bien ejecutado supera a uno sobrecargado.
-6. JUSTIFICAR SIEMPRE cada decisión clínica — omisiones, cambios y adaptaciones.
-7. NUNCA protocolos genéricos. Cada respuesta debe ser específica para ESTA clienta.
-
-══════════════════════════════════
-ANÁLISIS OBLIGATORIO ANTES DE RECOMENDAR
-══════════════════════════════════
-
-Antes de cualquier protocolo, analizá:
-- Biotipo cutáneo y fototipo
-- Estado de barrera cutánea
-- Sensibilidad y reactividad
-- Lesiones activas (acné, rosácea, etc.)
-- Medicación e interacciones
-- Embarazo/lactancia (cambia TODO)
-- Exposición solar reciente
-- Edad y elasticidad
-- Estado de hidratación
-- Objetivos reales vs objetivos posibles
-
-══════════════════════════════════
-APARATOLOGÍA DISPONIBLE — REGLAS EXACTAS
-══════════════════════════════════
-
-ESPÁTULA ULTRASÓNICA MULTIFUNCIÓN (24kHz):
-⚠️ NO confundir con ultrasonido facial clásico. Es una espátula multifunción.
-
-Función LIMPIEZA ULTRASÓNICA:
-- Reemplaza exfoliación mecánica en piel sensible/rosácea/barrera dañada
-- ⏱ 3-5 min con agua o tónico. Piel sensible: 2-3 min
-- Movimientos horizontales suaves sobre piel húmeda
-- ✔ Ideal: sensible, grasa, mixta, acné no inflamatorio
-
-Función EXPORTACIÓN DE IONES (–):
-- Desobstrucción de poros, alternativa a extracción manual
-- ⏱ 2-4 min sobre comedones. Ángulo 45°
-- ❌ NUNCA sobre pústulas activas — riesgo de diseminar
-
-Función IONTOFORESIS (+):
-- Introduce activos en profundidad (hialurónico, niacinamida, vitamina C)
-- ⏱ 5-8 min. Piel sensible: 4-5 min
-- Movimientos circulares lentos. Piel húmeda con el activo
-- ✔ Ideal para deshidratación, manchas, barrera dañada
-
-Función EMS:
-- Lifting suave, estimulación muscular, mejora circulación
-- ⏱ 3-5 min. Movimientos ascendentes SIEMPRE
-- ❌ OMITIR: acné inflamatorio, rosácea activa, embarazo, marcapasos, epilepsia
-
-CONTRAINDICACIONES ESPÁTULA: marcapasos, epilepsia, embarazo, heridas abiertas, inflamación activa severa.
-
-───────────────────────────────
-MÁSCARA LED CON EMS:
-
-🔴 LED ROJO (630-660nm): colágeno, antiedad, regeneración, elasticidad. ⏱ 15-20 min. Cierre ideal de protocolos antiedad e hidratación.
-🔵 LED AZUL (415nm): acné, bacterias, P. acnes. ⏱ 10-15 min. ❌ NO en usuarios de retinoides (fotosensibilidad).
-🟡 LED AMARILLO (590nm): calmante, rojeces, rosácea leve, post-peeling, post-extracción. ⏱ 12-15 min.
-🟢 LED VERDE (520nm): manchas, luminosidad, hiperpigmentación. ⏱ 15 min.
-
-EMS integrado: ✔ lifting y tonicidad. ❌ OMITIR: embarazo, marcapasos, epilepsia, rellenos recientes (<4 sem), inflamación activa, heridas.
-
-REGLA LED: Siempre AL FINAL del protocolo. Sobre piel limpia con activos aplicados. Ojos siempre protegidos.
-
-───────────────────────────────
-VAPORIZADOR FACIAL:
-- ✔ Normal/grasa/mixta: 5-8 min a 25-30cm
-- ⚠ Sensible: 3 min máximo o paño tibio 2 min
-- ❌ OMITIR: rosácea activa, cuperosis, telangectasias, embarazo, acné con muchas pústulas
-
-ALTA FRECUENCIA:
-- POST-extracción siempre. Efecto antiséptico.
-- ✔ Normal/grasa: 4-5 min · Sensible: 2-3 min, intensidad baja
-- ❌ OMITIR: marcapasos, embarazo, epilepsia, herpes activo, piel muy seca/deshidratada
-
-GALVÁNICA / IONTOFORESIS:
-- Anafórico (–): introduce activos hidratantes/calmantes
-- Catafórico (+): cierra poros post-tratamiento
-- ✔ Normal: 10-12 min · Sensible: 6-8 min, intensidad mínima
-- ❌ OMITIR: embarazo, marcapasos, metal en zona, heridas
-
-══════════════════════════════════
-LÓGICA DE ÁCIDOS Y PEELINGS
-══════════════════════════════════
-
-Elegí según biotipo, fototipo, sensibilidad y objetivo:
-
-GLICÓLICO: textura, luminosidad, piel resistente. Más irritante. Fototipo I-III.
-MANDÉLICO: rosácea leve, sensible, fototipos altos (III-VI), acné adulto. Menos irritante.
-SALICÍLICO: acné, grasa, comedones. Liposoluble, penetra en poro.
-LÁCTICO: deshidratación, sensible. El más suave.
-
-REGLA PEELINGS:
-- Primera sesión → concentración baja, tiempo mínimo (3-5 min), observar respuesta
-- Fototipo IV-VI → NUNCA glicólico en alta concentración, priorizar mandélico
-- Retinoides activos → CONTRAINDICADO cualquier peeling
-- Isotretinoína últimos 12 meses → CONTRAINDICADO
-- Señal de alarma: ardor fuerte → neutralizar inmediatamente
-
-══════════════════════════════════
-REGLAS HORMONALES
-══════════════════════════════════
-
-- Embarazo → CONTRAINDICADO: peelings, retinoides, alta frecuencia, galvánica, EMS, despigmentantes (kójico/arbutina). PERMITIDO: limpieza suave, hidratación, mascarillas calmantes, LED amarillo/verde.
-- Lactancia → evitar retinoides y activos sistémicos.
-- Anticonceptivos + manchas → SPF OBLIGATORIO, evitar calor.
-- Menopausia/perimenopausia → piel más seca y sensible, priorizar hidratación y antiedad suave.
-- Fase premenstrual → evitar peelings agresivos, piel más reactiva.
-- Acné hormonal cíclico → no tratar como acné común, identificar patrón de ciclo.
-
-══════════════════════════════════
-DERMAPLANING — REGLAS
-══════════════════════════════════
-- ❌ Acné activo, rosácea activa
-- ⚠ Embarazo/lactancia: solo si no se combina con ácidos
-- Siempre hojas esterilizadas de uso único
-- Diferenciá: dermaplaning simple vs combinado con ácidos (mayor riesgo)
-
-══════════════════════════════════
-LIFTING Y LAMINADO — REGLAS
-══════════════════════════════════
-- Analizá estructura del pelo, grosor, salud del folículo
-- ❌ Conjuntivitis, orzuelo, alergia al formol, alergias severas
-- ⚠ Embarazo/lactancia: evaluación caso por caso
-- Tiempos: respetá siempre los del fabricante. Laminado cejas ≈ mitad del tiempo que lifting pestañas
-- Adaptá según respuesta del pelo en sesión
-
-══════════════════════════════════
-PERFIL DE LA CLIENTA
-══════════════════════════════════
+  return `PERFIL DE LA CLIENTA
 - Nombre: ${c.nombre}
-- Tipo de piel: ${c.tpiel} | Fototipo: ${c.fototipo}
+- Edad: ${c.edad||'no especificada'}
+- Tipo de piel: ${c.tpiel||'no especificado'} | Fototipo: ${c.fototipo||'no especificado'}
 - Estado barrera: ${c.barrera||'no especificado'}
+- Zona T: ${c.zonat||'—'} | Mejillas: ${c.mejillas||'—'} | Textura: ${c.textura||'—'} | Tono: ${c.tono||'—'}
+- Observaciones de piel: ${c.obspiel||'ninguna'}
 - Problemáticas: ${(c.problematicas||[]).join(', ')||'no especificadas'}
 - Condiciones médicas: ${(c.condiciones||[]).join(', ')||'ninguna'}
-- Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'}
-- Alimentación: ${c.alim||'—'} | Agua: ${c.agua||'—'} | Sueño: ${c.sueno||'—'} | Estrés: ${c.estres||'—'}
-- Usa SPF: ${c.fps||'—'} | Rutina actual: ${c.skincare||'ninguna'}
-- Cejas: ${c.cejas||'—'} | Pestañas: ${c.pestanas||'—'}
+- Medicación: ${c.medicacion||'ninguna'} | Alergias: ${c.alergias||'ninguna'} | Alergia tintes/adhesivos: ${c.alegTinte||'ninguna'}
+- Hábitos: alimentación ${c.alim||'—'} · agua ${c.agua||'—'} · sueño ${c.sueno||'—'} · estrés ${c.estres||'—'} · ejercicio ${c.ejercicio||'—'} · tabaco/alcohol ${c.tabaco||'—'}
+- Sol: exposición ${c.solar||'—'} · usa SPF ${c.fps||'—'}
+- Rutina actual en casa: ${c.skincare||'ninguna'}
+- Cejas: ${c.cejas||'—'} | Pestañas: ${c.pestanas||'—'} | Tinte previo: ${c.prevTinte||'—'} | Extensiones: ${c.extensiones||'—'}
 - Menstruación: ${c.menstruacion||'no especificado'} | Estado hormonal: ${c.estadoHormonal||'no especificado'}
-- Anticonceptivos: ${(c.anticonceptivos||[]).join(', ')||c.anticonceptivoOtro||'no especificado'}
 - Obs. hormonales: ${c.obsHormonal||'ninguna'}
-- Objetivo: ${c.objetivo||'no especificado'}
-- Sesiones previas: ${sesCli.length}
-- Rechazos anteriores: ${rechazos||'ninguno'}
-- Notas: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
-- Insumos disponibles: ${insumosTengo.length?insumosTengo.join(', '):'no especificados'}
+- OBJETIVO DE LA CLIENTA: ${c.objetivo||'no especificado'}
+- Observaciones libres: ${c.obs||'ninguna'}
+- Notas de gabinete: ${(c.notas||[]).map(n=>n.texto).join(' / ')||'ninguna'}
+- Productos que rechazó antes: ${rechazos||'ninguno'}
 
-HISTORIAL DE SESIONES (${sesCli.length} sesiones):
-${sesCli.slice(0,8).map((s,i)=>`Sesión ${s.numero||i+1} (${s.fecha}): ${s.tratamiento} | Estado piel: ${s.estadoPiel||'—'} | Reacción: ${s.reacPiel||s.reaccion||'—'} | Mejoró: ${s.mejoro||'—'} | Eval: ${s.evaluacion||'—'}/5 | Domiciliario: ${s.domiciliario||'—'} | Productos usados: ${s.productos||'—'} | Nota próxima: ${s.notaProxima||'—'}`).join('\n')||'Sin sesiones previas'}
+HISTORIAL (${sesCli.length} sesiones):
+${sesCli.slice(0,8).map((s,i)=>`· Ses.${s.numero||i+1} (${s.fecha}) ${s.tratamiento} — piel al inicio: ${s.estadoPiel||'—'} | reacción: ${s.reacPiel||s.reaccion||'—'} | mejoró: ${s.mejoro||'—'} | eval ${s.evaluacion||'—'}/5 | domiciliario: ${s.domiciliario||'—'} | productos usados: ${s.productos||'—'}`).join('\n')||'Sin sesiones previas — es la primera vez.'}`;
+}
 
-GUÍA DE PRODUCTOS DEL GABINETE (usá ESTOS específicamente):
-LIMPIEZA: Biobellus Leche Desmaquillante (normal/seca/sensible) · Agua micelar (grasa/acné)
-GEL LIMPIEZA: Gel de Limpieza Facial Idraet o Biobellus
-EXFOLIACIÓN SUAVE: Idraet Exfoliante Enzimático — para sensible/seca/madura ⏱5-8min
-EXFOLIACIÓN MECÁNICA: Biobellus Crema Pulidora — para normal/grasa ❌NO en sensible
-ARCILLA GRASA: Arcilla Verde granel — para grasa/mixta/comedones ⏱10-15min
-ARCILLA SENSIBLE: Caolín/Arcilla Blanca granel — para sensible/seca ⏱10-12min
-SÉRUM HIDRATACIÓN: Idraet Sérum Hialurónico 1% — para todas las pieles deshidratadas
-SÉRUM POROS/SEBO: Libra Booster Niacinamida + Zinc 10% — para grasa/mixta/acné/manchas
-SÉRUM MANCHAS/ANTIEDAD: Revox B77 Just Vitamina C 20% — con SPF obligatorio
-SÉRUM BARRERA/CALMANTE: Idraet Sérum Ceramidas 1% — para sensible/rosácea/barrera dañada
-SÉRUM ANTIEDAD NOCHE: Sérum Retinol/Péptidos — solo noche ❌NO con vitamina C
-CREMA SECA/MADURA: Biobellus Hidronutritiva Colágeno 500ml
-CREMA GRASA/MIXTA: Idraet Skin Food Watermelon Kiwi 50ml (oil-free)
-CREMA BARRERA: Crema Barrera + Ceramidas — post-peeling, post-dermaplaning, sensible
-ACEITE: Rosa Mosqueta — noche, manchas/cicatrices/antiedad ❌NO en acné activo
-MASCARILLA HIDRATANTE: Biobellus/Xioimy Lámina Colágeno ⏱15-20min
-MASCARILLA CALMANTE: Lámina Aloe Vera ⏱15min
-SPF NORMAL: Banana Boat/Isdin Fusion Water — para normal/mixta/seca
-SPF OIL-FREE: La Roche-Posay Anthelios Fluide/Isdin Oil-Free — para grasa/acné
-SPF MINERAL: Banana Boat Mineral/La Roche-Posay Mineral — para sensible/post-peeling/embarazo
-TÓNICO: Biobellus Tónico Astringente/Hamamelis — para grasa/mixta ❌NO en sensible/seca
-PEELING: Ácido Mandélico en polvo 50g + Gel Neutro (preparación casera) + bicarbonato para neutralizar
+function inventarioTexto(){
+  const inv=inventarioParaIA();
+  const tildados=Object.keys(misInsumos).filter(k=>misInsumos[k]).map(k=>k.split('_').slice(1).join(' ')).join(' · ');
+  if(inv) return `INVENTARIO REAL DEL GABINETE — SOLO PRODUCTOS EN STOCK
+Usá EXCLUSIVAMENTE estos productos, escribiendo el nombre EXACTO tal como figura acá (así la cosmetóloga lo reconoce en el envase sin dudar):
+${inv}
+${tildados?`\nOtros insumos disponibles: ${tildados}`:''}
+REGLA: Si para este caso hiciera falta algo que NO está en la lista, decilo al final en una sección aparte "TE FALTARÍA", pero el protocolo tiene que poder ejecutarse con lo que hay.`;
+  if(tildados) return `INSUMOS DISPONIBLES: ${tildados}\n(La cosmetóloga todavía no cargó su inventario detallado con marcas. Recomendá por tipo de producto/activo.)`;
+  return 'INVENTARIO: no cargado. Recomendá por tipo de producto y activo, sin inventar marcas.';
+}
 
-══════════════════════════════════
-ESTRUCTURA DE RESPUESTA OBLIGATORIA
-══════════════════════════════════
+const REGLAS_CLINICAS = `REGLAS CLÍNICAS OBLIGATORIAS
+1. BARRERA PRIMERO: si está comprometida → reparar antes de cualquier activo fuerte. Sin excepciones.
+2. MÁXIMO 3 aparatos por sesión.
+3. Orden: limpiar → equilibrar → tratar → estimular → sellar/proteger.
+4. No mezclar activos incompatibles (ej. vitamina C + retinol; retinol + ácidos fuertes).
+5. Fototipo IV-VI → evitar exfoliación agresiva y glicólico alto (riesgo hiperpigmentación). Preferir mandélico o láctico.
+6. Retinoides o isotretinoína (últimos 6-12 meses) → NO exfoliar ni peeling.
+7. Embarazo → prohibido: peelings, retinoides, alta frecuencia, galvánica, EMS, despigmentantes (kójico/arbutina/hidroquinona). Permitido: limpieza suave, hidratación, mascarillas calmantes, LED amarillo/verde.
+8. Lactancia → sin retinoides ni activos sistémicos.
+9. Rosácea/cuperosis activa → sin vapor, sin alta frecuencia, sin exfoliación mecánica, sin EMS.
+10. Marcapasos/epilepsia → sin galvánica, sin alta frecuencia, sin EMS, sin ultrasonido.
+11. Fase premenstrual → evitar peelings agresivos.
+12. Ante la duda → bajar intensidad. MENOS ES MÁS.
 
----
-**🔍 1. DIAGNÓSTICO PROFESIONAL**
-[Estado real de la piel. Prioridades clínicas. Lo más urgente primero.]
+APARATOLOGÍA — TIEMPOS Y CRITERIOS
+· VAPORIZADOR: normal/grasa 5-8 min a 25-30cm · sensible 3 min o paño tibio · ❌ rosácea, cuperosis, embarazo, pústulas activas.
+· ESPÁTULA ULTRASÓNICA (24kHz, multifunción — NO es ultrasonido clásico):
+  – Limpieza ultrasónica: reemplaza exfoliación mecánica en sensible/rosácea/barrera dañada. 3-5 min sobre piel húmeda.
+  – Exportación de iones: desobstrucción, alternativa a extracción manual. 2-4 min a 45°. ❌ sobre pústulas.
+  – Iontoforesis: introduce activos. 5-8 min (sensible 4-5). Movimientos circulares lentos.
+  – EMS: lifting suave. 3-5 min ascendentes. ❌ acné inflamatorio, rosácea, embarazo, marcapasos, epilepsia.
+· ALTA FRECUENCIA: siempre POST-extracción. Normal/grasa 4-5 min · sensible 2-3 min. ❌ marcapasos, embarazo, epilepsia, herpes activo, piel muy seca.
+· GALVÁNICA: anafórico (–) introduce activos · catafórico (+) cierra poros. Normal 10-12 min · sensible 6-8 min. ❌ embarazo, marcapasos, metal en zona, heridas.
+· MÁSCARA LED (siempre al final, ojos protegidos): 🔴 rojo 630-660nm 15-20 min colágeno/regeneración · 🔵 azul 415nm 10-15 min acné (❌ con retinoides) · 🟡 amarillo 590nm 12-15 min calmante/post-peeling/post-extracción · 🟢 verde 520nm 15 min manchas. ❌ rojo en hiperpigmentación activa. ❌ azul y rojo post-peeling.
 
----
-**🎯 2. OBJETIVOS DE ESTA SESIÓN**
-[Qué vas a lograr HOY — realista y específico]
+ÁCIDOS: glicólico → textura/luminosidad, piel resistente, fototipo I-III (más irritante) · mandélico → rosácea leve, sensible, fototipos altos, acné adulto (más seguro) · salicílico → acné, grasa, comedones (liposoluble) · láctico → deshidratación, sensible (el más suave).
 
----
-**🚫 3. CONTRAINDICACIONES PARA ESTE CASO**
-[Lista con ❌ — qué NO hacer y por qué, específico para esta clienta]
+DERMAPLANING: ❌ acné activo con pústulas, rosácea activa, isotretinoína <6 meses. Hoja estéril de un solo uso. El vello NO vuelve más grueso.
 
----
-**✅ 4. AJUSTES AL PROTOCOLO BASE**
-Usá este formato para cada cambio:
-- ✔ MANTENER: [paso] — [motivo breve]
-- ⚠ ADAPTAR: [paso] → [cómo cambia] | 📌 Motivo: [justificación clínica]
-- ❌ OMITIR: [paso] | 📌 Motivo: [justificación clínica]
+LIFTING/LAMINADO: ❌ conjuntivitis, orzuelo, alergia al formol. Respetar tiempos del fabricante. Laminado de cejas ≈ mitad del tiempo que lifting de pestañas. El tinte SIEMPRE después del laminado. Depilar y diseñar ANTES del laminado.`;
 
----
-**📋 5. PROTOCOLO FINAL PERSONALIZADO — PASO A PASO**
-[El protocolo REAL a ejecutar. Numerado. Sin interpretación necesaria.]
+// ---------- PASO 1: OPCIONES DE TRATAMIENTO ----------
+async function generarAnalisisIA(c){
+  const prompt=`Sos una cosmiatra profesional con 15+ años de gabinete. Hablás A LA COSMETÓLOGA (nunca a la clienta), en español rioplatense, directo y sin relleno. Nada de palabrería ni consejos genéricos: todo tiene que ser específico para ESTA clienta.
 
-PASO N — [NOMBRE EN MAYÚSCULAS]
-[Qué hacer exactamente]
-🧴 Producto: [específico — priorizar insumos disponibles]
-⚙️ Aparato: [cuál, función exacta, tiempo, movimiento] o "Sin aparato"
-⏱ Tiempo: [exacto según su tipo de piel]
-📌 [Advertencia si aplica]
+${REGLAS_CLINICAS}
 
----
-**⚙️ 6. APARATOLOGÍA SELECCIONADA**
-[Máximo 3. Para cada una: por qué la elegiste, función usada, tiempo, intensidad, y señal para parar]
+${perfilClientaTexto(c)}
 
----
-**🧴 7. ACTIVOS RECOMENDADOS**
-[Ingredientes clave para este caso. Qué buscás con cada uno.]
+TAREA — Devolvé SOLO esto, corto y concreto (máximo 250 palabras en total):
 
----
-**🏠 8. DOMICILIARIO PERSONALIZADO**
-- Mañana: [rutina paso a paso con activos específicos]
-- Noche: [rutina paso a paso con activos específicos]
-- Hábito clave: [1 cambio importante para este caso]
-- ❌ Evitar: [qué no debe usar en casa]
+**🔍 DIAGNÓSTICO**
+3 a 5 bullets. Qué está pasando en la piel de ${c.nombre} y qué hay que priorizar. Concreto, sin explicar teoría.
 
----
-**📊 9. CONTROL DE EXPECTATIVAS**
-[Cuántas sesiones para ver resultados. Qué puede esperar y cuándo. Qué depende de ella.]
+**🚫 ALERTAS PARA ESTE CASO**
+Bullets con ❌ o ⚠️. Solo lo que aplica a ella (contraindicaciones reales según su ficha). Si no hay ninguna, escribí "Sin contraindicaciones relevantes".
 
----
-**🎯 10. PRÓXIMA SESIÓN SUGERIDA**
-- Tratamiento: [qué hacer la próxima vez]
-- Frecuencia ideal: [cada cuánto]
-- Señales de progreso: [qué debería ver mejorado]
-- Ajuste para la próxima: [qué cambiarías basándote en esta sesión]
+**✅ TRATAMIENTOS RECOMENDADOS**
+Exactamente 3 opciones, en orden de prioridad clínica. Formato por opción:
+**1. [Nombre del tratamiento]** — [por qué ESTE para ella, 1 línea concreta citando su ficha] · Sesiones sugeridas: [nº y frecuencia]
 
-${insumosTengo.length?'---\n**💡 CON TUS INSUMOS**\n[Qué podés hacer con lo que tenés. Qué te faltaría para este caso ideal.]':''}`;
+Nada más. No escribas el protocolo todavía — la cosmetóloga elige primero.`;
 
   await callIA(prompt, document.getElementById('ia-contenido'));
   iaTextoActual=document.getElementById('ia-contenido').innerText;
+  window._iaPaso1=document.getElementById('ia-contenido').innerHTML;
+  mostrarSelectorTratamiento();
+}
+
+// ---------- SELECTOR DE TRATAMIENTO ----------
+const SERVICIOS_LISTA = ['Limpieza Facial Profunda','Hidratación Profunda','Control de Acné','Despigmentación & Luminosidad','Anti-Edad & Lifting Facial','Calmante & Barrera Protectora','Revitalización & Glow','Peeling Químico Superficial','Dermaplaning','Lifting de Pestañas','Laminado de Cejas','Henna de Cejas','Tinte de Cejas','Tinte de Pestañas','Diseño & Perfilado de Cejas','Combo Limpieza + Perfilado','Combo Mirada Completa','Combo Lifting + Tinte Pestañas','Combo Henna + Perfilado','Combo Limpieza + Peeling','Combo Facial + Mirada Completa','Combo Laminado + Henna','Combo Laminado + Tinte'];
+
+function mostrarSelectorTratamiento(){
+  const cont=document.getElementById('ia-contenido');
+  if(!cont)return;
+  const customs=Object.values(serviciosCustom||{}).map(s=>s.nombre);
+  const todos=[...SERVICIOS_LISTA,...customs];
+  const box=document.createElement('div');
+  box.id='selector-tratamiento';
+  box.style.cssText='margin-top:16px;background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid var(--sage);border-radius:14px;padding:14px';
+  box.innerHTML=`
+    <div style="font-weight:700;font-size:0.92rem;color:var(--deep);margin-bottom:4px">👉 Elegí el tratamiento a realizar</div>
+    <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">Podés elegir cualquiera, no solo los recomendados. Te armo el protocolo completo paso a paso adaptado a ${clientas[clientaActualId]?.nombre||'ella'}.</div>
+    <select id="sel-tratamiento-ia" style="width:100%;padding:11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.88rem;background:white;margin-bottom:10px">
+      <option value="">Seleccionar tratamiento...</option>
+      ${todos.map(t=>`<option>${t}</option>`).join('')}
+    </select>
+    <button onclick="pedirProtocoloCompleto()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(196,99,122,0.3)">
+      📋 Generar protocolo completo
+    </button>`;
+  cont.appendChild(box);
+  box.scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function pedirProtocoloCompleto(){
+  const trat=document.getElementById('sel-tratamiento-ia')?.value;
+  if(!trat){alert('Elegí un tratamiento primero');return;}
+  const c=clientas[clientaActualId];
+  if(!c)return;
+  generarProtocoloCompleto(c,trat);
+}
+
+// ---------- PASO 2: PROTOCOLO COMPLETO ----------
+async function generarProtocoloCompleto(c,tratamiento){
+  const cont=document.getElementById('ia-contenido');
+  cont.innerHTML=`<div class="ai-box"><div class="ai-loading">📋 Armando el protocolo completo de <strong>${tratamiento}</strong> para ${c.nombre}<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div></div>`;
+
+  const prompt=`Sos una cosmiatra profesional con 15+ años de gabinete. Hablás A LA COSMETÓLOGA, en español rioplatense, directo. PROHIBIDO el relleno, los consejos genéricos y las frases de manual.
+
+${REGLAS_CLINICAS}
+
+${perfilClientaTexto(c)}
+
+${inventarioTexto()}
+
+TRATAMIENTO ELEGIDO POR LA COSMETÓLOGA: **${tratamiento}**
+
+TAREA CRÍTICA:
+Escribí el protocolo COMPLETO de "${tratamiento}" para ${c.nombre}, listo para ejecutar en cabina sin consultar ninguna otra pantalla.
+
+REGLAS DE ESCRITURA — OBLIGATORIAS:
+1. Escribí TODOS los pasos del tratamiento de principio a fin (desde recibir a la clienta hasta el SPF final). NO escribas solo los pasos que cambian. Si el protocolo tiene 10 pasos, escribí los 10.
+2. En CADA paso nombrá el producto EXACTO del inventario, entre comillas, tal cual figura en la lista de arriba.
+3. En CADA paso justificá la elección en 1 línea empezando con "Por qué:" — y la justificación tiene que citar algo concreto de la ficha de ${c.nombre} (su tipo de piel, barrera, fototipo, condición, medicación, hábito u objetivo). Ejemplo correcto: "Por qué: barrera comprometida + rosácea leve → no tolera exfoliación mecánica". Ejemplo INCORRECTO (genérico, prohibido): "Por qué: es bueno para piel sensible".
+4. Tiempos exactos en minutos ajustados a ELLA, no rangos genéricos del manual.
+5. Si un paso estándar del tratamiento NO se hace en su caso, igual escribilo en su número con ❌ OMITIDO y el motivo clínico.
+6. Nada de teoría, nada de introducción, nada de cierre motivacional.
+
+FORMATO EXACTO:
+
+**📋 ${tratamiento.toUpperCase()} — ${c.nombre}**
+Duración estimada: [min] · Aparatos a usar: [máx 3, listados]
+
+**⚠️ ANTES DE EMPEZAR**
+[Bullets solo con lo que aplica a ella. Si algo se omite del protocolo estándar, decilo acá también.]
+
+**PASO 1 — [NOMBRE DEL PASO EN MAYÚSCULAS]**
+Qué hacer: [acción concreta]
+🧴 Producto: "[nombre exacto del inventario]"
+⚙️ Aparato: [cuál, función, intensidad] o "Sin aparato"
+⏱ Tiempo: [X min]
+💡 Por qué: [justificación citando su ficha]
+
+**PASO 2 — ...** (y así hasta el último paso, sin saltear ninguno)
+
+**🏠 DOMICILIARIO PARA ${c.nombre.toUpperCase()}**
+Mañana: [pasos con productos concretos]
+Noche: [pasos con productos concretos]
+❌ Que NO use: [según su caso]
+
+**📊 EXPECTATIVAS REALES**
+[Qué va a ver y cuándo. Cuántas sesiones. Qué depende de ella.]
+
+**🎯 PRÓXIMA SESIÓN**
+[Qué hacer la próxima vez y en cuántos días]
+
+**🛒 TE FALTARÍA** (solo si aplica)
+[Productos que no tenés en stock y que mejorarían este protocolo]`;
+
+  await callIA(prompt, cont);
+  iaTextoActual=cont.innerText;
+
+  // Botón para volver a elegir otro tratamiento
+  const volver=document.createElement('button');
+  volver.style.cssText='width:100%;margin-top:12px;padding:11px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:12px;font-family:\'DM Sans\',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer';
+  volver.textContent='↩ Elegir otro tratamiento';
+  volver.onclick=()=>{ const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
+  cont.appendChild(volver);
 }
 
 async function guardarAnalisisIA(){
@@ -3331,6 +3328,142 @@ function toggleInsumo(key,val){
   actualizarResumenInsumos();
   const span=document.querySelector(`#ins_${key}`)?.parentElement?.querySelector('span');
   if(span){span.textContent=val?'✅':'Falta';span.className=val?'insumo-ok':'insumo-falta';}
+}
+
+// ===================== MI INVENTARIO =====================
+const INV_CATS = {
+  limpiadores:'🧼 Limpiadores',
+  exfoliantes:'✨ Exfoliantes & Peelings',
+  serums:'💧 Sérums & Activos',
+  cremas:'🧴 Cremas & Finalizadores',
+  mascarillas:'🎭 Mascarillas & Arcillas',
+  tonicos:'🌊 Tónicos',
+  spf:'☀️ Protectores Solares',
+  aparatologia:'⚙️ Aparatología',
+  cejas:'👁️ Cejas & Pestañas',
+  descartables:'🧤 Descartables',
+  otros:'📦 Otros'
+};
+
+function renderInventario(){
+  const cont=document.getElementById('inventario-lista');
+  if(!cont)return;
+  const lista=Object.values(miInventario);
+  if(!lista.length){
+    cont.innerHTML=`<div class="empty-state"><div class="icon">📦</div><p>Todavía no cargaste productos.<br>Agregalos abajo con el nombre exacto del envase.</p></div>`;
+    actualizarResumenInventario();return;
+  }
+  const grupos={};
+  lista.forEach(p=>{const c=p.categoria||'otros';if(!grupos[c])grupos[c]=[];grupos[c].push(p);});
+  cont.innerHTML=Object.keys(INV_CATS).filter(c=>grupos[c]).map(cat=>`
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-title" style="font-size:0.88rem">${INV_CATS[cat]} <span style="font-weight:400;color:var(--muted);font-size:0.78rem">(${grupos[cat].length})</span></div>
+      ${grupos[cat].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'')).map(p=>`
+        <div style="display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--border);opacity:${p.stock===false?'0.5':'1'}">
+          <input type="checkbox" ${p.stock!==false?'checked':''} onchange="toggleStockInv('${p.id}',this.checked)" style="width:19px;height:19px;accent-color:var(--sage);flex-shrink:0;cursor:pointer">
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:600;font-size:0.86rem;${p.stock===false?'text-decoration:line-through':''}">${p.marca?`<span style="color:var(--sage)">${p.marca}</span> `:''}${p.nombre}</div>
+            <div style="font-size:0.73rem;color:var(--muted)">${p.tamano||''}${p.tamano&&p.precio?' · ':''}${p.precio?'$'+Number(p.precio).toLocaleString('es-AR'):''}${p.notas?' · '+p.notas:''}</div>
+          </div>
+          <button onclick="editarInventario('${p.id}')" style="background:none;border:none;cursor:pointer;font-size:0.9rem;flex-shrink:0">✏️</button>
+          <button onclick="eliminarInventario('${p.id}')" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:1rem;flex-shrink:0">×</button>
+        </div>`).join('')}
+    </div>`).join('');
+  actualizarResumenInventario();
+}
+
+async function guardarInventario(){
+  const nombre=v('inv-nombre').trim();
+  if(!nombre){alert('Poné el nombre del producto');return;}
+  const editId=document.getElementById('inv-edit-id')?.value||'';
+  const id=editId||uid();
+  const prod={
+    id,
+    categoria:v('inv-categoria')||'otros',
+    marca:v('inv-marca').trim(),
+    nombre,
+    precio:v('inv-precio')?parseInt(v('inv-precio')):null,
+    tamano:v('inv-tamano').trim(),
+    notas:v('inv-notas').trim(),
+    stock: editId ? (miInventario[id]?.stock!==false) : true,
+    fechaTs: miInventario[id]?.fechaTs || Date.now()
+  };
+  miInventario[id]=prod;
+  await guardarInventarioStorage();
+  ['inv-nombre','inv-marca','inv-precio','inv-tamano','inv-notas'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('inv-edit-id').value='';
+  document.getElementById('inv-form-titulo').textContent='➕ Agregar producto';
+  document.getElementById('inv-btn-cancelar').style.display='none';
+  renderInventario();
+}
+
+function editarInventario(id){
+  const p=miInventario[id];if(!p)return;
+  document.getElementById('inv-edit-id').value=id;
+  document.getElementById('inv-categoria').value=p.categoria||'otros';
+  document.getElementById('inv-marca').value=p.marca||'';
+  document.getElementById('inv-nombre').value=p.nombre||'';
+  document.getElementById('inv-precio').value=p.precio||'';
+  document.getElementById('inv-tamano').value=p.tamano||'';
+  document.getElementById('inv-notas').value=p.notas||'';
+  document.getElementById('inv-form-titulo').textContent='✏️ Editando: '+p.nombre;
+  document.getElementById('inv-btn-cancelar').style.display='inline-flex';
+  document.getElementById('inv-form-titulo').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+function cancelarEdicionInventario(){
+  document.getElementById('inv-edit-id').value='';
+  ['inv-nombre','inv-marca','inv-precio','inv-tamano','inv-notas'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  document.getElementById('inv-form-titulo').textContent='➕ Agregar producto';
+  document.getElementById('inv-btn-cancelar').style.display='none';
+}
+
+async function toggleStockInv(id,val){
+  if(!miInventario[id])return;
+  miInventario[id].stock=val;
+  await guardarInventarioStorage();
+  renderInventario();
+}
+
+async function eliminarInventario(id){
+  if(!confirm('¿Eliminar este producto del inventario?'))return;
+  delete miInventario[id];
+  await guardarInventarioStorage();
+  renderInventario();
+}
+
+async function guardarInventarioStorage(){
+  localStorage.setItem('ginails_inventario',JSON.stringify(miInventario));
+  if(useFirebase && userEmail){
+    try{ await fs.setDoc(fs.doc(db,`usuarios/${userEmail}/config`,'inventario'), miInventario); }
+    catch(e){ console.log('Error guardando inventario:',e); }
+  }
+}
+
+function actualizarResumenInventario(){
+  const cont=document.getElementById('inventario-resumen');
+  if(!cont)return;
+  const lista=Object.values(miInventario);
+  const enStock=lista.filter(p=>p.stock!==false);
+  const sinStock=lista.filter(p=>p.stock===false);
+  const total=lista.reduce((s,p)=>s+(Number(p.precio)||0),0);
+  const conPrecio=lista.filter(p=>p.precio).length;
+  cont.innerHTML=`
+    <div style="display:flex;justify-content:space-between;padding:5px 0"><span>Productos cargados</span><strong>${lista.length}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:5px 0"><span>✅ En stock</span><strong style="color:var(--success)">${enStock.length}</strong></div>
+    <div style="display:flex;justify-content:space-between;padding:5px 0"><span>❌ Sin stock</span><strong style="color:var(--danger)">${sinStock.length}</strong></div>
+    ${total?`<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1.5px solid var(--border);margin-top:5px"><span>Inversión total <span style="font-size:0.75rem;color:var(--muted)">(${conPrecio} con precio)</span></span><strong style="color:var(--gold)">$${total.toLocaleString('es-AR')}</strong></div>`:''}`;
+}
+
+// Devuelve el texto del inventario en stock para el prompt de la IA
+function inventarioParaIA(){
+  const lista=Object.values(miInventario).filter(p=>p.stock!==false);
+  if(!lista.length)return '';
+  const grupos={};
+  lista.forEach(p=>{const c=p.categoria||'otros';if(!grupos[c])grupos[c]=[];grupos[c].push(p);});
+  return Object.keys(INV_CATS).filter(c=>grupos[c]).map(cat=>
+    `${INV_CATS[cat].replace(/[^\w\sáéíóúñÁÉÍÓÚÑ&]/g,'').trim()}: ${grupos[cat].map(p=>`"${p.marca?p.marca+' ':''}${p.nombre}"${p.tamano?' ('+p.tamano+')':''}`).join(' · ')}`
+  ).join('\n');
 }
 
 function actualizarResumenInsumos(){
