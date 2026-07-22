@@ -1980,7 +1980,7 @@ input[type="file"]{display:none;}
         <div class="form-group full"><label>Nombre tal cual el envase *</label><input type="text" id="inv-nombre" placeholder="Ej: Sérum Hialurónico 1%"></div>
         <div class="form-group"><label>Precio (opcional)</label><input type="number" id="inv-precio" min="0" placeholder="0"></div>
         <div class="form-group"><label>Contenido / tamaño</label><input type="text" id="inv-tamano" placeholder="Ej: 30ml, 500g"></div>
-        <div class="form-group full"><label>Notas (opcional)</label><input type="text" id="inv-notas" placeholder="Dónde lo comprás, rinde para X sesiones..."></div>
+        <div class="form-group full"><label>Descripción / activos <span style="font-weight:400;color:var(--muted);font-size:0.78rem">— la IA lo usa para elegir mejor</span></label><input type="text" id="inv-notas" placeholder="Ej: con niacinamida y zinc, regula sebo, para piel grasa"></div>
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" onclick="guardarInventario()">💾 Guardar producto</button>
@@ -3081,7 +3081,12 @@ function perfilClientaTexto(c){
 - Productos que rechazó antes: ${rechazos||'ninguno'}
 
 HISTORIAL (${sesCli.length} sesiones):
-${sesCli.slice(0,8).map((s,i)=>`· Ses.${s.numero||i+1} (${s.fecha}) ${s.tratamiento} — piel al inicio: ${s.estadoPiel||'—'} | reacción: ${s.reacPiel||s.reaccion||'—'} | mejoró: ${s.mejoro||'—'} | eval ${s.evaluacion||'—'}/5 | domiciliario: ${s.domiciliario||'—'} | productos usados: ${s.productos||'—'}`).join('\n')||'Sin sesiones previas — es la primera vez.'}`;
+${sesCli.slice(0,8).map((s,i)=>`· Ses.${s.numero||i+1} (${s.fecha}) ${s.tratamiento} — piel al inicio: ${s.estadoPiel||'—'} | reacción: ${s.reacPiel||s.reaccion||'—'} | mejoró: ${s.mejoro||'—'} | eval ${s.evaluacion||'—'}/5 | domiciliario: ${s.domiciliario||'—'} | productos usados: ${s.productos||'—'}`).join('\n')||'Sin sesiones previas — es la primera vez.'}
+
+CÓMO USAR EL HISTORIAL (importante):
+· SÍ usalo para: ver cómo evolucionó la piel, qué reacciones tuvo, qué le funcionó o le irritó, si cumple el domiciliario, y qué falta trabajar del objetivo.
+· NO lo uses como preferencia: que la cosmetóloga haya usado un producto o cambiado un paso en una sesión anterior NO significa que haya que repetirlo. Recomendá SIEMPRE lo mejor para el caso actual según la ficha, aunque contradiga lo que se hizo antes.
+· Si un producto le dio reacción adversa → eso SÍ es una contraindicación real, evitalo.`;
 }
 
 function inventarioTexto(){
@@ -3091,6 +3096,7 @@ function inventarioTexto(){
 Usá EXCLUSIVAMENTE estos productos, escribiendo el nombre EXACTO tal como figura acá (así la cosmetóloga lo reconoce en el envase sin dudar):
 ${inv}
 ${tildados?`\nOtros insumos disponibles: ${tildados}`:''}
+Lo que va después de la flecha → es la descripción que cargó la cosmetóloga (activos, para qué lo usa, cómo se aplica). Tomala como información real del producto y usala para decidir cuál corresponde en cada paso.
 REGLA: Si para este caso hiciera falta algo que NO está en la lista, decilo al final en una sección aparte "TE FALTARÍA", pero el protocolo tiene que poder ejecutarse con lo que hay.`;
   if(tildados) return `INSUMOS DISPONIBLES: ${tildados}\n(La cosmetóloga todavía no cargó su inventario detallado con marcas. Recomendá por tipo de producto/activo.)`;
   return 'INVENTARIO: no cargado. Recomendá por tipo de producto y activo, sin inventar marcas.';
@@ -3462,7 +3468,7 @@ function inventarioParaIA(){
   const grupos={};
   lista.forEach(p=>{const c=p.categoria||'otros';if(!grupos[c])grupos[c]=[];grupos[c].push(p);});
   return Object.keys(INV_CATS).filter(c=>grupos[c]).map(cat=>
-    `${INV_CATS[cat].replace(/[^\w\sáéíóúñÁÉÍÓÚÑ&]/g,'').trim()}: ${grupos[cat].map(p=>`"${p.marca?p.marca+' ':''}${p.nombre}"${p.tamano?' ('+p.tamano+')':''}`).join(' · ')}`
+    `${INV_CATS[cat].replace(/[^\w\sáéíóúñÁÉÍÓÚÑ&]/g,'').trim()}:\n${grupos[cat].map(p=>`  · "${p.marca?p.marca+' ':''}${p.nombre}"${p.tamano?' ('+p.tamano+')':''}${p.notas?' → '+p.notas:''}`).join('\n')}`
   ).join('\n');
 }
 
@@ -4018,6 +4024,9 @@ function mostrarFormPublico(clientaId) {
       <div class="form-group"><label>Estado de tus pestañas</label>
         <select id="fp-pestanas"><option value="">Seleccionar</option><option>Abundantes y sanas</option><option>Escasas / finas</option><option>Muy lacias</option><option>Frágiles</option></select>
       </div>
+      <div class="form-group full"><label>¿Sos alérgica a algo?</label><input type="text" id="fp-alergias" placeholder="Medicamentos, cosméticos, alimentos... Si no, escribí 'ninguna'"></div>
+      <div class="form-group full"><label>¿Alguna vez tuviste reacción a tinturas, adhesivos o pestañas postizas?</label><input type="text" id="fp-aleg-tinte" placeholder="Contame si te pasó algo alguna vez"></div>
+      <div class="form-group full"><label>¿Qué usás hoy en tu piel?</label><textarea id="fp-skincare" placeholder="Jabón, crema, protector solar, serums... lo que uses aunque sea poquito" style="min-height:55px"></textarea></div>
       <div class="form-group full"><label>¿Hiciste algún tratamiento estético antes?</label><textarea id="fp-tratprev" placeholder="¿Cuáles? ¿Cómo te fue?" style="min-height:55px"></textarea></div>
       <div class="form-group full" style="border-top:1.5px solid var(--border);padding-top:12px;margin-top:4px">
         <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">🌸 Salud hormonal (opcional)</div>
@@ -4061,6 +4070,9 @@ async function enviarFormPublico() {
     cejas: document.getElementById('fp-cejas')?.value || '',
     pestanas: document.getElementById('fp-pestanas')?.value || '',
     tratprev: document.getElementById('fp-tratprev')?.value || '',
+    alergias: document.getElementById('fp-alergias')?.value || '',
+    alegTinte: document.getElementById('fp-aleg-tinte')?.value || '',
+    skincare: document.getElementById('fp-skincare')?.value || '',
     menstruacion: document.getElementById('fp-menstruacion')?.value || '',
     estadoHormonal: document.getElementById('fp-estado-hormonal')?.value || '',
     anticonceptivo: document.getElementById('fp-anticonceptivo')?.value || '',
@@ -4353,6 +4365,7 @@ async function renderCRMFormularios(){
 
       ${r.condiciones?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Condiciones médicas:</strong> ${r.condiciones}</div>`:''}
       ${r.alergias?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Alergias:</strong> ${r.alergias}</div>`:''}
+      ${r.alegTinte?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Reacción a tinturas/adhesivos:</strong> ${r.alegTinte}</div>`:''}
       ${r.skincare?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Skincare actual:</strong> ${r.skincare}</div>`:''}
       ${r.tratprev?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Tratamientos previos:</strong> ${r.tratprev}</div>`:''}
       ${r.objetivo?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Objetivo:</strong> ${r.objetivo}</div>`:''}
@@ -4376,102 +4389,54 @@ async function renderCRMFormularios(){
 
 async function cargarFormEnFichaNueva(docId){
   const snap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/formularios_pendientes`, docId));
-  if(!snap.exists()) return;
+  if(!snap.exists()){ alert('Ese formulario ya no está disponible.'); return; }
   const r = snap.data();
 
-  // Buscar clienta: primero por ID directo, luego por nombre o teléfono
-  const clientaExistente = 
-    (r.clientaRefId && clientas[r.clientaRefId]) ||
-    Object.values(clientas).find(c => {
-      const mismoNombre = c.nombre?.toLowerCase().trim() === r.nombre?.toLowerCase().trim();
-      const mismoTel = r.tel && c.tel && c.tel.replace(/\D/g,'') === r.tel.replace(/\D/g,'');
-      return mismoNombre || mismoTel;
-    });
+  const [cid, c] = buscarClientaPorForm(r);
 
-  // Mapa COMPLETO: campo del formulario → campo de la ficha
-  const mapa = {
-    tel:            r.tel,
-    edad:           r.edad,
-    ocup:           r.ocup,
-    insta:          r.insta,
-    medicacion:     r.condiciones,
-    alergias:       r.alergias,
-    fps:            r.fps,
-    alim:           r.alim,
-    agua:           r.agua,
-    sueno:          r.sueno,
-    estres:         r.estres,
-    cejas:          r.cejas,
-    pestanas:       r.pestanas,
-    skincare:       r.skincare,
-    tratprev:       r.tratprev,
-    objetivo:       r.objetivo,
-    obs:            r.obs,
-    menstruacion:   r.menstruacion,
-    estadoHormonal: r.estadoHormonal,
-    anticonceptivoOtro: r.anticonceptivo,
-    obsHormonal:    r.obsHormonal,
-  };
-
-  if(clientaExistente){
-    // Solo actualizar campos vacíos (no pisar lo que ya completó)
-    const actualizar = {};
-    Object.entries(mapa).forEach(([campo, valor]) => {
-      if(valor !== undefined && valor !== null && valor !== '') {
-        // Para hábitos y hormonal: siempre actualizar con lo del formulario
-        const siempreActualizar = ['fps','alim','agua','sueno','estres','cejas','pestanas',
-          'menstruacion','estadoHormonal','anticonceptivoOtro','objetivo','obs','obsHormonal'];
-        if(siempreActualizar.includes(campo) || !clientaExistente[campo]) {
-          actualizar[campo] = valor;
-        }
-      }
-    });
-
-    Object.assign(clientaExistente, actualizar);
-    await saveDoc('clientas', clientaExistente.id, clientaExistente);
-    await delDoc('formularios_pendientes', docId);
-
-    // Forzar recarga desde Firebase para asegurar sincronización
-    if(useFirebase && userEmail){
-      const snap2 = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/clientas`, clientaExistente.id));
-      if(snap2.exists()) clientas[clientaExistente.id] = {...snap2.data(), id: clientaExistente.id};
+  if(cid && c){
+    const campos = aplicarFormAFicha(c, r);
+    try{
+      await saveDoc('clientas', cid, c);
+      await delDoc('formularios_pendientes', docId);
+    }catch(e){
+      alert('No se pudo guardar en la ficha. Probá de nuevo en un momento.');
+      console.log(e); return;
     }
-
     document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
     renderCRMFormularios();
     renderClientas();
-    setTimeout(()=>{ abrirFicha(clientaExistente.id); }, 300);
-
-  } else {
-    // Nueva clienta — precargar formulario con todos los campos
-    document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
-    showSection('nueva-clienta', null);
-    setTimeout(()=>{
-      // Textos e inputs
-      const textos = {
-        'nc-nombre':r.nombre, 'nc-tel':r.tel||'', 'nc-edad':r.edad,
-        'nc-ocup':r.ocup, 'nc-insta':r.insta||'',
-        'nc-medicacion':r.condiciones, 'nc-alergias':r.alergias||'',
-        'nc-skincare':r.skincare||'', 'nc-tratprev':r.tratprev||'',
-        'nc-objetivo':r.objetivo||'', 'nc-obs':r.obs||'',
-        'nc-obs-hormonal':r.obsHormonal||'', 'nc-anticon-otro':r.anticonceptivo||''
-      };
-      Object.entries(textos).forEach(([id,val])=>{
-        const el=document.getElementById(id); if(el&&val) el.value=val;
-      });
-      // Selects
-      const selects = {
-        'nc-fps':r.fps, 'nc-alim':r.alim, 'nc-agua':r.agua,
-        'nc-sueno':r.sueno, 'nc-estres':r.estres, 'nc-cejas':r.cejas,
-        'nc-pestanas':r.pestanas, 'nc-menstruacion':r.menstruacion,
-        'nc-estado-hormonal':r.estadoHormonal
-      };
-      Object.entries(selects).forEach(([id,val])=>{
-        const el=document.getElementById(id); if(el&&val) el.value=val;
-      });
-      alert(`✅ Datos precargados de ${r.nombre}.\nCompletá lo que falta y guardá la ficha.`);
-    }, 300);
+    alert(`✅ ${campos.length} datos cargados en la ficha de ${c.nombre}.`);
+    setTimeout(()=>{ abrirFicha(cid); }, 200);
+    return;
   }
+
+  // No existe la clienta → precargar el formulario de alta
+  document.querySelectorAll('.modal-overlay').forEach(m=>m.remove());
+  showSection('nueva-clienta', null);
+  setTimeout(()=>{
+    const textos = {
+      'nc-nombre':r.nombre, 'nc-tel':r.tel, 'nc-edad':r.edad,
+      'nc-ocup':r.ocup, 'nc-insta':r.insta,
+      'nc-medicacion':r.condiciones, 'nc-alergias':r.alergias,
+      'nc-skincare':r.skincare, 'nc-tratprev':r.tratprev,
+      'nc-objetivo':r.objetivo, 'nc-obs':r.obs,
+      'nc-obs-hormonal':r.anticonceptivo, 'nc-anticon-otro':r.anticonceptivo
+    };
+    Object.entries(textos).forEach(([id,val])=>{
+      const el=document.getElementById(id); if(el&&val) el.value=val;
+    });
+    const selects = {
+      'nc-fps':r.fps, 'nc-alim':r.alim, 'nc-agua':r.agua,
+      'nc-sueno':r.sueno, 'nc-estres':r.estres, 'nc-cejas':r.cejas,
+      'nc-pestanas':r.pestanas, 'nc-menstruacion':r.menstruacion,
+      'nc-estado-hormonal':r.estadoHormonal
+    };
+    Object.entries(selects).forEach(([id,val])=>{
+      const el=document.getElementById(id); if(el&&val) el.value=val;
+    });
+    alert(`✅ Datos de ${r.nombre} precargados.\nCompletá el tipo de piel y guardá la ficha.`);
+  }, 300);
 }
 
 async function descartarFormulario(docId){
@@ -4495,6 +4460,88 @@ function recordatorioWhatsApp(clientaId){
   window.open(`https://wa.me/${tel}?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
+// Busca la clave real de una clienta en el objeto `clientas`
+function buscarClientaPorForm(r){
+  const norm = t => (t||'').toString().toLowerCase().trim().replace(/\s+/g,' ');
+  const soloNum = t => (t||'').toString().replace(/\D/g,'');
+  const telForm = soloNum(r.tel);
+
+  // 1) Por id de referencia del link
+  if(r.clientaRefId && clientas[r.clientaRefId]) return [r.clientaRefId, clientas[r.clientaRefId]];
+
+  // 2) Por nombre exacto
+  for(const [cid,c] of Object.entries(clientas)){
+    if(norm(c.nombre) && norm(c.nombre)===norm(r.nombre)) return [cid,c];
+  }
+  // 3) Por teléfono (últimos 8 dígitos, para ignorar prefijos)
+  if(telForm.length>=8){
+    for(const [cid,c] of Object.entries(clientas)){
+      const t = soloNum(c.tel);
+      if(t.length>=8 && t.slice(-8)===telForm.slice(-8)) return [cid,c];
+    }
+  }
+  return [null,null];
+}
+
+// Pasa los datos del formulario a la ficha. Devuelve los campos actualizados.
+function aplicarFormAFicha(c, r){
+  const limpio = v => (v===undefined||v===null) ? '' : String(v).trim();
+  const esNada = v => ['','ninguna','ninguno','no','nada','n/a','-','--'].includes(limpio(v).toLowerCase());
+
+  // Campos que la clienta contesta sobre sí misma → siempre pisan lo viejo
+  const siempre = {
+    fps: r.fps, alim: r.alim, agua: r.agua, sueno: r.sueno, estres: r.estres,
+    cejas: r.cejas, pestanas: r.pestanas, menstruacion: r.menstruacion,
+    estadoHormonal: r.estadoHormonal, objetivo: r.objetivo
+  };
+  // Campos que solo se completan si están vacíos en la ficha
+  const siVacio = {
+    tel: r.tel, edad: r.edad, ocup: r.ocup, insta: r.insta,
+    alergias: r.alergias, skincare: r.skincare, tratprev: r.tratprev,
+    alegTinte: r.alegTinte
+  };
+
+  const actualizados = [];
+
+  Object.entries(siempre).forEach(([k,v])=>{
+    if(limpio(v)!=='' && c[k]!==limpio(v)){ c[k]=limpio(v); actualizados.push(k); }
+  });
+  Object.entries(siVacio).forEach(([k,v])=>{
+    if(limpio(v)!=='' && !limpio(c[k])){ c[k]=limpio(v); actualizados.push(k); }
+  });
+
+  // Condiciones médicas → van al array de anamnesis (aparecen en la alerta roja de la ficha)
+  if(!esNada(r.condiciones)){
+    const nuevas = limpio(r.condiciones).split(/[,;]+/).map(x=>x.trim()).filter(Boolean);
+    const actuales = Array.isArray(c.condiciones) ? c.condiciones.slice() : [];
+    nuevas.forEach(n=>{ if(!actuales.some(a=>a.toLowerCase()===n.toLowerCase())) actuales.push(n); });
+    if(actuales.length !== (c.condiciones||[]).length){ c.condiciones = actuales; actualizados.push('condiciones'); }
+  }
+
+  // Anticonceptivo y observaciones hormonales
+  if(!esNada(r.anticonceptivo)){
+    const txt = limpio(r.anticonceptivo);
+    const previo = limpio(c.obsHormonal);
+    if(!previo.includes(txt)){
+      c.obsHormonal = previo ? previo + ' · ' + txt : txt;
+      actualizados.push('obsHormonal');
+    }
+  }
+
+  // "Algo más que quieras contarme" → observaciones, sin pisar lo que ya escribiste vos
+  if(!esNada(r.obs)){
+    const txt = limpio(r.obs);
+    const previo = limpio(c.obs);
+    if(!previo.includes(txt)){
+      c.obs = previo ? previo + ' · [Del formulario] ' + txt : txt;
+      actualizados.push('obs');
+    }
+  }
+
+  c.formularioRecibido = limpio(r.fechaFormulario) || new Date().toLocaleString('es-AR');
+  return actualizados;
+}
+
 async function checkFormulariosFirebase(){
   if(!useFirebase||!userEmail)return;
   try{
@@ -4502,62 +4549,42 @@ async function checkFormulariosFirebase(){
     const pendientes=[];snap.forEach(d=>pendientes.push({id:d.id,...d.data()}));
     if(!pendientes.length)return;
 
-    // Auto-sincronizar los que tienen clientaRefId válido
-    let autoSincronizados=0;
-    for(const r of pendientes){
-      const c = (r.clientaRefId && clientas[r.clientaRefId]) ||
-        Object.values(clientas).find(x => x.nombre?.toLowerCase().trim()===r.nombre?.toLowerCase().trim());
-      if(!c) continue;
+    const sincronizadas=[];
+    const sinMatch=[];
 
-      const siempreActualizar=['fps','alim','agua','sueno','estres','cejas','pestanas',
-        'menstruacion','estadoHormonal','anticonceptivoOtro','objetivo','obs','obsHormonal'];
-      const mapa={
-        tel:r.tel, edad:r.edad, ocup:r.ocup, insta:r.insta,
-        medicacion:r.condiciones, alergias:r.alergias,
-        fps:r.fps, alim:r.alim, agua:r.agua, sueno:r.sueno,
-        estres:r.estres, cejas:r.cejas, pestanas:r.pestanas,
-        skincare:r.skincare, tratprev:r.tratprev,
-        objetivo:r.objetivo, obs:r.obs,
-        menstruacion:r.menstruacion, estadoHormonal:r.estadoHormonal,
-        anticonceptivoOtro:r.anticonceptivo, obsHormonal:r.obsHormonal
-      };
-      const actualizar={};
-      Object.entries(mapa).forEach(([campo,valor])=>{
-        if(valor!==undefined&&valor!==null&&valor!==''){
-          if(siempreActualizar.includes(campo)||!c[campo]) actualizar[campo]=valor;
-        }
-      });
-      if(Object.keys(actualizar).length>0){
-        Object.assign(c, actualizar);
-        await saveDoc('clientas', c.id, c);
+    for(const r of pendientes){
+      const [cid,c] = buscarClientaPorForm(r);
+      if(!cid||!c){ sinMatch.push(r); continue; }
+
+      const campos = aplicarFormAFicha(c, r);
+      try{
+        await saveDoc('clientas', cid, c);           // cid real, nunca undefined
+        await delDoc('formularios_pendientes', r.id); // recién ahora borramos
+        sincronizadas.push({nombre:c.nombre, campos:campos.length});
+      }catch(e){
+        console.log('No se pudo guardar la ficha, dejo el formulario pendiente:', e);
       }
-      await delDoc('formularios_pendientes', r.id);
-      autoSincronizados++;
     }
 
-    if(autoSincronizados>0){
-      renderClientas();
-      // Mostrar notificación de sincronización exitosa
-      const inicio=document.getElementById('inicio');if(!inicio)return;
+    const inicio=document.getElementById('inicio');
+
+    if(sincronizadas.length && inicio){
+      const detalle = sincronizadas.map(s=>`${s.nombre} (${s.campos} datos)`).join(' · ');
       const notif=document.createElement('div');
       notif.className='alert alert-success';
-      notif.innerHTML=`✅ <strong>${autoSincronizados} formulario${autoSincronizados>1?'s':''}</strong> sincronizado${autoSincronizados>1?'s':''} automáticamente con ${autoSincronizados>1?'las fichas':'la ficha'}.`;
+      notif.innerHTML=`✅ <strong>${sincronizadas.length} formulario${sincronizadas.length>1?'s':''}</strong> cargado${sincronizadas.length>1?'s':''} en la ficha: ${detalle}`;
       inicio.insertBefore(notif,inicio.firstChild);
-      setTimeout(()=>notif.remove(), 5000);
-      return;
+      setTimeout(()=>notif.remove(), 8000);
+      renderClientas();
     }
 
-    // Si quedan formularios sin clienta → mostrar notificación para revisión manual
-    const snap2=await fs.getDocs(fs.collection(db,`usuarios/${userEmail}/formularios_pendientes`));
-    const restantes=[];snap2.forEach(d=>restantes.push({id:d.id,...d.data()}));
-    if(!restantes.length)return;
-    if(document.getElementById('notif-formularios'))return;
-    const inicio=document.getElementById('inicio');if(!inicio)return;
-    const notif=document.createElement('div');
-    notif.id='notif-formularios';notif.className='alert alert-success';notif.style.cursor='pointer';
-    notif.innerHTML=`📲 <strong>${restantes.length} formulario${restantes.length>1?'s':''} recibido${restantes.length>1?'s':''}!</strong> Tocá para ver`;
-    notif.onclick=()=>showSection('crm',document.getElementById('nav-crm'));
-    inicio.insertBefore(notif,inicio.firstChild);
+    if(sinMatch.length && inicio && !document.getElementById('notif-formularios')){
+      const notif=document.createElement('div');
+      notif.id='notif-formularios';notif.className='alert alert-info';notif.style.cursor='pointer';
+      notif.innerHTML=`📲 <strong>${sinMatch.length} formulario${sinMatch.length>1?'s':''} sin ficha asignada.</strong> Tocá para verlos`;
+      notif.onclick=()=>showSection('crm',document.getElementById('nav-crm'));
+      inicio.insertBefore(notif,inicio.firstChild);
+    }
   }catch(e){console.log('Error formularios:',e);}
 }
 
