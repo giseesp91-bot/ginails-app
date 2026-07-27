@@ -2527,22 +2527,41 @@ document.addEventListener('DOMContentLoaded', () => {
         const userData = userSnap.exists() ? userSnap.data() : {};
 
         const suscripcionActiva = userData.suscripcionActiva === true;
-        const suscripcionVence = userData.suscripcionVence ? new Date(userData.suscripcionVence) : null;
-        const suscripcionVigente = suscripcionActiva && suscripcionVence && suscripcionVence > new Date();
+        // Parseo robusto de la fecha (tolera espacios y formatos raros)
+        let suscripcionVence = null;
+        if (userData.suscripcionVence) {
+          const raw = String(userData.suscripcionVence).trim();
+          const parsed = new Date(raw);
+          if (!isNaN(parsed.getTime())) suscripcionVence = parsed;
+        }
+        // Damos hasta el final del día de vencimiento, no la hora exacta
+        const ahora = new Date();
+        const suscripcionVigente = suscripcionActiva && suscripcionVence && suscripcionVence.getTime() >= ahora.getTime();
 
-        if (!suscripcionVigente) {
+        if (suscripcionVigente) {
+          // Tiene suscripción al día → guardamos que entró OK y lo dejamos pasar directo
+          try { localStorage.setItem('gp_ultimo_acceso_ok', String(Date.now())); } catch(e){}
+        } else {
           // Verificar trial
           const trialInicio = userData.trialInicio;
           if (!trialInicio) {
-            // Primera vez — ir a trial.html para registrar inicio
             window.location.href = "trial.html";
             return;
           }
           const diasPasados = (Date.now() - trialInicio) / (1000 * 60 * 60 * 24);
           if (diasPasados >= DIAS_TRIAL) {
-            // Trial vencido → pago
-            window.location.href = "pago.html";
-            return;
+            // Antes de mandarla a pagar, red de seguridad:
+            // si entró OK en las últimas 48hs, la dejamos pasar igual
+            // (evita sacarla por una lectura lenta o intermitente de Firebase)
+            let accesoReciente = false;
+            try {
+              const ult = parseInt(localStorage.getItem('gp_ultimo_acceso_ok') || '0');
+              accesoReciente = ult && (Date.now() - ult) < (48 * 60 * 60 * 1000);
+            } catch(e){}
+            if (!accesoReciente) {
+              window.location.href = "pago.html";
+              return;
+            }
           }
         }
       } catch(e) {

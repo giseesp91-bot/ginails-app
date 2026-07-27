@@ -322,6 +322,7 @@
     sendPasswordResetEmail,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey:            "AIzaSyBDBv8dSyIfLk9QMTsKF6MkfH75fLNUdvw",
@@ -336,9 +337,24 @@
   const auth     = getAuth(app);
   const provider = new GoogleAuthProvider();
 
-  // Si ya está logueada → redirigir directo
-  onAuthStateChanged(auth, (user) => {
-    if (user) window.location.href = "index.html";
+  // Si ya está logueada → decidir a dónde mandarla
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) return;
+    try {
+      const db = getFirestore(app);
+      const snap = await getDoc(doc(db, "usuarios", user.email));
+      // Si ya aceptó los términos alguna vez → entra directo a la app
+      if (snap.exists() && snap.data().terminosAceptados) {
+        window.location.href = "index.html";
+      } else {
+        // Primera vez → tiene que ver y aceptar los términos
+        window.location.href = "terminos.html";
+      }
+    } catch(e) {
+      // Si Firebase falla, no la bloqueamos: la mandamos a la app,
+      // que ahí se vuelve a chequear todo
+      window.location.href = "index.html";
+    }
   });
 
   // ── Helpers ──────────────────────────────────
@@ -364,7 +380,8 @@
     hideError();
     try {
       await signInWithPopup(auth, provider);
-      window.location.href = "terminos.html";
+      // La redirección la maneja onAuthStateChanged de arriba
+      // (manda a index si ya aceptó términos, o a terminos.html si es primera vez)
     } catch (e) {
       showError(traducirError(e.code));
     }
