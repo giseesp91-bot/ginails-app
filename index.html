@@ -13,6 +13,11 @@
   --sage:#6a9e7a;--gold:#b8976a;--light:#ffffff;--border:#e0ead8;
   --text:#2a3a2a;--muted:#7a8e7a;--success:#5a9e6a;--danger:#c05c5c;
   --shadow:0 4px 24px rgba(61,31,26,0.08);
+  /* Sistema unificado: sombras y redondeos */
+  --sh-sm:0 2px 10px rgba(45,74,53,0.06);
+  --sh-md:0 3px 14px rgba(45,74,53,0.10);
+  --sh-lg:0 12px 40px rgba(45,74,53,0.16);
+  --r-sm:10px; --r-md:14px; --r-lg:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:var(--app-font-size,16px);}
@@ -32,7 +37,7 @@ main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .section{display:none;animation:fadeIn 0.3s ease;}
 .section.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-.card{background:white;border-radius:16px;padding:18px;box-shadow:0 2px 16px rgba(45,74,53,0.08);border:1px solid var(--border);margin-bottom:14px;transition:box-shadow 0.2s;}
+.card{background:white;border-radius:18px;padding:18px;box-shadow:var(--sh-md);border:1px solid var(--border);margin-bottom:14px;transition:box-shadow 0.25s ease, transform 0.25s ease;}
 .card-title{font-family:'Playfair Display',serif;font-size:1rem;color:var(--deep);margin-bottom:12px;padding-bottom:9px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;gap:7px;}
 .section-title{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--deep);margin-bottom:16px;display:flex;align-items:center;gap:9px;}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
@@ -40,14 +45,14 @@ main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .form-group{display:flex;flex-direction:column;gap:4px;}
 .form-group.full{grid-column:1/-1;}
 label{font-size:0.74rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;}
-input,select,textarea{padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;color:var(--text);background:var(--light);transition:border 0.2s;outline:none;}
-input:focus,select:focus,textarea:focus{border-color:var(--rose);background:white;}
+input,select,textarea{padding:8px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.87rem;color:var(--text);background:var(--light);transition:border 0.2s;outline:none;}
+input:focus,select:focus,textarea:focus{border-color:var(--rose);background:white;box-shadow:0 0 0 3px rgba(196,99,122,0.10);}
 textarea{resize:vertical;min-height:70px;}
 .check-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;}
-.check-item{display:flex;align-items:center;gap:5px;background:var(--light);border:1.5px solid var(--border);border-radius:7px;padding:5px 10px;cursor:pointer;font-size:0.81rem;transition:all 0.15s;user-select:none;}
+.check-item{display:flex;align-items:center;gap:5px;background:var(--light);border:1.5px solid var(--border);border-radius:10px;padding:5px 10px;cursor:pointer;font-size:0.81rem;transition:all 0.15s;user-select:none;}
 .check-item input[type="checkbox"]{accent-color:var(--rose);}
 .check-item:has(input:checked){background:#fde8e3;border-color:var(--rose);color:var(--rose);font-weight:600;}
-.btn{padding:8px 18px;border-radius:9px;border:none;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
+.btn{padding:8px 18px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;transition:all 0.2s;}
 .btn-primary{background:linear-gradient(135deg,var(--rose),#a84e65);color:white;box-shadow:0 3px 10px rgba(196,99,122,0.3);}.btn-primary:hover{background:linear-gradient(135deg,#a84e65,#963d55);transform:translateY(-2px);box-shadow:0 5px 15px rgba(196,99,122,0.4);}
 .btn-secondary{background:white;color:var(--text);border:1.5px solid var(--border);}.btn-secondary:hover{background:var(--cream);border-color:var(--sage);color:var(--deep);transform:translateY(-1px);}
 .btn-success{background:linear-gradient(135deg,var(--success),#4a8e5a);color:white;box-shadow:0 3px 10px rgba(90,158,106,0.3);}
@@ -61,36 +66,36 @@ textarea{resize:vertical;min-height:70px;}
 .badge-gold{background:#fdf3e3;color:#8a6a20;}
 .badge-blue{background:#e3edf8;color:#3a5a8a;}
 .badge-red{background:#fde8e8;color:#8a2a2a;}
-.client-card{background:white;border:1.5px solid var(--border);border-radius:11px;padding:12px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
-.client-card:hover{border-color:var(--rose);box-shadow:var(--shadow);transform:translateX(3px);}
+.client-card{background:white;border:1.5px solid var(--border);border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:all 0.2s;margin-bottom:8px;}
+.client-card:hover{border-color:var(--rose);box-shadow:var(--sh-md);transform:translateX(3px);}
 .client-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--blush),var(--rose));display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1rem;color:white;flex-shrink:0;}
 .progress-bar-wrap{background:var(--border);border-radius:20px;height:7px;margin:5px 0;overflow:hidden;}
 .progress-bar{background:linear-gradient(90deg,var(--rose),var(--gold));height:100%;border-radius:20px;transition:width 0.4s;}
-.sesion-item{background:white;border:1.5px solid var(--border);border-radius:9px;padding:11px 13px;margin-bottom:7px;}
+.sesion-item{background:white;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:7px;}
 .sesion-num{background:var(--rose);color:white;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;}
 /* SERVICIOS */
-.servicio-card{border:1.5px solid var(--border);border-radius:11px;overflow:hidden;margin-bottom:11px;}
+.servicio-card{border:1.5px solid var(--border);border-radius:14px;overflow:hidden;margin-bottom:11px;}
 .serv-header{background:linear-gradient(135deg,var(--deep),#5c2f29);color:white;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;gap:8px;}
 .serv-header h4{font-family:'Playfair Display',serif;font-size:0.92rem;}
 .serv-body{padding:14px 15px;background:white;display:none;}
 .serv-body.open{display:block;}
 .serv-section{margin-bottom:11px;}
 .serv-section h5{font-size:0.74rem;text-transform:uppercase;letter-spacing:0.4px;color:var(--muted);margin-bottom:6px;font-weight:700;}
-.paso-item{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;background:var(--light);border-radius:7px;font-size:0.83rem;margin-bottom:4px;}
+.paso-item{display:flex;gap:8px;align-items:flex-start;padding:6px 8px;background:var(--light);border-radius:10px;font-size:0.83rem;margin-bottom:4px;}
 .paso-num{background:var(--rose);color:white;width:19px;height:19px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.67rem;font-weight:700;flex-shrink:0;margin-top:1px;}
 .insumo-item{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);font-size:0.83rem;}
 .insumo-check{accent-color:var(--rose);width:15px;height:15px;flex-shrink:0;cursor:pointer;}
 .insumo-falta{color:var(--danger);font-size:0.72rem;font-weight:600;}
 .insumo-ok{color:var(--success);font-size:0.72rem;font-weight:600;}
 /* IA BOX */
-.ai-box{background:linear-gradient(135deg,#fdf4f2,#f0faf0);border:1.5px solid var(--blush);border-radius:11px;padding:15px;margin-top:12px;}
+.ai-box{background:linear-gradient(135deg,#fdf4f2,#f0faf0);border:1.5px solid var(--blush);border-radius:14px;padding:15px;margin-top:12px;}
 .ai-loading{text-align:center;color:var(--muted);padding:16px;}
 .dot{animation:blink 1.4s infinite;}
 .dot:nth-child(2){animation-delay:0.2s;}
 .dot:nth-child(3){animation-delay:0.4s;}
 @keyframes blink{0%,80%,100%{opacity:0}40%{opacity:1}}
 .ai-content{font-size:0.85rem;line-height:1.8;white-space:pre-wrap;}
-.alert{padding:10px 13px;border-radius:9px;font-size:0.83rem;margin-bottom:11px;display:flex;align-items:flex-start;gap:7px;}
+.alert{padding:10px 13px;border-radius:10px;font-size:0.83rem;margin-bottom:11px;display:flex;align-items:flex-start;gap:7px;}
 .alert-warning{background:#fff8e3;border-left:4px solid var(--gold);color:#6a4a10;}
 .alert-info{background:#e8f4fd;border-left:4px solid #4a90d9;color:#1a3a5a;}
 .alert-success{background:#e8f7ee;border-left:4px solid var(--success);color:#1a4a2a;}
@@ -104,7 +109,7 @@ textarea{resize:vertical;min-height:70px;}
 .tab-content{display:none;}.tab-content.active{display:block;}
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(61,31,26,0.55);z-index:200;align-items:center;justify-content:center;padding:12px;}
 .modal-overlay.open{display:flex;}
-.modal{background:white;border-radius:16px;padding:20px;max-width:640px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,0.2);animation:modalIn 0.3s ease;}
+.modal{background:white;border-radius:18px;padding:20px;max-width:640px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg);animation:modalIn 0.3s ease;}
 @keyframes modalIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
 .modal-title{font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--deep);margin-bottom:16px;}
 .modal-close{float:right;background:var(--border);border:none;border-radius:50%;width:27px;height:27px;cursor:pointer;font-size:0.88rem;color:var(--text);}
@@ -112,24 +117,24 @@ textarea{resize:vertical;min-height:70px;}
 @media(max-width:500px){.field-row{grid-template-columns:1fr;}}
 .field-label{font-size:0.71rem;color:var(--muted);font-weight:600;text-transform:uppercase;}
 .field-value{font-size:0.87rem;color:var(--text);}
-.ficha-section{background:var(--light);border-radius:11px;padding:13px;margin-bottom:11px;}
+.ficha-section{background:var(--light);border-radius:14px;padding:13px;margin-bottom:11px;}
 .ficha-section h4{font-family:'Playfair Display',serif;font-size:0.92rem;color:var(--deep);margin-bottom:9px;display:flex;align-items:center;gap:5px;}
 .foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(95px,1fr));gap:7px;margin-top:7px;}
-.foto-thumb{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px;border:2px solid var(--border);cursor:pointer;transition:all 0.2s;}
+.foto-thumb{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;border:2px solid var(--border);cursor:pointer;transition:all 0.2s;}
 .foto-thumb:hover{border-color:var(--rose);transform:scale(1.03);}
 .sep{border:none;border-top:1px solid var(--border);margin:12px 0;}
 ::-webkit-scrollbar{width:4px;}
-::-webkit-scrollbar-thumb{background:var(--blush);border-radius:2px;}
+::-webkit-scrollbar-thumb{background:var(--blush);border-radius:10px;}
 input[type="file"]{display:none;}
 .loading-screen{position:fixed;inset:0;background:var(--deep);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;}
 .logo-big{font-family:'Playfair Display',serif;color:var(--blush);font-size:1.8rem;}
 .spinner{width:32px;height:32px;border:3px solid rgba(232,196,176,0.2);border-top-color:var(--blush);border-radius:50%;animation:spin 0.8s linear infinite;}
 @keyframes spin{to{transform:rotate(360deg)}}
 .precio-badge{background:linear-gradient(135deg,var(--gold),#e8b84a);color:white;padding:4px 12px;border-radius:20px;font-size:0.78rem;font-weight:700;}
-.contraind-tag{background:#fde8e8;color:var(--danger);border-radius:6px;padding:3px 8px;font-size:0.72rem;font-weight:600;display:inline-block;margin:2px;}
-.highlight{background:#fff4f2;border-radius:7px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px;}
+.contraind-tag{background:#fde8e8;color:var(--danger);border-radius:10px;padding:3px 8px;font-size:0.72rem;font-weight:600;display:inline-block;margin:2px;}
+.highlight{background:#fff4f2;border-radius:10px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px;}
 .highlight strong{color:var(--rose);}
-.tag-aviso{background:#fff3cd;border:1px solid #ffc107;border-radius:7px;padding:8px 12px;font-size:0.82rem;color:#856404;margin-bottom:8px;}
+.tag-aviso{background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:8px 12px;font-size:0.82rem;color:#856404;margin-bottom:8px;}
 .ic{flex-shrink:0} .nav-btn .ic{width:16px;height:16px}
 </style>
 </head>
@@ -165,6 +170,24 @@ input[type="file"]{display:none;}
 <main>
 
 <!-- INICIO -->
+<!-- ONBOARDING PRIMER USO -->
+<div id="onboarding-overlay" style="display:none;position:fixed;inset:0;background:rgba(45,74,53,0.55);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:20px">
+  <div style="background:white;border-radius:22px;max-width:420px;width:100%;padding:0;overflow:hidden;box-shadow:var(--sh-lg);max-height:92vh;display:flex;flex-direction:column">
+    <div style="background:linear-gradient(135deg,var(--deep),#1e3224);padding:24px 24px 20px;text-align:center;color:white">
+      <div style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:4px">Ginails <span style="color:var(--sage);font-style:italic">Pro</span></div>
+      <div style="font-size:0.82rem;opacity:0.85">Tu gabinete, ordenado y profesional</div>
+    </div>
+    <div id="onboarding-body" style="padding:22px 24px;overflow-y:auto"></div>
+    <div style="padding:14px 24px 22px;display:flex;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid var(--border)">
+      <div id="onboarding-dots" style="display:flex;gap:6px"></div>
+      <div style="display:flex;gap:8px">
+        <button id="onboarding-skip" onclick="cerrarOnboarding()" style="padding:9px 14px;background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:0.84rem;cursor:pointer">Saltar</button>
+        <button id="onboarding-next" onclick="onboardingNext()" style="padding:10px 20px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer;box-shadow:var(--sh-sm)">Siguiente</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div id="inicio" class="section active">
   <div class="saludo" style="margin-bottom:18px">
     <div id="saludo-inicio" style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#2d4a35;display:flex;align-items:center;gap:8px"><span data-ic-html="hormonal-20" style="display:inline-flex;vertical-align:-0.15em;margin-right:6px"></span>Bienvenida/o</div>
@@ -173,17 +196,17 @@ input[type="file"]{display:none;}
 
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
-    <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08);cursor:pointer;transition:all 0.2s">
+    <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md);cursor:pointer;transition:all 0.2s">
       <div style="margin-bottom:6px;color:#c4637a" data-ic-html="clientas-26"></div>
       <div id="stat-clientas" style="font-size:1.5rem;font-weight:700;color:#c4637a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Clientas</div>
     </div>
-    <div style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08)">
+    <div style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md)">
       <div style="margin-bottom:6px;color:#6a9e7a" data-ic-html="historial-26"></div>
       <div id="stat-sesiones" style="font-size:1.5rem;font-weight:700;color:#6a9e7a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Sesiones</div>
     </div>
-    <div onclick="showSection('gastos',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(184,151,106,0.08);cursor:pointer;transition:all 0.2s">
+    <div onclick="showSection('gastos',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md);cursor:pointer;transition:all 0.2s">
       <div style="margin-bottom:6px;color:#b8976a" data-ic-html="dinero-26"></div>
       <div id="stat-ganancia" style="font-size:1.1rem;font-weight:700;color:#b8976a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Ganancia este mes</div>
@@ -195,17 +218,17 @@ input[type="file"]{display:none;}
     <div class="card-title" style="display:flex;align-items:center;gap:7px"><span style="color:#c4637a" data-ic-html="idea-18"></span> Acceso Rápido</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button onclick="showSection('nueva-clienta',null)" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#c4637a,#a84e65);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(196,99,122,0.3);transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0" data-ic-html="nueva-clienta-22"></div>
+        <div style="width:42px;height:42px;border-radius:14px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0" data-ic-html="nueva-clienta-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Nueva Clienta</strong><small style="font-size:0.74rem;opacity:0.8;font-weight:400">Registrar nueva clienta</small></div>
         <span style="font-size:1.2rem;opacity:0.7">›</span>
       </button>
       <button onclick="showSection('clientas',null)" style="width:100%;padding:14px 16px;background:#f0f8f2;color:#2d4a35;border:1.5px solid #d0e8d8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:#e0f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#2d4a35" data-ic-html="clientas-22"></div>
+        <div style="width:42px;height:42px;border-radius:14px;background:#e0f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#2d4a35" data-ic-html="clientas-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Mis Clientas</strong><small style="font-size:0.74rem;color:#7a8e7a;font-weight:400">Gestionar mis clientas</small></div>
         <span style="font-size:1.2rem;color:#6a9e7a;opacity:0.8">›</span>
       </button>
       <button onclick="showSection('servicios',null)" style="width:100%;padding:14px 16px;background:#fdf8f0;color:#5a3a10;border:1.5px solid #e8dcc8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:#f5ead8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#5a3a10" data-ic-html="servicios-22"></div>
+        <div style="width:42px;height:42px;border-radius:14px;background:#f5ead8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#5a3a10" data-ic-html="servicios-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Servicios & Protocolos</strong><small style="font-size:0.74rem;color:#9a7a5a;font-weight:400">Explorar servicios disponibles</small></div>
         <span style="font-size:1.2rem;color:#b8976a;opacity:0.8">›</span>
       </button>
@@ -232,14 +255,14 @@ input[type="file"]{display:none;}
   </div>
   <div id="crm-tab-clientes" class="tab-content">
     <div style="margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap">
-      <select id="crm-filtro" onchange="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+      <select id="crm-filtro" onchange="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
         <option value="todas">Todas</option>
         <option value="inactivas">Inactivas +30 días</option>
         <option value="activas">Con plan activo</option>
         <option value="sin-plan">Sin plan</option>
         <option value="vip">Mayor consumo</option>
       </select>
-      <input type="text" id="crm-buscar" placeholder="🔍 Buscar..." oninput="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light);flex:1">
+      <input type="text" id="crm-buscar" placeholder="🔍 Buscar..." oninput="renderCRMClientas()" style="padding:7px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light);flex:1">
     </div>
     <div id="crm-lista-clientas"></div>
   </div>
@@ -249,7 +272,7 @@ input[type="file"]{display:none;}
   <div id="crm-tab-cabina" class="tab-content">
     <div class="card" style="background:linear-gradient(135deg,var(--deep),#5c2f29);color:white;padding:14px">
       <div style="font-family:'Playfair Display',serif;font-size:1rem;color:var(--blush);margin-bottom:10px">🛋️ Modo Cabina Rápida</div>
-      <input type="text" id="cabina-buscar" placeholder="Nombre de la clienta..." oninput="renderCabinaBuscar()" style="width:100%;padding:8px 11px;border:none;border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem">
+      <input type="text" id="cabina-buscar" placeholder="Nombre de la clienta..." oninput="renderCabinaBuscar()" style="width:100%;padding:8px 11px;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.87rem">
     </div>
     <div id="cabina-resultado"></div>
   </div>
@@ -478,7 +501,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Limpieza Facial Profunda<br>
@@ -488,7 +511,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES · LEER ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Isotretinoína (últimos 12 meses)</strong> → NO exfoliación, NO extracción, NO vapor. Solo limpieza suave + calmante.</div>
@@ -500,7 +523,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Sin herpes activo ni alergias conocidas a los productos</label>
@@ -513,7 +536,7 @@ input[type="file"]{display:none;}
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
 
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Adaptaciones rápidas:</strong> Piel seca/sensible → enzimática, sin vapor ni mecánica · Piel grasa/mixta → vapor + mecánica o enzimática · Rosácea → sin vapor, sin extracción · Acné → vapor corto + alta frecuencia + LED azul
           </div>
 
@@ -532,12 +555,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> Vaporizador facial · Alta frecuencia (4 cabezales) · Lupa LED 10x<br><strong>Productos:</strong> Desmaquillante micelar o aceite · Gel/espuma limpiadora · Tónico · Exfoliante enzimático o mecánico · Arcilla verde/blanca · Mascarilla lámina · Sérum hialurónico · Crema hidratante · SPF 50</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">La limpieza profunda es la base de cualquier protocolo estético. Sin una piel correctamente descongestinada, ningún activo penetra bien. Elimina el exceso de sebo, células muertas y comedones que obstruyen los folículos e impiden la absorción. Es el primer paso obligatorio para toda clienta, sin importar su problemática. Una piel limpia responde hasta un 40% mejor a los tratamientos posteriores.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Después de la sesión:</strong> Piel visiblemente más limpia, luminosa y suave. Poros menos obstruidos.<br>
@@ -566,7 +589,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Hidratación Profunda<br>
@@ -576,7 +599,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Barrera muy comprometida/irritada</strong> → Solo paso 1-2 y mascarilla calmante. No avanzar hasta estabilizar.</div>
@@ -586,7 +609,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Barrera cutánea estable (no irritada ni enrojecida hoy)</label>
@@ -597,7 +620,7 @@ input[type="file"]{display:none;}
         </div>
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Adaptaciones:</strong> Piel seca → sin vapor prolongado, sérum ceramidas · Piel grasa deshidratada → gel hialurónico oil-free · Piel sensible → omitir exfoliación, mascarilla aloe · Piel madura → agregar masaje + activos colágeno
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Doble limpieza suave</strong> — leche micelar + gel suave. Agua tibia. <strong style="color:var(--rose)">⏱ 3-4 min</strong></div></div>
@@ -616,12 +639,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> Vaporizador · Galvánica (iontoforesis) · Ultrasonido facial · LED amarillo 590nm (opcional, 10-12 min, estimula síntesis de colágeno)<br><strong>Productos:</strong> Desmaquillante suave · Tónico hidratante · Exfoliante enzimático · Sérum hialurónico 1% · Sérum ceramidas · Aceite rosa mosqueta · Mascarilla lámina colágeno · Crema hidratante intensa · SPF 50</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">La deshidratación no es exclusiva de la piel seca — una piel grasa también puede estar deshidratada. Una piel sin agua no puede defenderse, absorber activos ni lucir saludable. Este tratamiento restaura el agua en las capas profundas con activos higroscópicos (hialurónico) y técnicas que fuerzan la penetración (galvánica, ultrasonido). Sin hidratación base, ningún otro tratamiento activo da resultados óptimos.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>1ra sesión:</strong> Piel más suave y confortable. Sensación de tensión reducida.<br>
@@ -650,7 +673,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Control de Acné<br>
@@ -660,7 +683,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Acné quístico severo</strong> → NO tratar. Derivar a dermatólogo.</div>
@@ -671,7 +694,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Sin isotretinoína en los últimos 12 meses</label>
@@ -683,7 +706,7 @@ input[type="file"]{display:none;}
         </div>
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Adaptaciones:</strong> Piel sensible + acné → sin ácidos fuertes, solo salicílico 1% + arcilla blanca · Fototipo IV-VI → sin glicólico, solo salicílico o mandélico · Fase premenstrual → ser más suave, la piel está más reactiva
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Doble limpieza</strong> — aceite desmaquillante (disuelve sebo) + gel con ácido salicílico 2%. <strong style="color:var(--rose)">⏱ 3-4 min · No frotar, masaje suave</strong></div></div>
@@ -700,12 +723,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> Vaporizador · Alta frecuencia (cabezal tubular directo) · Panel LED azul 415nm<br><strong>Productos:</strong> Aceite desmaquillante · Gel salicílico 2% · Tónico hamamelis/niacinamida · Arcilla verde/blanca · Sérum niacinamida 10% · Crema fluida no comedogénica · SPF 50 oil-free</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Ataca el acné desde múltiples frentes: la extracción elimina tapones de sebo, la alta frecuencia mata bacterias con ozono, el LED azul reduce P. acnes que causa inflamación, y la arcilla absorbe el exceso de sebo. No es un tratamiento estético superficial — es un protocolo clínico que trata la causa, no solo las consecuencias. El resultado depende en un 50% del domiciliario y los hábitos.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Semana 1-2:</strong> Posible "purga" — leve empeoramiento temporal. Normal, señal que está funcionando.<br>
@@ -734,7 +757,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Despigmentación & Luminosidad<br>
@@ -744,7 +767,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Embarazo</strong> → OMITIR ácido kójico, arbutina, retinoides. Solo vitamina C + SPF.</div>
@@ -756,7 +779,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Fototipo identificado y protocolo adaptado</label>
@@ -768,7 +791,7 @@ input[type="file"]{display:none;}
         </div>
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Ácido según fototipo:</strong> I-II → glicólico/láctico 15-20% · II-III → mandélico 15% o láctico 10-15% · III-IV → mandélico 10-15% (NUNCA glicólico de entrada) · IV-VI → mandélico 10% máx
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Limpieza suave</strong> — leche micelar o gel sin activos agresivos. <strong style="color:var(--rose)">⏱ 2-3 min</strong></div></div>
@@ -785,12 +808,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> Ultrasonido · Galvánica (iontoforesis) · LED amarillo 590nm<br><strong>Productos:</strong> Gel limpiador suave · Ácido mandélico/kójico/láctico (según fototipo) · Sérum vitamina C 20% · Sérum arbutina/tranexámico · Mascarilla vitamina C · Crema despigmentante · SPF 50</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Las manchas son sobreproducción de melanina como respuesta al sol, inflamación u hormonas. Este protocolo actúa en tres niveles: inhibe la enzima tirosinasa (que produce melanina), exfolia las capas donde la mancha está concentrada, y usa LED para reducir la actividad melanocítica. Sin SPF estricto, el tratamiento no funciona — el sol rehace la mancha más rápido de lo que se trata.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>3ra-4ta sesión:</strong> Manchas más claras, bordes menos definidos.<br>
@@ -819,7 +842,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Anti-Edad & Lifting Facial<br>
@@ -829,7 +852,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Marcapasos / implantes metálicos</strong> → OMITIR ultrasonido y galvánica completamente.</div>
@@ -840,7 +863,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Sin marcapasos ni implantes metálicos</label>
@@ -851,7 +874,7 @@ input[type="file"]{display:none;}
         </div>
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Adaptaciones:</strong> Piel seca madura → priorizar hidratación intensa + mascarilla colagenizante · Piel flácida → más tiempo de masaje Kobido + ultrasonido · Rosácea → sin vapor, galvánica suave · Menopausia → agregar ceramidas + activos reparadores
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Doble limpieza suave</strong> — leche desmaquillante + gel suave. <strong style="color:var(--rose)">⏱ 3-4 min</strong></div></div>
@@ -869,12 +892,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> Vaporizador · Ultrasonido · Galvánica (modo anafórico) · LED rojo 630-660nm<br><strong>Productos:</strong> Leche desmaquillante · Exfoliante AHA (láctico/mandélico) · Sérum péptidos tensores · Retinol encapsulado · Mascarilla colagenizante lámina · Crema reafirmante DMAE/bakuchiol · Contorno ojos · SPF 50</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Con el tiempo los fibroblastos (células que producen colágeno) se vuelven más lentos. Este protocolo los estimula mecánicamente (masaje, ultrasonido) y con activos (péptidos, retinol encapsulado) para producir colágeno nuevo. El LED rojo actúa directamente sobre la mitocondria celular, acelerando la regeneración. No es magia — es estimulación fisiológica real con respaldo científico.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>1ra sesión:</strong> Piel más hidratada y luminosa (efecto inmediato del masaje).<br>
@@ -904,7 +927,7 @@ input[type="file"]{display:none;}
       </div>
       <div class="serv-body" style="display:none">
 
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Calmante & Barrera Protectora<br>
@@ -914,7 +937,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES ABSOLUTAS</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>NUNCA usar:</strong> Vapor · Alta frecuencia · Exfoliantes mecánicos · Peelings químicos · Galvánica en intensidad alta</div>
@@ -924,7 +947,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
 
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Piel estable hoy (no en brote activo con pústulas)</label>
@@ -935,7 +958,7 @@ input[type="file"]{display:none;}
         </div>
 
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Principio fundamental: MENOS ES MÁS.</strong> Cualquier agresión puede desencadenar una crisis. Cada paso debe ser suave, sin fricción, sin temperatura alta.
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Limpieza micelar</strong> — agua micelar o leche sin fragancia. Agua TIBIA. <strong style="color:var(--rose)">⏱ 2 min · NO frotar nunca. Solo presión gentil con algodón o manos</strong></div></div>
@@ -951,12 +974,12 @@ input[type="file"]{display:none;}
           <div class="highlight"><strong>Aparatos:</strong> LED verde 530nm o amarillo 590nm (ÚNICOS permitidos en rosácea)<br><strong>Productos:</strong> Agua micelar sin fragancia · Tónico aloe/azuleno SIN alcohol · Sérum centella asiática · Sérum alantoína/bisabolol · Mascarilla aloe vera (mantener fría) · Crema barrera con ceramidas y pantenol · SPF mineral con zinc</div>
         </div>
 
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">La piel sensible tiene la barrera cutánea comprometida — pierde agua fácilmente y reacciona de más. Este protocolo no trata síntomas, trata la CAUSA: fortalece la barrera con ceramidas y calmantes, reduce la inflamación con LED frío, y evita cualquier estímulo agresivo. La rosácea no se cura — se controla. El objetivo es minimizar brotes y mejorar la calidad de vida de la piel.</p>
         </div>
 
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>1ra sesión:</strong> Piel más calmada, menos ardor y enrojecimiento inmediato.<br>
@@ -984,7 +1007,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-glow">$22.000</span><span class="badge badge-gold">3-5 ses · Mensual</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Revitalización & Efecto Glow<br>
@@ -993,7 +1016,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 55-65 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>⚠️ <strong>Piel irritada/sensibilizada</strong> → Omitir exfoliación enzimática.</div>
@@ -1001,7 +1024,7 @@ input[type="file"]{display:none;}
             <div>❌ <strong>Herpes activo</strong> → Suspender.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Piel no irritada ni sensibilizada hoy</label>
@@ -1022,11 +1045,11 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Aparatología y productos</h5>
           <div class="highlight"><strong>Aparatos:</strong> Vaporizador · Ultrasonido · LED naranja/amarillo 590nm<br><strong>Productos:</strong> Exfoliante enzimático · Sérum vitamina C 20% · Coenzima Q10 · Mascarilla vitamina C lámina · Crema hidratante · SPF 50</div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">La piel opaca es resultado del estrés oxidativo — los radicales libres (sol, polución, estrés) dañan las células y la piel pierde su reflectancia natural. Los antioxidantes neutralizan esos radicales, la exfoliación elimina el estrato córneo opaco, y el LED estimula la circulación. El resultado es inmediato y muy visible — ideal para ofrecer antes de un evento.</p>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado inmediato:</strong> Piel luminosa y fresca al salir. El efecto glow dura 1-2 semanas.<br>
@@ -1051,7 +1074,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-peeling">$24.000</span><span class="badge badge-gold">4-6 ses · Cada 2-3 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Peeling Químico Superficial<br>
@@ -1060,7 +1083,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 45-60 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES ABSOLUTAS</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Embarazo</strong> → CONTRAINDICADO cualquier peeling.</div>
@@ -1072,7 +1095,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Exposición solar previa 48hs</strong> → Posponer sesión.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Sin isotretinoína en los últimos 12 meses</label>
@@ -1084,7 +1107,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Guía de ácidos por fototipo:</strong> I-II → glicólico/láctico 15-20% · II-III → mandélico 15% o láctico 10-15% · III-IV → mandélico 10-15% (NUNCA glicólico) · IV-VI → mandélico 10% máx · Primera sesión SIEMPRE empezar con % mínimo y tiempo corto
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Limpieza y desgrasado</strong> — gel limpiador + algodón con alcohol isopropílico. Secar completamente. <strong style="color:var(--rose)">⏱ 3-4 min · Esperar que la piel esté completamente seca antes de aplicar el ácido</strong></div></div>
@@ -1098,11 +1121,11 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Aparatología y productos</h5>
           <div class="highlight"><strong>Productos:</strong> Gel limpiador · Alcohol isopropílico · Ácido mandélico/glicólico/láctico según fototipo · Bicarbonato para neutralizar · Sérum centella asiática · Mascarilla aloe vera (fría) · Crema barrera regenerante · SPF 50<br><strong>Aparatos:</strong> Ninguno durante el peeling. Ultrasonido post-peeling (opcional, si la piel lo tolera).</div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">Los ácidos químicos (AHA/BHA) rompen los puentes entre células muertas y aceleran la renovación celular de forma controlada. A diferencia de los exfoliantes físicos, actúan uniformemente y en profundidad. El porcentaje y tipo de ácido SIEMPRE se elige según el fototipo — no hay un protocolo único.</p>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Post-sesión:</strong> Leve enrojecimiento 1-2hs. Normal.<br>
@@ -1130,7 +1153,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-dermaplaning">$18.000</span><span class="badge badge-gold">~45 min</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:#fff0f7;border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:#fff0f7;border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Exfoliación física con bisturí estéril (hoja #10)<br>
@@ -1139,7 +1162,7 @@ input[type="file"]{display:none;}
             <strong>Duración sesión:</strong> 40-50 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8f8;border-radius:9px;padding:12px;margin-bottom:10px;border-left:4px solid var(--danger)">
+        <div class="serv-section" style="background:#fff8f8;border-radius:10px;padding:12px;margin-bottom:10px;border-left:4px solid var(--danger)">
           <h5 style="color:var(--danger)">⚠️ CHECK ANTES DE EMPEZAR — CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;line-height:1.9">
             <div>❌ <strong>Acné activo con pústulas o nódulos</strong> → NO hacer — riesgo de diseminar bacterias</div>
@@ -1149,13 +1172,13 @@ input[type="file"]{display:none;}
             <div>❌ <strong>Queratosis actínica o lesiones pigmentadas no diagnosticadas</strong> → Derivar a dermatólogo</div>
             <div>⚠️ <strong>Embarazo/lactancia combinado con ácidos</strong> → Dermaplaning simple sí, con ácidos NO</div>
             <div>⚠️ <strong>Piel muy sensible o cuperosis</strong> → Evaluar caso por caso, presión mínima</div>
-            <div style="margin-top:8px;background:#fdf4f2;border-radius:7px;padding:8px;font-size:0.81rem">
+            <div style="margin-top:8px;background:#fdf4f2;border-radius:10px;padding:8px;font-size:0.81rem">
               ✅ <strong>Consentimiento informado:</strong> explicar que el vello NO vuelve más grueso (mito).<br>
               ✅ <strong>Bioseguridad:</strong> hoja estéril de uso único, descartar inmediatamente después.
             </div>
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Ramificación por tipo de piel</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.9">
             <strong>Normal/mixta:</strong> protocolo completo, presión media<br>
@@ -1216,7 +1239,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-lifting-pestanas">$18.000</span><span class="badge badge-gold">Cada 6-8 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Lifting de Pestañas (Lash Lift)<br>
@@ -1225,7 +1248,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 60-75 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Orzuelos, conjuntivitis o infección ocular activa</strong> → Suspender. Reprogramar cuando esté resuelto.</div>
@@ -1236,7 +1259,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Ojos sensibles / lagrimeo frecuente</strong> → Extremar precaución con parches. Usar hipoalergénicos.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Sin infección ocular activa ni orzuelo</label>
@@ -1247,7 +1270,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Selección de rodillo:</strong> S → menos de 8mm · M → 8-12mm · L → 12-14mm · XL → más de 14mm<br>
             <strong>Tiempos S1/S2 según textura:</strong> Pestañas finas/frágiles → S1: 6-7 min / S2: 5-6 min · Pestañas normales → S1: 8-10 min / S2: 6-8 min · Pestañas gruesas/resistentes → S1: 10-12 min / S2: 8-10 min
           </div>
@@ -1264,11 +1287,11 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Productos</h5>
           <div class="highlight">Kit lifting (S1 + S2 + adhesivo) · Rodillos S/M/L/XL · Parches de gel · Removedor sin aceite · Spooly · Film plástico · Sérum nutritivo/keratina · Tinte (opcional)</div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">El lifting rompe los enlaces de queratina en las pestañas y las fija en una nueva posición curvada permanentemente (hasta que la pestaña se cae). No daña la pestaña cuando se hace con los tiempos correctos. Es el complemento ideal para clientas que no quieren extensiones ni rimmel diario. Combinado con tinte, el resultado es maximalista y sin maquillaje.</p>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado inmediato:</strong> Pestañas rizadas y abiertas. Ojos más grandes al instante.<br>
@@ -1295,7 +1318,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-laminado-cejas">$16.000</span><span class="badge badge-gold">Cada 6-8 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Laminado de Cejas (Brow Lamination)<br>
@@ -1304,7 +1327,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 50-65 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Alergia al tioglicolato</strong> → CONTRAINDICADO. Patch test obligatorio.</div>
@@ -1314,7 +1337,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Piel muy sensible en frente</strong> → Reducir tiempo de S1 al mínimo. Monitorear cada 2 min.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Patch test realizado 24-48hs antes si es primera vez</label>
@@ -1324,7 +1347,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Tiempos S1/S2 según textura de pelo:</strong> Pelo fino/suave → S1: 6-8 min / S2: 5-6 min · Pelo normal → S1: 8-10 min / S2: 6-8 min · Pelo grueso/resistente → S1: 10-12 min / S2: 8-10 min
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Limpieza</strong> — removedor sin aceite o agua micelar en la zona de cejas. Secar bien. <strong style="color:var(--rose)">⏱ 2 min</strong></div></div>
@@ -1339,11 +1362,11 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Productos</h5>
           <div class="highlight">Kit laminado (S1 + S2) · Spooly · Film plástico · Removedor sin aceite · Aceite nutritivo post-tratamiento · Pinzas · Hilo de algodón (opcional) · Henna/tinte (opcional)</div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">El laminado es la versión del lifting de pestañas pero para cejas. Reestructura la queratina del pelo y lo fija en la posición deseada. El efecto fluffy (pelos parados hacia arriba) es el más pedido ahora — da sensación de cejas más densas y definidas sin tinte ni microblading. Dura un ciclo de crecimiento del pelo.</p>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado inmediato:</strong> Cejas fluffy, más definidas y ordenadas.<br>
@@ -1369,7 +1392,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-henna">$14.000</span><span class="badge badge-gold">Cada 3-4 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Henna de Cejas<br>
@@ -1378,7 +1401,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 45-60 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Alergia a pigmentos o PPD</strong> → Patch test OBLIGATORIO 24-48hs antes. Contraindicado si reacción positiva.</div>
@@ -1387,7 +1410,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Embarazo primer trimestre</strong> → Ser precavida. Henna natural (sin PPD) generalmente segura, pero consultar.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Patch test realizado si es primera vez</label>
@@ -1397,7 +1420,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Tiempos según tono deseado:</strong> Resultado suave/natural → 15-18 min · Resultado definido/medio → 18-22 min · Resultado intenso/marcado → 22-25 min · Piel grasa → reducir 2-3 min (absorbe menos)
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Limpieza y desgrasado</strong> — agua micelar + algodón. Eliminar toda grasa. Secar. <strong style="color:var(--rose)">⏱ 2 min · La grasa impide que la henna adhiera a la piel</strong></div></div>
@@ -1412,11 +1435,11 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Productos</h5>
           <div class="highlight">Henna (negro, marrón oscuro, marrón claro, castaño — según cliente) · Agua destilada o activador · Pincel fino · Hisopos · Cinta adhesiva (para proteger piel alrededor) · Gel de cejas fijador</div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">💡 ¿POR QUÉ ESTE TRATAMIENTO?</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#2a4a7a">A diferencia del tinte químico, la henna es un pigmento natural que tiñe pelo Y piel de forma gradual y duradera. El resultado es más natural, progresivo y seguro para pieles sensibles. Ideal para clientas que quieren cejas más llenas sin recurrir a técnicas permanentes. El pelo mantiene el color 4-6 semanas; la piel 2-3 semanas.</p>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Las primeras 24hs:</strong> El color en piel puede parecer muy intenso — se aclara con el primer lavado.<br>
@@ -1442,7 +1465,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-tinte">$12.000</span><span class="badge badge-gold">Cada 4-6 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Tinte de Cejas & Pestañas<br>
@@ -1451,7 +1474,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 30-45 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Alergia conocida a PPD o tintes oxidativos</strong> → CONTRAINDICADO. Patch test obligatorio.</div>
@@ -1461,7 +1484,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Primera vez</strong> → Patch test 24-48hs antes OBLIGATORIO.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Patch test realizado (primera vez o si cambió de marca)</label>
@@ -1471,7 +1494,7 @@ input[type="file"]{display:none;}
           </div>
         </div>
         <div class="serv-section"><h5>🔬 Protocolo paso a paso</h5>
-          <div style="background:#f0f7ff;border-radius:7px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
+          <div style="background:#f0f7ff;border-radius:10px;padding:7px 10px;margin-bottom:8px;font-size:0.78rem;color:#2a4a7a">
             <strong>Tiempos:</strong> Resultado suave → 8-10 min · Resultado medio → 10-12 min · Resultado intenso → 12-15 min · Pestañas: siempre 8-10 min máximo · Nunca exceder 15 min
           </div>
           <div class="paso-item"><span class="paso-num">1</span><div><strong>Protección perimetral</strong> — vaselina o crema barrera alrededor de la zona. Para pestañas: parche protector inferior. <strong style="color:var(--rose)">⏱ 1-2 min</strong></div></div>
@@ -1483,7 +1506,7 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Productos</h5>
           <div class="highlight">Tinte RefectoCil negro/marrón · Oxidante 10 vol (suave) o 20 vol (intenso) · Vaselina · Parches protectores · Pincel fino · Hisopos · Algodones</div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Duración:</strong> Pelo: 4-6 semanas. El tinte NO pinta la piel como la henna.<br>
@@ -1503,7 +1526,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-perfilado">$8.000</span><span class="badge badge-gold">Cada 3-4 sem</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 TRATAMIENTO · FRECUENCIA · OBJETIVO</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Tratamiento:</strong> Diseño & Perfilado de Cejas<br>
@@ -1512,7 +1535,7 @@ input[type="file"]{display:none;}
             <strong>Duración:</strong> 20-35 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">🚫 CONTRAINDICACIONES</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:6px">
             <div>❌ <strong>Isotretinoína activa</strong> → Piel muy frágil. Solo tijera, sin cera ni hilo agresivo.</div>
@@ -1521,7 +1544,7 @@ input[type="file"]{display:none;}
             <div>⚠️ <strong>Lifting/laminado reciente (menos de 48hs)</strong> → No depilación hasta pasadas 48hs.</div>
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">✅ CHECK ANTES DE EMPEZAR</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;display:flex;flex-direction:column;gap:5px">
             <label style="display:flex;align-items:center;gap:7px;cursor:pointer;text-transform:none;letter-spacing:0"><input type="checkbox" style="accent-color:var(--rose)"> Foto de frente tomada para ver simetría</label>
@@ -1540,7 +1563,7 @@ input[type="file"]{display:none;}
         <div class="serv-section"><h5>🧴 Productos</h5>
           <div class="highlight">Hilo de algodón · Pinzas punta fina · Tijera de cejas · Lápiz para mapeo · Spooly · Tónico calmante · Gel de cejas fijador</div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 CONTROL DE EXPECTATIVAS</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado inmediato:</strong> Cejas definidas y enmarcadas. Cara más ordenada.<br>
@@ -1569,7 +1592,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo1">$24.000</span><span class="badge badge-gold">~1.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Limpieza Facial Profunda completa + Diseño & Perfilado de Cejas<br>
@@ -1578,7 +1601,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Mensual
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Limpieza facial completa (50-70 min)<br>
@@ -1586,7 +1609,7 @@ input[type="file"]{display:none;}
             ⚠️ <strong>Las cejas siempre al final</strong> — el vapor de la limpieza abre los folículos y facilita la depilación
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Rostro completamente renovado — piel limpia y luminosa, cejas definidas y simétricas.<br>
@@ -1602,7 +1625,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo2">$38.000</span><span class="badge badge-gold">~2.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Lifting de Pestañas + Laminado de Cejas + Diseño & Perfilado<br>
@@ -1611,7 +1634,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Cada 6-8 semanas
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Laminado de cejas — S1 + S2 (40-45 min)<br>
@@ -1620,7 +1643,7 @@ input[type="file"]{display:none;}
             💡 <strong>Pro tip:</strong> Coordinar los tiempos para hacer el lifting mientras el laminado actúa — ahorra hasta 30 min de la cita
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Transformación total de la mirada. Pestañas curvadas y abiertas, cejas fluffy y perfectamente definidas.<br>
@@ -1639,7 +1662,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo3">$28.000</span><span class="badge badge-gold">~2hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Lifting de Pestañas + Tinte negro de pestañas<br>
@@ -1648,7 +1671,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Cada 6-8 semanas
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Lifting completo — aplicar S1 + S2 + keratina (60-70 min)<br>
@@ -1656,7 +1679,7 @@ input[type="file"]{display:none;}
             ⚠️ <strong>El tinte siempre después del lifting</strong> — si va antes, el S1 puede decolorar el tinte
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Pestañas rizadas y oscuras — efecto máximo sin extensiones. Ojos notablemente más grandes.<br>
@@ -1672,7 +1695,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo4">$20.000</span><span class="badge badge-gold">~1hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Diseño + depilación del contorno + Henna completa<br>
@@ -1681,7 +1704,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Cada 3-4 semanas
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Mapeo y diseño con lápiz — pedir aprobación (3-5 min)<br>
@@ -1690,7 +1713,7 @@ input[type="file"]{display:none;}
             ⚠️ <strong>Depilación siempre antes de la henna</strong> — nunca depilar sobre henna fresca
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Cejas perfectamente diseñadas con color natural que dura semanas en pelo y piel.<br>
@@ -1706,7 +1729,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo5">$28.000</span><span class="badge badge-gold">~1.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Limpieza Facial Profunda + Peeling Químico Superficial<br>
@@ -1715,7 +1738,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Cada 3-4 semanas (plan 4-6 sesiones)
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">⚠️ Importante antes de hacer este combo</h5>
           <div style="font-size:0.83rem;color:#5a2a2a;line-height:1.8">
             ❌ <strong>No hacer si la clienta tomó sol en las últimas 48hs</strong><br>
@@ -1724,7 +1747,7 @@ input[type="file"]{display:none;}
             ⚠️ SPF 50 obligatorio en casa los días siguientes
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Limpieza completa SIN extracción agresiva (40-50 min)<br>
@@ -1733,7 +1756,7 @@ input[type="file"]{display:none;}
             ⚠️ En este combo <strong>omitir la exfoliación mecánica</strong> de la limpieza — el peeling ya exfolia
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Piel renovada, luminosa y con textura notablemente mejorada.<br>
@@ -1749,7 +1772,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo6">$52.000</span><span class="badge badge-gold">~3.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Limpieza Facial Profunda + Lifting de Pestañas + Laminado de Cejas + Perfilado<br>
@@ -1758,7 +1781,7 @@ input[type="file"]{display:none;}
             <strong>Frecuencia:</strong> Cada 6-8 semanas
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución optimizado</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.8">
             <strong>1.</strong> Laminado de cejas S1 (10-12 min posado) — mientras actúa, arrancar el facial<br>
@@ -1769,7 +1792,7 @@ input[type="file"]{display:none;}
             💡 <strong>Pro tip:</strong> Coordinar los tiempos de posado con los pasos del facial ahorra ~40 min
           </div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Transformación completa — piel limpia, pestañas curvadas, cejas definidas y fluffy.<br>
@@ -1789,7 +1812,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo7">$30.000</span><span class="badge badge-gold">~1.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Laminado de Cejas completo + Henna + Perfilado del contorno<br>
@@ -1799,7 +1822,7 @@ input[type="file"]{display:none;}
             <strong>Resultado:</strong> Cejas fluffy, ordenadas, fijadas y con color natural intenso que tiñe tanto el pelo como la piel
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">⚠️ Contraindicaciones</h5>
           <div style="font-size:0.83rem;line-height:1.8">
             ❌ Alergia a la henna o componentes del laminado<br>
@@ -1808,7 +1831,7 @@ input[type="file"]{display:none;}
             ⚠️ Hacer patch test si es primera vez con henna
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.9">
             <strong>1.</strong> Diseño con lápiz + depilación del contorno — pedir aprobación antes <strong style="color:var(--rose)">⏱ 5-8 min</strong><br>
@@ -1826,7 +1849,7 @@ input[type="file"]{display:none;}
           <h5>🧴 Productos</h5>
           <div class="highlight">Kit laminado cejas S1+S2 · Agua micelar (desgrase pre-henna) · Henna negro o marrón oscuro según cliente · Algodones · Gel fijador de cejas · Pincel fino para henna · Hilo/pinza para depilación</div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Resultado y upsell</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Resultado:</strong> Cejas fluffy con volumen + color que tiñe el pelo Y la piel. Dura 4-5 semanas en pelo, 2 semanas en piel.<br>
@@ -1846,7 +1869,7 @@ input[type="file"]{display:none;}
         <div style="display:flex;gap:5px;align-items:center"><span class="precio-badge" id="precio-combo8">$28.000</span><span class="badge badge-gold">~1.5hs</span></div>
       </div>
       <div class="serv-body" style="display:none">
-        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:9px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
+        <div class="serv-section" style="background:linear-gradient(135deg,#fdf4f2,#f5fdf5);border-radius:10px;padding:12px 14px;margin-bottom:10px;border:1.5px solid var(--blush)">
           <h5>💥 COMBO · DURACIÓN · IDEAL PARA</h5>
           <div style="font-size:0.85rem;line-height:1.9">
             <strong>Incluye:</strong> Laminado de Cejas completo + Tinte RefectoCil + Perfilado del contorno<br>
@@ -1856,7 +1879,7 @@ input[type="file"]{display:none;}
             <strong>Resultado:</strong> Cejas fluffy, ordenadas y más oscuras. El tinte dura más que la henna en el pelo.
           </div>
         </div>
-        <div class="serv-section" style="background:#fff0f0;border-radius:9px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
+        <div class="serv-section" style="background:#fff0f0;border-radius:10px;padding:10px 13px;margin-bottom:10px;border-left:3px solid var(--danger)">
           <h5 style="color:var(--danger)">⚠️ Contraindicaciones</h5>
           <div style="font-size:0.83rem;line-height:1.8">
             ❌ Alergia a tintes con PPD (parafenilendiamina)<br>
@@ -1865,7 +1888,7 @@ input[type="file"]{display:none;}
             ⚠️ Siempre patch test 48hs antes si es primera vez
           </div>
         </div>
-        <div class="serv-section" style="background:#f0f7ff;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#f0f7ff;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#2a4a7a">🗂️ Orden de ejecución</h5>
           <div style="font-size:0.83rem;color:#2a4a7a;line-height:1.9">
             <strong>1.</strong> Diseño con lápiz + depilación del contorno <strong style="color:var(--rose)">⏱ 5-8 min</strong><br>
@@ -1883,7 +1906,7 @@ input[type="file"]{display:none;}
           <h5>🧴 Productos</h5>
           <div class="highlight">Kit laminado cejas S1+S2 · Tinte RefectoCil negro o marrón según clienta · Oxidante 10vol · Pincel fino · Algodones · Vaselina para proteger piel del contorno · Gel fijador de cejas · Hilo/pinza para depilación</div>
         </div>
-        <div class="serv-section" style="background:#fff8e3;border-radius:9px;padding:10px 13px;margin-bottom:10px">
+        <div class="serv-section" style="background:#fff8e3;border-radius:10px;padding:10px 13px;margin-bottom:10px">
           <h5 style="color:#8a6a10">📊 Diferencia con henna / cuándo elegir tinte</h5>
           <p style="font-size:0.84rem;line-height:1.6;color:#7a5a10">
             <strong>Tinte vs Henna:</strong><br>
@@ -2036,7 +2059,7 @@ input[type="file"]{display:none;}
       <div id="pres-items-container"></div>
       <button class="btn btn-secondary btn-sm" onclick="agregarItemPres()" style="margin-top:7px">+ Agregar ítem</button>
     </div>
-    <div style="background:var(--light);border-radius:9px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
+    <div style="background:var(--light);border-radius:10px;padding:10px 13px;display:flex;justify-content:space-between;align-items:center">
       <span style="font-weight:700">Total</span>
       <span id="pres-total-display" style="font-size:1.1rem;font-weight:700;color:var(--rose)">$0</span>
     </div>
@@ -2143,16 +2166,16 @@ input[type="file"]{display:none;}
         <label>Tamaño de texto</label>
         <div style="display:flex;align-items:center;gap:12px;margin-top:6px">
           <button onclick="cambiarFuente(-1)" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:white;font-size:1.1rem;cursor:pointer;font-weight:700">A-</button>
-          <div style="flex:1;background:var(--light);border-radius:8px;padding:8px;text-align:center;font-size:0.85rem;color:var(--muted)" id="fuente-preview">Normal (16px)</div>
+          <div style="flex:1;background:var(--light);border-radius:10px;padding:8px;text-align:center;font-size:0.85rem;color:var(--muted)" id="fuente-preview">Normal (16px)</div>
           <button onclick="cambiarFuente(1)" style="width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:white;font-size:1.1rem;cursor:pointer;font-weight:700">A+</button>
-          <button onclick="resetFuente()" style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:white;font-size:0.78rem;cursor:pointer;color:var(--muted)">Reset</button>
+          <button onclick="resetFuente()" style="padding:6px 12px;border-radius:10px;border:1.5px solid var(--border);background:white;font-size:0.78rem;cursor:pointer;color:var(--muted)">Reset</button>
         </div>
       </div>
       <div class="form-group full">
         <label>Modo de color</label>
         <div style="display:flex;gap:10px;margin-top:6px">
-          <button onclick="setModo('claro')" id="btn-modo-claro" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--sage);background:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--deep)">☀️ Claro</button>
-          <button onclick="setModo('oscuro')" id="btn-modo-oscuro" style="flex:1;padding:10px;border-radius:12px;border:2px solid var(--border);background:#1a2a1a;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:#aed8ae">🌙 Oscuro</button>
+          <button onclick="setModo('claro')" id="btn-modo-claro" style="flex:1;padding:10px;border-radius:14px;border:2px solid var(--sage);background:white;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--deep)">☀️ Claro</button>
+          <button onclick="setModo('oscuro')" id="btn-modo-oscuro" style="flex:1;padding:10px;border-radius:14px;border:2px solid var(--border);background:#1a2a1a;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:#aed8ae">🌙 Oscuro</button>
         </div>
       </div>
       <div class="form-group full">
@@ -2195,7 +2218,7 @@ input[type="file"]{display:none;}
       <div id="modal-fotos"></div>
     </div>
     <div id="mf-notas" class="tab-content">
-      <textarea id="nueva-nota" placeholder="Observaciones libres: actitudes, preferencias, reacciones, lo que te contó..." style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.86rem;resize:vertical;min-height:80px;outline:none;background:var(--light);margin-bottom:7px"></textarea>
+      <textarea id="nueva-nota" placeholder="Observaciones libres: actitudes, preferencias, reacciones, lo que te contó..." style="width:100%;padding:9px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.86rem;resize:vertical;min-height:80px;outline:none;background:var(--light);margin-bottom:7px"></textarea>
       <button class="btn btn-primary btn-sm" onclick="guardarNota()"><span data-ic-html="guardar-16" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Agregar Nota</button>
       <hr class="sep">
       <div id="lista-notas"></div>
@@ -2754,6 +2777,7 @@ async function loadFirebase(){
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
   initCRM();
   await checkFormulariosFirebase();
+  chequearOnboarding();
 }
 
 async function saveDoc(col,id,data){
@@ -2986,7 +3010,7 @@ function abrirFicha(id){
     ${(c.analisisIA||[]).length?`<div class="ficha-section" style="background:#f0fdf4">
       <h4>🤖 Análisis IA guardado</h4>
       <p style="font-size:0.76rem;color:var(--muted);margin-bottom:8px">${(c.analisisIA[c.analisisIA.length-1].fecha)}</p>
-      <div id="ia-guardado-texto" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:8px;padding:10px;border:1px solid var(--border)">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+      <div id="ia-guardado-texto" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:10px;padding:10px;border:1px solid var(--border)">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
       ${c.analisisIA.length>1?`<div style="font-size:0.74rem;color:var(--muted);margin-top:5px">${c.analisisIA.length} análisis guardados — mostrando el último</div>`:''}
     </div>`:''}
   `;
@@ -3038,7 +3062,7 @@ function renderPlanModal(){
     <button class="btn btn-success btn-sm" onclick="abrirModalSesion()"><span data-ic-html="agregar-16" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Registrar Sesión</button>
   </div>`;
   if(plan){
-    html+=`<div style="background:linear-gradient(135deg,#fdf4f2,#f0fdf4);border:1.5px solid var(--blush);border-radius:11px;padding:13px;margin-bottom:11px">
+    html+=`<div style="background:linear-gradient(135deg,#fdf4f2,#f0fdf4);border:1.5px solid var(--blush);border-radius:14px;padding:13px;margin-bottom:11px">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:7px;margin-bottom:8px">
         <div><div style="font-weight:700;font-size:0.93rem">🎯 ${plan.servicio}</div><div style="font-size:0.76rem;color:var(--muted);margin-top:2px">${plan.frecuencia||''} · Inicio: ${plan.fechaInicio||'—'}</div></div>
         <span class="badge ${prog>=100?'badge-sage':'badge-gold'}">${sesPlan.length}/${plan.totalSesiones} sesiones</span>
@@ -3102,9 +3126,9 @@ function renderHistorialModal(){
     </div>
     ${s.estadoPiel?`<div style="font-size:0.78rem;color:var(--muted);margin-top:5px">Estado: ${s.estadoPiel}</div>`:''}
     ${s.productos?`<div style="font-size:0.78rem;margin-top:4px"><strong>Usados:</strong> ${s.productos}</div>`:''}
-    ${s.reaccion?`<div style="font-size:0.78rem;margin-top:4px;background:var(--light);padding:6px;border-radius:6px">${s.reaccion}</div>`:''}
-    ${s.tuvoRechazo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff0f0;padding:6px;border-radius:6px;color:var(--danger)">⚠️ <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ '+s.productoReemplazo:''}</div>`:''}
-    ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:6px;color:#1a5a3a">📌 ${s.notaProxima}</div>`:''}
+    ${s.reaccion?`<div style="font-size:0.78rem;margin-top:4px;background:var(--light);padding:6px;border-radius:10px">${s.reaccion}</div>`:''}
+    ${s.tuvoRechazo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff0f0;padding:6px;border-radius:10px;color:var(--danger)">⚠️ <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ '+s.productoReemplazo:''}</div>`:''}
+    ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:10px;color:#1a5a3a">📌 ${s.notaProxima}</div>`:''}
     <div style="text-align:right;margin-top:7px"><button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')"><span data-ic-html="eliminar-16" style="display:inline-flex;vertical-align:-0.1em"></span></button></div>
   </div>`).join('');
 }
@@ -3141,7 +3165,7 @@ function renderNotasModal(){
   if(!notas.length){cont.innerHTML=`<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:12px">Sin notas todavía.</div>`;return;}
   cont.innerHTML=notas.slice().reverse().map((n,ri)=>{
     const i=notas.length-1-ri;
-    return `<div style="background:var(--light);border-radius:8px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--border)">
+    return `<div style="background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:8px;border:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;gap:7px">
         <div style="font-size:0.84rem;line-height:1.6;flex:1">${n.texto}</div>
         <button onclick="eliminarNota(${i})" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.95rem;flex-shrink:0">×</button>
@@ -3482,7 +3506,7 @@ function mostrarSelectorTratamiento(){
       <option value="">Seleccionar tratamiento...</option>
       ${todos.map(t=>`<option>${t}</option>`).join('')}
     </select>
-    <button onclick="pedirProtocoloCompleto()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(196,99,122,0.3)">
+    <button onclick="pedirProtocoloCompleto()" style="width:100%;padding:13px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.92rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(196,99,122,0.3)">
       📋 Generar protocolo completo
     </button>`;
   cont.appendChild(box);
@@ -3583,7 +3607,7 @@ Noche: [pasos con productos del inventario]
 
   // Botón para volver a elegir otro tratamiento
   const volver=document.createElement('button');
-  volver.style.cssText='width:100%;margin-top:12px;padding:11px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:12px;font-family:\'DM Sans\',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer';
+  volver.style.cssText='width:100%;margin-top:12px;padding:11px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:14px;font-family:\'DM Sans\',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer';
   volver.textContent='↩ Elegir otro tratamiento';
   volver.onclick=()=>{ const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
   cont.appendChild(volver);
@@ -3942,7 +3966,7 @@ function renderPreciosCat(contId,ids){
       <div style="flex:1;font-size:0.87rem;font-weight:600">${info.nombre}</div>
       <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
         <span style="font-size:0.71rem;color:var(--muted)">$</span>
-        <input type="number" value="${misPrecios[id]||0}" min="0" onchange="actualizarPrecio('${id}',this.value)" style="width:85px;padding:5px 7px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;color:var(--rose);text-align:right;background:var(--light)">
+        <input type="number" value="${misPrecios[id]||0}" min="0" onchange="actualizarPrecio('${id}',this.value)" style="width:85px;padding:5px 7px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:700;color:var(--rose);text-align:right;background:var(--light)">
       </div>
     </div>`;
   }).join('');
@@ -3990,10 +4014,10 @@ function renderPresItems(){
   const cont=document.getElementById('pres-items-container');if(!cont)return;
   cont.innerHTML=presItemsList.map((item,i)=>`
     <div style="display:grid;grid-template-columns:1fr 50px 90px 30px;gap:5px;margin-bottom:5px;align-items:center">
-      <input type="text" value="${item.desc}" placeholder="Servicio" onchange="presItemsList[${i}].desc=this.value" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--light)">
-      <input type="number" value="${item.cant}" min="1" onchange="presItemsList[${i}].cant=parseInt(this.value)||1;calcTotalPres()" style="padding:6px 5px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.82rem;text-align:center;background:var(--light)">
-      <input type="number" value="${item.precio}" min="0" placeholder="$" onchange="presItemsList[${i}].precio=parseFloat(this.value)||0;calcTotalPres()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:7px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--light)">
-      <button onclick="presItemsList.splice(${i},1);if(!presItemsList.length)presItemsList=[{desc:'',cant:1,precio:0}];renderPresItems();" style="background:var(--danger);color:white;border:none;border-radius:7px;width:30px;height:30px;cursor:pointer">×</button>
+      <input type="text" value="${item.desc}" placeholder="Servicio" onchange="presItemsList[${i}].desc=this.value" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--light)">
+      <input type="number" value="${item.cant}" min="1" onchange="presItemsList[${i}].cant=parseInt(this.value)||1;calcTotalPres()" style="padding:6px 5px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;text-align:center;background:var(--light)">
+      <input type="number" value="${item.precio}" min="0" placeholder="$" onchange="presItemsList[${i}].precio=parseFloat(this.value)||0;calcTotalPres()" style="padding:6px 8px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.82rem;background:var(--light)">
+      <button onclick="presItemsList.splice(${i},1);if(!presItemsList.length)presItemsList=[{desc:'',cant:1,precio:0}];renderPresItems();" style="background:var(--danger);color:white;border:none;border-radius:10px;width:30px;height:30px;cursor:pointer">×</button>
     </div>`).join('');
   calcTotalPres();
 }
@@ -4223,6 +4247,87 @@ function eliminarFormRecibido(idx){
 // ===================== CONFIGURACIÓN =====================
 let miConfig = JSON.parse(localStorage.getItem('ginails_config') || '{}');
 
+// ===================== ONBOARDING PRIMER USO =====================
+const ONBOARDING_PASOS = [
+  {
+    ic:'clientas',
+    titulo:'Cargá tus clientas',
+    texto:'Guardá la ficha completa de cada una: tipo de piel, anamnesis, hábitos y objetivo. Todo en un solo lugar, siempre a mano.'
+  },
+  {
+    ic:'robot',
+    titulo:'La IA te arma el protocolo',
+    texto:'Elegí un tratamiento y la IA te genera el protocolo paso a paso, personalizado según la piel de tu clienta y usando tus propios productos.'
+  },
+  {
+    ic:'insumos',
+    titulo:'Tu inventario, tus productos',
+    texto:'Cargá los productos que tenés en el gabinete con su marca. La IA solo te recomienda lo que realmente tenés en stock.'
+  },
+  {
+    ic:'campana',
+    titulo:'No se te escapa ninguna',
+    texto:'El CRM te avisa cuándo a cada clienta le toca volver, quiénes no tienen plan activo y quiénes son tus mejores clientas.'
+  },
+  {
+    ic:'check',
+    titulo:'¡Listo para empezar!',
+    texto:'Arrancá cargando tu primera clienta desde el botón de Acceso Rápido. Cualquier duda, todo está a un toque.'
+  }
+];
+let _onbPaso = 0;
+
+function mostrarOnboarding(){
+  _onbPaso = 0;
+  document.getElementById('onboarding-overlay').style.display = 'flex';
+  renderOnboardingPaso();
+}
+
+function renderOnboardingPaso(){
+  const p = ONBOARDING_PASOS[_onbPaso];
+  const body = document.getElementById('onboarding-body');
+  body.innerHTML = `
+    <div style="text-align:center">
+      <div style="width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#f0f8f2,#e0f0e8);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:var(--sage)">
+        <span data-ic-html="${p.ic}-34"></span>
+      </div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--deep);margin-bottom:8px">${p.titulo}</div>
+      <div style="font-size:0.9rem;color:var(--muted);line-height:1.6">${p.texto}</div>
+    </div>`;
+  // dots
+  document.getElementById('onboarding-dots').innerHTML = ONBOARDING_PASOS.map((_,i)=>
+    `<div style="width:7px;height:7px;border-radius:50%;background:${i===_onbPaso?'var(--rose)':'var(--border)'};transition:background 0.2s"></div>`
+  ).join('');
+  // botón final
+  const btn = document.getElementById('onboarding-next');
+  btn.textContent = _onbPaso === ONBOARDING_PASOS.length-1 ? 'Empezar' : 'Siguiente';
+  document.getElementById('onboarding-skip').style.display = _onbPaso === ONBOARDING_PASOS.length-1 ? 'none' : 'block';
+  if(typeof aplicarIconos==='function') aplicarIconos(body);
+}
+
+function onboardingNext(){
+  if(_onbPaso < ONBOARDING_PASOS.length-1){
+    _onbPaso++;
+    renderOnboardingPaso();
+  } else {
+    cerrarOnboarding();
+  }
+}
+
+function cerrarOnboarding(){
+  document.getElementById('onboarding-overlay').style.display = 'none';
+  try{ localStorage.setItem('gp_onboarding_visto','1'); }catch(e){}
+}
+
+// Mostrar solo la primera vez
+function chequearOnboarding(){
+  try{
+    if(!localStorage.getItem('gp_onboarding_visto')){
+      setTimeout(mostrarOnboarding, 800);
+    }
+  }catch(e){}
+}
+
 function aplicarSaludo() {
   const s = document.getElementById('saludo-inicio');
   if (s){
@@ -4363,17 +4468,17 @@ function mostrarFormPublico(clientaId) {
         <div style="font-size:0.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:8px">🌸 Salud hormonal (opcional)</div>
       </div>
       <div class="form-group"><label>¿Tu menstruación es regular?</label>
-        <select id="fp-menstruacion" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+        <select id="fp-menstruacion" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
           <option value="">Seleccionar</option><option>Regular</option><option>Irregular</option><option>No menstrúo / menopausia</option>
         </select>
       </div>
       <div class="form-group"><label>Estado hormonal actual</label>
-        <select id="fp-estado-hormonal" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+        <select id="fp-estado-hormonal" style="padding:8px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
           <option value="">Seleccionar</option><option>Ciclo menstrual activo</option><option>Embarazo</option><option>Lactancia</option><option>Perimenopausia</option><option>Menopausia</option>
         </select>
       </div>
       <div class="form-group full"><label>Método anticonceptivo (si usás)</label>
-        <input type="text" id="fp-anticonceptivo" placeholder="Ej: pastillas, DIU, implante, ninguno..." style="padding:8px 11px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
+        <input type="text" id="fp-anticonceptivo" placeholder="Ej: pastillas, DIU, implante, ninguno..." style="padding:8px 11px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.87rem;width:100%">
       </div>
       <div class="form-group full"><label>¿Algo más que quieras contarme?</label><textarea id="fp-obs" placeholder="Cualquier detalle que creas importante..." style="min-height:55px"></textarea></div>
     </div>`;
@@ -4522,10 +4627,10 @@ function renderCRMAlertas(){
   if(!alertas.length){panel.innerHTML=`<div class="empty-state"><div class="icon">✅</div><p>¡Todo en orden! Sin alertas por ahora.</p></div>`;return;}
   const col={peligro:'#fde8e8',warning:'#fff8e3',info:'#e8f4fd',exito:'#e8f7ee'};
   const bord={peligro:'var(--danger)',warning:'var(--gold)',info:'#4a90d9',exito:'var(--success)'};
-  panel.innerHTML=alertas.map(a=>`<div style="background:${col[a.tipo]};border-left:4px solid ${bord[a.tipo]};border-radius:9px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px">
+  panel.innerHTML=alertas.map(a=>`<div style="background:${col[a.tipo]};border-left:4px solid ${bord[a.tipo]};border-radius:10px;padding:11px 13px;margin-bottom:8px;display:flex;align-items:flex-start;gap:10px">
     <span style="font-size:1.2rem;flex-shrink:0">${a.icono}</span>
     <div style="flex:1"><div style="font-weight:700;font-size:0.87rem">${a.nombre}</div><div style="font-size:0.83rem;margin-top:2px">${a.msg}</div><div style="font-size:0.76rem;color:var(--muted);margin-top:2px">${a.detalle}</div></div>
-    <button onclick="recordatorioWhatsApp('${a.clientaId}')" style="background:var(--success);color:white;border:none;border-radius:7px;padding:4px 9px;font-size:0.72rem;cursor:pointer;flex-shrink:0"><span data-ic-html="whatsapp-16" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>WA</button>
+    <button onclick="recordatorioWhatsApp('${a.clientaId}')" style="background:var(--success);color:white;border:none;border-radius:10px;padding:4px 9px;font-size:0.72rem;cursor:pointer;flex-shrink:0"><span data-ic-html="whatsapp-16" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>WA</button>
   </div>`).join('');
 }
 
@@ -4550,8 +4655,8 @@ function renderCRMClientas(){
       ${c.total>0?`<div style="font-size:0.74rem;color:var(--gold)">💰 $${c.total.toLocaleString('es-AR')}</div>`:''}
     </div>
     <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
-      <span style="font-size:0.72rem;background:var(--light);border-radius:7px;padding:2px 7px">${c.cant} ses.</span>
-      <button onclick="event.stopPropagation();recordatorioWhatsApp('${c.id}')" style="background:var(--success);color:white;border:none;border-radius:7px;padding:3px 8px;font-size:0.7rem;cursor:pointer"><span data-ic-html="whatsapp-16" style="display:inline-flex;vertical-align:-0.1em"></span></button>
+      <span style="font-size:0.72rem;background:var(--light);border-radius:10px;padding:2px 7px">${c.cant} ses.</span>
+      <button onclick="event.stopPropagation();recordatorioWhatsApp('${c.id}')" style="background:var(--success);color:white;border:none;border-radius:10px;padding:3px 8px;font-size:0.7rem;cursor:pointer"><span data-ic-html="whatsapp-16" style="display:inline-flex;vertical-align:-0.1em"></span></button>
     </div>
   </div>`).join('');
 }
@@ -4613,21 +4718,21 @@ function renderCabinaFicha(clientaId){
     </div>
     <div style="margin-bottom:11px">
       <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:6px">🚦 Seguridad</div>
-      ${flags.map(f=>`<div style="background:${f.bg};border-left:4px solid ${f.bord};border-radius:7px;padding:7px 10px;margin-bottom:5px;font-size:0.82rem">${f.txt}</div>`).join('')}
+      ${flags.map(f=>`<div style="background:${f.bg};border-left:4px solid ${f.bord};border-radius:10px;padding:7px 10px;margin-bottom:5px;font-size:0.82rem">${f.txt}</div>`).join('')}
     </div>
-    ${plan?`<div style="background:linear-gradient(135deg,#fdf4f2,#f0fdf4);border-radius:9px;padding:10px 12px;margin-bottom:10px">
+    ${plan?`<div style="background:linear-gradient(135deg,#fdf4f2,#f0fdf4);border-radius:10px;padding:10px 12px;margin-bottom:10px">
       <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🎯 Plan activo</div>
       <div style="font-weight:700;font-size:0.9rem">${plan.servicio}</div>
       <div style="font-size:0.76rem;color:var(--muted)">${sesPlan.length}/${plan.totalSesiones} sesiones · ${prog}%</div>
       <div class="progress-bar-wrap" style="margin-top:5px"><div class="progress-bar" style="width:${prog}%"></div></div>
     </div>`:`<div class="alert alert-warning" style="margin-bottom:10px">Sin plan activo</div>`}
-    ${ultima?`<div style="background:var(--light);border-radius:9px;padding:10px 12px;margin-bottom:10px">
+    ${ultima?`<div style="background:var(--light);border-radius:10px;padding:10px 12px;margin-bottom:10px">
       <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">📅 Última sesión</div>
       <div style="font-size:0.85rem;font-weight:600">${ultima.tratamiento}</div>
       <div style="font-size:0.76rem;color:var(--muted)">${ultima.fecha}</div>
       ${ultima.notaProxima?`<div style="font-size:0.8rem;color:var(--success);margin-top:4px">📌 ${ultima.notaProxima}</div>`:''}
     </div>`:''}
-    ${analisis?`<div style="background:#f0fdf4;border-radius:9px;padding:10px 12px;margin-bottom:10px">
+    ${analisis?`<div style="background:#f0fdf4;border-radius:10px;padding:10px 12px;margin-bottom:10px">
       <div style="font-size:0.74rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px">🤖 Último análisis IA</div>
       <div style="font-size:0.78rem;line-height:1.6;max-height:100px;overflow-y:auto">${(analisis.texto||'').substring(0,300)}...</div>
     </div>`:''}
@@ -4703,7 +4808,7 @@ async function renderCRMFormularios(){
       ${r.obs?`<div style="font-size:0.81rem;margin-bottom:4px"><strong>Observaciones:</strong> ${r.obs}</div>`:''}
 
       ${(r.menstruacion||r.estadoHormonal||r.anticonceptivo)?`
-      <div style="background:#fff0f7;border-radius:7px;padding:7px 10px;margin-top:7px;font-size:0.79rem;border:1px solid #f4c0d1">
+      <div style="background:#fff0f7;border-radius:10px;padding:7px 10px;margin-top:7px;font-size:0.79rem;border:1px solid #f4c0d1">
         <strong style="color:#7a2a4a">🌸 Hormonal:</strong>
         ${r.menstruacion?` Menstruación: ${r.menstruacion} ·`:''}
         ${r.estadoHormonal?` ${r.estadoHormonal} ·`:''}
@@ -4997,7 +5102,7 @@ function renderEditarFicha(id){
   const c=clientas[id];if(!c)return;
   c.id=c.id||id;
 
-  const sel=(id,val,opts)=>`<select id="${id}" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
+  const sel=(id,val,opts)=>`<select id="${id}" style="width:100%;padding:8px 10px;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.84rem;background:var(--light)">
     <option value="">Seleccionar</option>
     ${opts.map(o=>`<option${val===o?' selected':''}>${o}</option>`).join('')}
   </select>`;
