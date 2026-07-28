@@ -25,7 +25,7 @@ header{background:var(--deep);padding:14px 18px;display:flex;align-items:center;
 .fb-ok{background:#1a4a2a;color:#90e0a0;}.fb-err{background:#4a1a1a;color:#e09090;}.fb-wait{background:#3a2a0a;color:#e0c070;}
 nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:linear-gradient(180deg,#253d2b,#1e3224);border-bottom:2px solid rgba(106,158,122,0.15);}
 nav::-webkit-scrollbar{display:none;}
-.nav-btn{background:rgba(255,255,255,0.07);border:1px solid rgba(106,158,122,0.2);color:rgba(200,232,200,0.85);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:500;}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(106,158,122,0.2);color:rgba(200,232,200,0.85);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:500;}
 .nav-btn:hover{background:rgba(106,158,122,0.2);border-color:#6a9e7a;color:white;transform:translateY(-1px);}
 .nav-btn.active{background:linear-gradient(135deg,#6a9e7a,#4a8a5a);border-color:#6a9e7a;color:white;box-shadow:0 3px 12px rgba(106,158,122,0.4);}
 main{padding:18px 14px;max-width:920px;margin:0 auto;}
@@ -130,6 +130,7 @@ input[type="file"]{display:none;}
 .highlight{background:#fff4f2;border-radius:7px;padding:8px 12px;font-size:0.85rem;margin-bottom:6px;}
 .highlight strong{color:var(--rose);}
 .tag-aviso{background:#fff3cd;border:1px solid #ffc107;border-radius:7px;padding:8px 12px;font-size:0.82rem;color:#856404;margin-bottom:8px;}
+.ic{flex-shrink:0} .nav-btn .ic{width:16px;height:16px}
 </style>
 </head>
 <body>
@@ -148,17 +149,17 @@ input[type="file"]{display:none;}
   <div class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</div>
 </header>
 <nav>
-  <button class="nav-btn active" onclick="showSection('inicio',this)">🏠 Inicio</button>
-  <button class="nav-btn" onclick="showSection('nueva-clienta',this)">➕ Nueva Clienta</button>
-  <button class="nav-btn" onclick="showSection('clientas',this)">👤 Clientas</button>
-  <button class="nav-btn" onclick="showSection('servicios',this)">✨ Servicios</button>
-  <button class="nav-btn" onclick="showSection('insumos',this)">🧴 Mis Insumos</button>
-  <button class="nav-btn" onclick="showSection('precios',this)">🏷️ Precios</button>
-  <button class="nav-btn" onclick="showSection('presupuestos',this)">🧾 Presupuestos</button>
-  <button class="nav-btn" onclick="showSection('gastos',this)">📊 Gastos</button>
-  <button class="nav-btn" onclick="showSection('compras',this)">🛍️ Compras</button>
-  <button class="nav-btn" onclick="showSection('config',this)">⚙️ Config</button>
-  <button class="nav-btn" onclick="showSection('crm',this)" id="nav-crm">📊 CRM <span id="crm-badge" style="display:none;background:var(--danger);color:white;border-radius:20px;padding:1px 6px;font-size:0.65rem;margin-left:3px">0</span></button>
+  <button class="nav-btn active" onclick="showSection('inicio',this)" data-ic="inicio">Inicio</button>
+  <button class="nav-btn" onclick="showSection('nueva-clienta',this)" data-ic="nueva-clienta">Nueva Clienta</button>
+  <button class="nav-btn" onclick="showSection('clientas',this)" data-ic="clientas">Clientas</button>
+  <button class="nav-btn" onclick="showSection('servicios',this)" data-ic="servicios">Servicios</button>
+  <button class="nav-btn" onclick="showSection('insumos',this)" data-ic="insumos">Mis Insumos</button>
+  <button class="nav-btn" onclick="showSection('precios',this)" data-ic="precios">Precios</button>
+  <button class="nav-btn" onclick="showSection('presupuestos',this)" data-ic="presupuestos">Presupuestos</button>
+  <button class="nav-btn" onclick="showSection('gastos',this)" data-ic="gastos">Gastos</button>
+  <button class="nav-btn" onclick="showSection('compras',this)" data-ic="compras">Compras</button>
+  <button class="nav-btn" onclick="showSection('config',this)" data-ic="config">Config</button>
+  <button class="nav-btn" onclick="showSection('crm',this)" id="nav-crm" data-ic="crm">CRM <span id="crm-badge" style="display:none;background:var(--danger);color:white;border-radius:20px;padding:1px 6px;font-size:0.65rem;margin-left:3px">0</span></button>
 </nav>
 
 <main>
@@ -173,17 +174,17 @@ input[type="file"]{display:none;}
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
     <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08);cursor:pointer;transition:all 0.2s">
-      <div style="font-size:1.8rem;margin-bottom:6px">👤</div>
+      <div style="margin-bottom:6px;color:#c4637a" data-ic-html="clientas-26"></div>
       <div id="stat-clientas" style="font-size:1.5rem;font-weight:700;color:#c4637a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Clientas</div>
     </div>
     <div style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(106,158,122,0.08)">
-      <div style="font-size:1.8rem;margin-bottom:6px">📅</div>
+      <div style="margin-bottom:6px;color:#6a9e7a" data-ic-html="historial-26"></div>
       <div id="stat-sesiones" style="font-size:1.5rem;font-weight:700;color:#6a9e7a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Sesiones</div>
     </div>
     <div onclick="showSection('gastos',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:0 3px 14px rgba(184,151,106,0.08);cursor:pointer;transition:all 0.2s">
-      <div style="font-size:1.8rem;margin-bottom:6px">💰</div>
+      <div style="margin-bottom:6px;color:#b8976a" data-ic-html="dinero-26"></div>
       <div id="stat-ganancia" style="font-size:1.1rem;font-weight:700;color:#b8976a;line-height:1">—</div>
       <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Ganancia este mes</div>
     </div>
@@ -191,20 +192,20 @@ input[type="file"]{display:none;}
 
   <!-- ACCESO RAPIDO -->
   <div class="card" style="background:white;border:1.5px solid #e0ead8">
-    <div class="card-title">⚡ Acceso Rápido</div>
+    <div class="card-title" style="display:flex;align-items:center;gap:7px"><span style="color:#c4637a" data-ic-html="idea-18"></span> Acceso Rápido</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <button onclick="showSection('nueva-clienta',null)" style="width:100%;padding:14px 16px;background:linear-gradient(135deg,#c4637a,#a84e65);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(196,99,122,0.3);transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">➕</div>
+        <div style="width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0" data-ic-html="nueva-clienta-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Nueva Clienta</strong><small style="font-size:0.74rem;opacity:0.8;font-weight:400">Registrar nueva clienta</small></div>
         <span style="font-size:1.2rem;opacity:0.7">›</span>
       </button>
       <button onclick="showSection('clientas',null)" style="width:100%;padding:14px 16px;background:#f0f8f2;color:#2d4a35;border:1.5px solid #d0e8d8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:#e0f0e8;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">👥</div>
+        <div style="width:42px;height:42px;border-radius:12px;background:#e0f0e8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#2d4a35" data-ic-html="clientas-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Mis Clientas</strong><small style="font-size:0.74rem;color:#7a8e7a;font-weight:400">Gestionar mis clientas</small></div>
         <span style="font-size:1.2rem;color:#6a9e7a;opacity:0.8">›</span>
       </button>
       <button onclick="showSection('servicios',null)" style="width:100%;padding:14px 16px;background:#fdf8f0;color:#5a3a10;border:1.5px solid #e8dcc8;border-radius:14px;font-family:'DM Sans',sans-serif;cursor:pointer;display:flex;align-items:center;gap:12px;transition:all 0.2s">
-        <div style="width:42px;height:42px;border-radius:12px;background:#f5ead8;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0">✨</div>
+        <div style="width:42px;height:42px;border-radius:12px;background:#f5ead8;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#5a3a10" data-ic-html="servicios-22"></div>
         <div style="flex:1;text-align:left"><strong style="display:block;font-size:0.92rem">Ver Servicios & Protocolos</strong><small style="font-size:0.74rem;color:#9a7a5a;font-weight:400">Explorar servicios disponibles</small></div>
         <span style="font-size:1.2rem;color:#b8976a;opacity:0.8">›</span>
       </button>
@@ -2414,6 +2415,113 @@ input[type="file"]{display:none;}
 </div>
 
 <script>
+
+// ===================== SET DE ÍCONOS PROFESIONALES =====================
+const ICONOS = {
+  'inicio': `<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>`,
+  'nueva-clienta': `<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/>`,
+  'clientas': `<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
+  'servicios': `<path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/><circle cx="12" cy="12" r="4"/>`,
+  'insumos': `<path d="M9 3h6v3H9z"/><path d="M10 6v3.28a2 2 0 0 1-.8 1.6L7 13.5V20a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-6.5l-2.2-2.67a2 2 0 0 1-.8-1.6V6"/><line x1="9" y1="14" x2="15" y2="14"/>`,
+  'precios': `<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>`,
+  'presupuestos': `<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><path d="M15 14.5a1.5 1.5 0 0 0-3 0v1a1.5 1.5 0 0 0 3 0v-1z"/>`,
+  'gastos': `<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>`,
+  'compras': `<path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>`,
+  'config': `<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>`,
+  'crm': `<rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/><path d="M15 7l-2 2-2-2"/>`,
+  'persona': `<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,
+  'salud': `<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>`,
+  'analisis-piel': `<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><path d="M11 8v6"/><path d="M8 11h6"/>`,
+  'habitos': `<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.5 10-10 10z"/><path d="M2 21c0-3 1.85-5.36 5-6"/>`,
+  'ojo': `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`,
+  'hormonal': `<path d="M12 2a4 4 0 0 0-4 4c0 2 4 6 4 6s4-4 4-6a4 4 0 0 0-4-4z"/><path d="M12 12v10"/><path d="M8 18h8"/>`,
+  'objetivo': `<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>`,
+  'historial': `<rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>`,
+  'fotos': `<path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/>`,
+  'notas': `<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>`,
+  'editar': `<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>`,
+  'protocolo': `<path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/><path d="M9 12l2 2 4-4"/>`,
+  'microscopio': `<path d="M6 18h8"/><path d="M3 22h18"/><path d="M14 22a7 7 0 1 0 0-14h-1"/><path d="M9 14h2"/><path d="M9 10l6 4"/>`,
+  'facial': `<path d="M12 2a10 10 0 0 0-7.75 16.25c.5.6.85 1.3 1.05 2.05L6 22h12l.7-1.7c.2-.75.55-1.45 1.05-2.05A10 10 0 0 0 12 2z"/>`,
+  'limpieza': `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`,
+  'hidratacion': `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>`,
+  'gota-piel': `<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/><path d="M12 10v6"/><path d="M9 13h6"/>`,
+  'mascarilla': `<path d="M3 7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v6a6 6 0 0 1-6 6h-6a6 6 0 0 1-6-6V7z"/><path d="M9 10h6"/><path d="M12 7v6"/>`,
+  'tonico': `<path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>`,
+  'sol': `<circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"/>`,
+  'bisturi': `<path d="M14.5 3.5l6 6L9 21H3v-6z"/><line x1="13" y1="7" x2="17" y2="11"/>`,
+  'corona': `<path d="M2 4l3 12h14l3-12-6 7-4-7-4 7-6-7z"/>`,
+  'diamante': `<path d="M6 3h12l4 6-10 13L2 9z"/><path d="M2 9h20"/><path d="M12 22V9"/>`,
+  'tijera': `<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/>`,
+  'dinero': `<rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="12" cy="12" r="3"/><line x1="6" y1="9" x2="6.01" y2="9"/><line x1="18" y1="15" x2="18.01" y2="15"/>`,
+  'billete-salida': `<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M15 12H9"/><path d="M12 9l3 3-3 3"/>`,
+  'grafico-sube': `<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>`,
+  'caja': `<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>`,
+  'guantes': `<path d="M7 11V7a3 3 0 0 1 6 0v4"/><path d="M13 11V5a3 3 0 0 1 6 0v10a6 6 0 0 1-6 6H9a6 6 0 0 1-6-6v-4a3 3 0 0 1 6 0z"/>`,
+  'carrito': `<circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>`,
+  'guardar': `<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>`,
+  'eliminar': `<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>`,
+  'cerrar': `<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`,
+  'agregar': `<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`,
+  'buscar': `<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>`,
+  'flecha-derecha': `<line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>`,
+  'flecha-izquierda': `<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>`,
+  'volver': `<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5v0a5.5 5.5 0 0 1-5.5 5.5H11"/>`,
+  'campana': `<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`,
+  'reloj': `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
+  'check': `<polyline points="20 6 9 17 4 12"/>`,
+  'alerta': `<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
+  'prohibido': `<circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/>`,
+  'lampara': `<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/>`,
+  'robot': `<rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="9" cy="16" r="1"/><circle cx="15" cy="16" r="1"/><path d="M9 7h6"/><line x1="12" y1="3" x2="12" y2="7"/><circle cx="12" cy="2" r="1"/>`,
+  'idea': `<path d="M9 18h6"/><path d="M10 22h4"/><path d="M15.09 14c.18-.98.65-1.74 1.41-2.5A4.65 4.65 0 0 0 18 8 6 6 0 0 0 6 8c0 1 .23 2.23 1.5 3.5A4.61 4.61 0 0 1 8.91 14"/><path d="M12 2v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 4.93l-1.41 1.41"/>`,
+  'whatsapp': `<path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>`,
+  'estrella': `<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`,
+  'refrescar': `<path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>`,
+  'sol-modo': `<circle cx="12" cy="12" r="5"/><path d="M12 1v2m0 18v2M4.22 4.22l1.42 1.42m12.72 12.72l1.42 1.42M1 12h2m18 0h2M4.22 19.78l1.42-1.42m12.72-12.72l1.42-1.42"/>`,
+  'luna': `<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>`,
+  'paleta': `<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.504 5.555-5.555C22 6.5 17.5 2 12 2z"/>`,
+  'candado': `<rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,
+  'nube': `<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>`,
+  'medalla-oro': `<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>`,
+  'medalla-plata': `<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/>`,
+  'semaforo': `<rect x="7" y="2" width="10" height="20" rx="5"/><circle cx="12" cy="7" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="12" cy="17" r="1.5"/>`,
+  'pausa': `<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>`,
+  'ticket': `<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2z"/>`,
+};
+
+// ic('nombre') o ic('nombre', 20) devuelve el SVG del ícono.
+function ic(nombre, size){
+  const inner = ICONOS[nombre];
+  if(!inner) return '';
+  const s = size || 18;
+  return `<svg class="ic" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:-0.15em;flex-shrink:0">${inner}</svg>`;
+}
+
+// Aplica íconos a todos los elementos con data-ic
+function aplicarIconos(root){
+  (root||document).querySelectorAll('[data-ic]:not([data-ic-done])').forEach(el=>{
+    const nombre = el.getAttribute('data-ic');
+    if(ICONOS[nombre]){
+      el.insertAdjacentHTML('afterbegin', ic(nombre) + ' ');
+      el.setAttribute('data-ic-done','1');
+    }
+  });
+  // data-ic-html="nombre-tamaño" → reemplaza el contenido por el ícono del tamaño dado
+  (root||document).querySelectorAll('[data-ic-html]:not([data-ic-done])').forEach(el=>{
+    const val = el.getAttribute('data-ic-html');
+    const m = val.match(/^(.+)-(\d+)$/);
+    const nombre = m ? m[1] : val;
+    const size = m ? parseInt(m[2]) : 18;
+    if(ICONOS[nombre]){
+      el.innerHTML = ic(nombre, size);
+      el.setAttribute('data-ic-done','1');
+    }
+  });
+}
+document.addEventListener('DOMContentLoaded', ()=> aplicarIconos());
+
+
 // ===================== ESTADO GLOBAL =====================
 let db=null,fs=null,useFirebase=false;
 let clientaActualId=null,iaTextoActual='';
@@ -2527,41 +2635,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const userData = userSnap.exists() ? userSnap.data() : {};
 
         const suscripcionActiva = userData.suscripcionActiva === true;
-        // Parseo robusto de la fecha (tolera espacios y formatos raros)
-        let suscripcionVence = null;
-        if (userData.suscripcionVence) {
-          const raw = String(userData.suscripcionVence).trim();
-          const parsed = new Date(raw);
-          if (!isNaN(parsed.getTime())) suscripcionVence = parsed;
-        }
-        // Damos hasta el final del día de vencimiento, no la hora exacta
-        const ahora = new Date();
-        const suscripcionVigente = suscripcionActiva && suscripcionVence && suscripcionVence.getTime() >= ahora.getTime();
+        const suscripcionVence = userData.suscripcionVence ? new Date(userData.suscripcionVence) : null;
+        const suscripcionVigente = suscripcionActiva && suscripcionVence && suscripcionVence > new Date();
 
-        if (suscripcionVigente) {
-          // Tiene suscripción al día → guardamos que entró OK y lo dejamos pasar directo
-          try { localStorage.setItem('gp_ultimo_acceso_ok', String(Date.now())); } catch(e){}
-        } else {
+        if (!suscripcionVigente) {
           // Verificar trial
           const trialInicio = userData.trialInicio;
           if (!trialInicio) {
+            // Primera vez — ir a trial.html para registrar inicio
             window.location.href = "trial.html";
             return;
           }
           const diasPasados = (Date.now() - trialInicio) / (1000 * 60 * 60 * 24);
           if (diasPasados >= DIAS_TRIAL) {
-            // Antes de mandarla a pagar, red de seguridad:
-            // si entró OK en las últimas 48hs, la dejamos pasar igual
-            // (evita sacarla por una lectura lenta o intermitente de Firebase)
-            let accesoReciente = false;
-            try {
-              const ult = parseInt(localStorage.getItem('gp_ultimo_acceso_ok') || '0');
-              accesoReciente = ult && (Date.now() - ult) < (48 * 60 * 60 * 1000);
-            } catch(e){}
-            if (!accesoReciente) {
-              window.location.href = "pago.html";
-              return;
-            }
+            // Trial vencido → pago
+            window.location.href = "pago.html";
+            return;
           }
         }
       } catch(e) {
@@ -2713,6 +2802,7 @@ function showSection(id,btn){
   if(id==='gastos'){renderGastos();actualizarResumen();setHoy('gasto-fecha');}
   if(id==='servicios')renderServiciosCustom();
   if(id==='crm'){renderCRMAlertas();renderCRMClientas();renderCRMConsumo();renderCRMFormularios();}
+  if(typeof aplicarIconos==='function') aplicarIconos();
 }
 
 // Manejar botón atrás del navegador/gesto
@@ -3116,9 +3206,192 @@ Usá EXCLUSIVAMENTE estos productos, escribiendo el nombre EXACTO tal como figur
 ${inv}
 ${tildados?`\nOtros insumos disponibles: ${tildados}`:''}
 Lo que va después de la flecha → es la descripción que cargó la cosmetóloga (activos, para qué lo usa, cómo se aplica). Tomala como información real del producto y usala para decidir cuál corresponde en cada paso.
-REGLA: Si para este caso hiciera falta algo que NO está en la lista, decilo al final en una sección aparte "TE FALTARÍA", pero el protocolo tiene que poder ejecutarse con lo que hay.`;
+REGLA CRÍTICA: Leé TODO este inventario antes de armar el protocolo. Antes de sugerir comprar o incorporar cualquier activo, verificá si ya hay un producto acá que cumpla esa función — si lo hay, usá ese y NO lo pongas en "TE FALTARÍA". Solo listá algo como faltante si de verdad NO existe ningún producto apto en toda esta lista.`;
   if(tildados) return `INSUMOS DISPONIBLES: ${tildados}\n(La cosmetóloga todavía no cargó su inventario detallado con marcas. Recomendá por tipo de producto/activo.)`;
   return 'INVENTARIO: no cargado. Recomendá por tipo de producto y activo, sin inventar marcas.';
+}
+
+// ===================== PROTOCOLOS BASE OFICIALES =====================
+// Estructura fija de cada servicio. La IA DEBE respetar estos pasos y este orden.
+// Solo personaliza el producto/aparato/activo de cada paso según el diagnóstico.
+const PROTOCOLOS_BASE = {
+  'Limpieza Facial Profunda':[
+    'Recepción y desmaquillado de ojos y labios',
+    'Primera limpieza (leche o gel desmaquillante)',
+    'Segunda limpieza (gel limpiador específico según piel)',
+    'Tónico equilibrante',
+    'Vaporización (u ozono) — omitir si hay rosácea/cuperosis',
+    'Exfoliación (enzimática o mecánica según piel)',
+    'Extracción de comedones',
+    'Alta frecuencia (post-extracción, antibacteriana)',
+    'Mascarilla (según necesidad de la piel)',
+    'Sérum tratante',
+    'Crema hidratante',
+    'Protector solar'
+  ],
+  'Hidratación Profunda':[
+    'Desmaquillado',
+    'Limpieza',
+    'Tónico',
+    'Exfoliación suave',
+    'Vaporización suave (opcional)',
+    'Sérum hidratante (ácido hialurónico)',
+    'Mascarilla hidratante / de lámina',
+    'Introducción de activos (galvánica/iontoforesis opcional)',
+    'Crema hidratante oclusiva',
+    'Protector solar'
+  ],
+  'Control de Acné':[
+    'Desmaquillado',
+    'Primera limpieza',
+    'Segunda limpieza (gel con activo seborregulador)',
+    'Tónico astringente',
+    'Vaporización (si no hay pústulas inflamadas ni rosácea)',
+    'Exfoliación con activo queratolítico (salicílico) si la piel lo tolera',
+    'Extracción de comedones',
+    'Alta frecuencia (antibacteriana)',
+    'Mascarilla purificante (arcilla)',
+    'Sérum seborregulador (niacinamida)',
+    'Gel/crema oil-free',
+    'Protector solar oil-free',
+    'Máscara LED azul (opcional, antibacteriana)'
+  ],
+  'Despigmentación & Luminosidad':[
+    'Desmaquillado',
+    'Limpieza',
+    'Tónico',
+    'Exfoliación (según fototipo — suave en fototipos altos)',
+    'Sérum despigmentante / vitamina C',
+    'Mascarilla iluminadora',
+    'Introducción de activos (iontoforesis opcional)',
+    'Crema con activo aclarante',
+    'Protector solar (OBLIGATORIO, alto factor)'
+  ],
+  'Anti-Edad & Lifting Facial':[
+    'Desmaquillado',
+    'Limpieza',
+    'Tónico',
+    'Exfoliación suave',
+    'Sérum antiedad (péptidos / vitamina C de día)',
+    'Masaje / aparatología reafirmante (EMS, radiofrecuencia) — según contraindicaciones',
+    'Mascarilla reafirmante / tensora',
+    'Máscara LED roja (colágeno)',
+    'Crema nutritiva/reafirmante',
+    'Contorno de ojos',
+    'Protector solar'
+  ],
+  'Calmante & Barrera Protectora':[
+    'Desmaquillado muy suave',
+    'Limpieza sin fricción',
+    'Tónico sin alcohol (agua termal / hidrolato)',
+    'Sérum reparador (ceramidas / pantenol)',
+    'Mascarilla calmante (avena / aloe)',
+    'Máscara LED amarilla (antiinflamatoria)',
+    'Crema barrera',
+    'Protector solar mineral'
+  ],
+  'Revitalización & Glow':[
+    'Desmaquillado',
+    'Limpieza',
+    'Tónico',
+    'Exfoliación suave (enzimática)',
+    'Vaporización suave (opcional)',
+    'Sérum antioxidante / vitamina C',
+    'Mascarilla iluminadora',
+    'Introducción de activos',
+    'Crema hidratante con glow',
+    'Protector solar'
+  ],
+  'Peeling Químico Superficial':[
+    'Desmaquillado',
+    'Limpieza profunda',
+    'Desengrase de la piel',
+    'Aplicación del ácido (mandélico/glicólico/láctico según fototipo y tolerancia)',
+    'Tiempo de actuación controlado',
+    'Neutralización (si el ácido lo requiere)',
+    'Mascarilla calmante',
+    'Máscara LED amarilla (opcional)',
+    'Crema barrera reparadora',
+    'Protector solar mineral (OBLIGATORIO)'
+  ],
+  'Dermaplaning':[
+    'Desmaquillado',
+    'Limpieza profunda',
+    'Secado completo de la piel',
+    'Dermaplaning con hoja estéril (movimientos a 45°)',
+    'Retirar restos con gasa',
+    'Sérum (vitamina C o hialurónico)',
+    'Mascarilla calmante',
+    'Crema barrera',
+    'Protector solar (OBLIGATORIO)'
+  ],
+  'Lifting de Pestañas':[
+    'Limpieza de pestañas (desengrase)',
+    'Colocación del escudo de silicona según curvatura',
+    'Fijación de pestañas al escudo',
+    'Paso 1 — Loción permanente (tiempo según grosor)',
+    'Paso 2 — Loción fijadora (mismo tiempo)',
+    'Paso 3 — Nutrición / aceite reparador',
+    'Tinte de pestañas (opcional, si está incluido)',
+    'Retirar y peinar'
+  ],
+  'Laminado de Cejas':[
+    'Diseño y depilación del contorno (ANTES del laminado)',
+    'Limpieza y desengrase',
+    'Paso 1 — Loción de fijado del vello hacia arriba',
+    'Paso 2 — Loción fijadora',
+    'Paso 3 — Nutrición',
+    'Henna o tinte (opcional, SIEMPRE post-laminado)',
+    'Peinado y gel fijador'
+  ],
+  'Henna de Cejas':[
+    'Diseño y perfilado del contorno',
+    'Limpieza y desengrase de la zona',
+    'Preparación de la henna',
+    'Aplicación de la henna dentro del diseño',
+    'Tiempo de actuación (según intensidad deseada)',
+    'Retirar en seco',
+    'Peinado y fijado'
+  ],
+  'Tinte de Cejas':[
+    'Diseño del contorno',
+    'Limpieza y desengrase',
+    'Protección de la piel del contorno (vaselina)',
+    'Mezcla tinte + oxidante',
+    'Aplicación sobre el vello',
+    'Tiempo de actuación',
+    'Retirar y peinar'
+  ],
+  'Tinte de Pestañas':[
+    'Limpieza y desengrase',
+    'Colocación de parches protectores bajo el ojo',
+    'Mezcla tinte + oxidante',
+    'Aplicación sobre las pestañas',
+    'Tiempo de actuación',
+    'Retirar con algodón húmedo'
+  ],
+  'Diseño & Perfilado de Cejas':[
+    'Análisis de la forma y visagismo',
+    'Marcado del diseño (regla de oro)',
+    'Depilación (cera/pinza/hilo)',
+    'Recorte si es necesario',
+    'Calmante post-depilación',
+    'Peinado y opcional maquillado de cejas'
+  ]
+};
+// Combos: se resuelven concatenando protocolos base en el orden correcto.
+// La lógica de combos ya está descrita en REGLAS_CLINICAS y en las fichas de servicio.
+
+function protocoloBaseTexto(tratamiento){
+  const pasos = PROTOCOLOS_BASE[tratamiento];
+  if(pasos){
+    return `PROTOCOLO BASE OFICIAL DE "${tratamiento}" (${pasos.length} pasos obligatorios, en este orden EXACTO):\n${pasos.map((p,i)=>`${i+1}. ${p}`).join('\n')}\n\nEste es el esqueleto FIJO. Tenés que escribir estos ${pasos.length} pasos, en este orden, sin saltear ninguno. Solo personalizás QUÉ producto/aparato/activo usás en cada uno según el diagnóstico.`;
+  }
+  // Combos u otros: no hay plantilla rígida, se guía por reglas
+  if(tratamiento.toLowerCase().includes('combo')){
+    return `"${tratamiento}" es un COMBO. Combiná los protocolos base de cada servicio que lo compone, en el orden profesional correcto (lo invasivo de piel al final, cubrir ojos en vapor si ya hiciste lifting/laminado, tinte/henna siempre post-laminado). No saltees pasos de ninguno de los servicios del combo.`;
+  }
+  return `"${tratamiento}" es un servicio personalizado. Seguí la lógica profesional estándar: limpiar → equilibrar → tratar → estimular → sellar/proteger, sin saltear pasos.`;
 }
 
 const REGLAS_CLINICAS = `REGLAS CLÍNICAS OBLIGATORIAS
@@ -3226,39 +3499,63 @@ ${perfilClientaTexto(c)}
 
 ${inventarioTexto()}
 
+${protocoloBaseTexto(tratamiento)}
+
 TRATAMIENTO ELEGIDO POR LA COSMETÓLOGA: **${tratamiento}**
 
-TAREA CRÍTICA:
-Escribí el protocolo COMPLETO de "${tratamiento}" para ${c.nombre}, listo para ejecutar en cabina sin consultar ninguna otra pantalla.
+════════════════════════════════
+CÓMO TENÉS QUE ARMAR EL PROTOCOLO
+════════════════════════════════
 
-REGLAS DE ESCRITURA — OBLIGATORIAS:
-1. Escribí TODOS los pasos del tratamiento de principio a fin (desde recibir a la clienta hasta el SPF final). NO escribas solo los pasos que cambian. Si el protocolo tiene 10 pasos, escribí los 10.
-2. En CADA paso nombrá el producto EXACTO del inventario, entre comillas, tal cual figura en la lista de arriba.
-3. En CADA paso justificá la elección en 1 línea empezando con "Por qué:" — y la justificación tiene que citar algo concreto de la ficha de ${c.nombre} (su tipo de piel, barrera, fototipo, condición, medicación, hábito u objetivo). Ejemplo correcto: "Por qué: barrera comprometida + rosácea leve → no tolera exfoliación mecánica". Ejemplo INCORRECTO (genérico, prohibido): "Por qué: es bueno para piel sensible".
-4. Tiempos exactos en minutos ajustados a ELLA, no rangos genéricos del manual.
-5. Si un paso estándar del tratamiento NO se hace en su caso, igual escribilo en su número con ❌ OMITIDO y el motivo clínico.
-6. Nada de teoría, nada de introducción, nada de cierre motivacional.
+1. ESTRUCTURA FIJA: Usá el PROTOCOLO BASE OFICIAL de arriba como esqueleto. Escribí TODOS sus pasos, en el MISMO orden, sin saltear ninguno. No inventes un protocolo nuevo ni reordenes pasos. El orden profesional es sagrado (ejemplo de orden correcto al final: sérum → mascarilla → LED → crema → protector solar; la crema y el protector SIEMPRE después del LED, nunca antes).
 
-FORMATO EXACTO:
+2. PERSONALIZACIÓN: Lo único que adaptás es QUÉ producto, aparato o activo usás en cada paso, según el diagnóstico de ${c.nombre}. El paso sigue estando; cambia el "con qué".
+
+3. USÁ EL INVENTARIO — REGLA CRÍTICA: En cada paso que lleve producto, elegí uno del INVENTARIO REAL de arriba y nombralo EXACTO entre comillas. Antes de decir que falta algo o sugerir comprar/incorporar un activo, REVISÁ TODO el inventario: si ya hay un producto que cumple esa función (aunque tenga otro nombre), usá ese. Ejemplo: si el inventario tiene una vitamina C, NO digas "sería bueno incorporar vitamina C" — usá la que ya está. Solo listá algo en "TE FALTARÍA" si de verdad NO existe ningún producto apto en el inventario. Si hay varios aptos para un paso, elegí el más adecuado al diagnóstico y aclaralo.
+
+4. REEMPLAZOS CONSCIENTES: Si por el diagnóstico cambiás un procedimiento por otro (ej: exfoliación manual → limpieza ultrasónica), está permitido, PERO: (a) el paso sigue ocupando su lugar en el orden, (b) explicás el motivo del cambio en una línea que empiece con "Cambio:". Nunca hagas desaparecer un paso sin dejar constancia.
+
+5. OMISIONES JUSTIFICADAS: Si un paso del protocolo base NO corresponde para ella (ej: vapor con rosácea), NO lo borres: escribilo en su número con "❌ OMITIDO —" y el motivo clínico. Así queda claro que no fue un olvido.
+
+6. JUSTIFICACIÓN REAL: En cada paso, la línea "Por qué:" tiene que citar algo CONCRETO de la ficha de ${c.nombre} (tipo de piel, barrera, fototipo, condición, medicación, hábito u objetivo). Prohibido lo genérico tipo "es bueno para piel sensible".
+
+7. TIEMPOS: en minutos, ajustados a ella, no rangos de manual.
+
+════════════════════════════════
+AUTO-VALIDACIÓN ANTES DE RESPONDER (hacelo mentalmente, NO lo muestres)
+════════════════════════════════
+Antes de escribir la respuesta final, revisá que:
+✓ Están TODOS los pasos del protocolo base (contá que no falte ninguno).
+✓ El orden coincide con el protocolo base (nada de crema/SPF antes del LED, nada de tratar antes de limpiar).
+✓ Cada producto sale del inventario y está nombrado exacto.
+✓ No sugeriste comprar/incorporar nada que ya exista en el inventario.
+✓ Cada paso que cambiaste u omitiste tiene su motivo escrito.
+✓ No hay contradicciones entre un paso y el siguiente (activos incompatibles, orden ilógico).
+Si algo falla, CORREGILO antes de mostrar. La respuesta que muestres ya tiene que estar validada.
+
+════════════════════════════════
+FORMATO EXACTO DE SALIDA
+════════════════════════════════
 
 **📋 ${tratamiento.toUpperCase()} — ${c.nombre}**
 Duración estimada: [min] · Aparatos a usar: [máx 3, listados]
 
 **⚠️ ANTES DE EMPEZAR**
-[Bullets solo con lo que aplica a ella. Si algo se omite del protocolo estándar, decilo acá también.]
+[Bullets solo con lo que aplica a ella: contraindicaciones reales, pasos que se van a omitir y por qué.]
 
-**PASO 1 — [NOMBRE DEL PASO EN MAYÚSCULAS]**
+**PASO 1 — [NOMBRE DEL PASO]**
 Qué hacer: [acción concreta]
 🧴 Producto: "[nombre exacto del inventario]"
 ⚙️ Aparato: [cuál, función, intensidad] o "Sin aparato"
 ⏱ Tiempo: [X min]
 💡 Por qué: [justificación citando su ficha]
+[Si aplica] Cambio: [qué reemplazaste y por qué]
 
-**PASO 2 — ...** (y así hasta el último paso, sin saltear ninguno)
+**PASO 2 — ...** (seguí con TODOS los pasos del protocolo base, en orden, sin saltear)
 
 **🏠 DOMICILIARIO PARA ${c.nombre.toUpperCase()}**
-Mañana: [pasos con productos concretos]
-Noche: [pasos con productos concretos]
+Mañana: [pasos con productos del inventario]
+Noche: [pasos con productos del inventario]
 ❌ Que NO use: [según su caso]
 
 **📊 EXPECTATIVAS REALES**
@@ -3267,8 +3564,8 @@ Noche: [pasos con productos concretos]
 **🎯 PRÓXIMA SESIÓN**
 [Qué hacer la próxima vez y en cuántos días]
 
-**🛒 TE FALTARÍA** (solo si aplica)
-[Productos que no tenés en stock y que mejorarían este protocolo]`;
+**🛒 TE FALTARÍA** (SOLO si de verdad no hay un producto apto en el inventario)
+[Productos que no tenés y que mejorarían este protocolo. Si el inventario ya cubre todo, escribí "Tenés todo lo necesario para este protocolo ✅"]`;
 
   await callIA(prompt, cont);
   iaTextoActual=cont.innerText;
