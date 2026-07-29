@@ -215,13 +215,59 @@ html.dark .section-title,html.dark .card-title{color:var(--deep) !important;}
 html.dark [style*="background:#fff0f0"],
 html.dark [style*="background:#fff0f7"],
 html.dark [style*="background:#fde8e8"],
+html.dark [style*="background:#fde8e3"],
 html.dark [style*="background:#f0f7ff"],
 html.dark [style*="background:#fff8e3"],
+html.dark [style*="background:#fff8f8"],
+html.dark [style*="background:#fff8f6"],
+html.dark [style*="background:#fff4f2"],
+html.dark [style*="background:#fff3e0"],
+html.dark [style*="background:#fff3cd"],
+html.dark [style*="background:#fdf8f0"],
+html.dark [style*="background:#fdf3e3"],
+html.dark [style*="background:#fdf4f2"],
+html.dark [style*="background:#fdfaf0"],
+html.dark [style*="background:#f0fdf4"],
+html.dark [style*="background:#f0faf5"],
+html.dark [style*="background:#f8fdf8"],
+html.dark [style*="background:#f8faf8"],
+html.dark [style*="background:#f5f5f5"],
 html.dark [style*="background:#e0f0e8"],
 html.dark [style*="background:#f5ead8"],
-html.dark [style*="background:#e8f5e9"]{
-  background:rgba(255,255,255,0.06) !important;
+html.dark [style*="background:#e8f5e9"],
+html.dark [style*="background:#fff9f5"]{
+  background:rgba(255,255,255,0.055) !important;
 }
+/* Dentro de esas cajitas y en tarjetas oscuras: forzar texto legible.
+   Los títulos y textos que estaban en tonos oscuros pasan a claros. */
+html.dark .card *[style*="color:#2"],
+html.dark .card *[style*="color:#3"],
+html.dark .card *[style*="color:#4"],
+html.dark .card *[style*="color:#5a3"],
+html.dark .turno-card *[style*="color:#2"],
+html.dark .clienta-card *[style*="color:#2"],
+html.dark [style*="background:var(--light)"] *[style*="color:#2"]{
+  color:var(--text) !important;
+}
+/* Tarjetas de lista (clientas, servicios) — nombres reales de la app */
+html.dark .client-card{background:var(--light) !important;border-color:var(--border) !important;}
+html.dark .client-card *{color:var(--text) !important;}
+html.dark .client-info strong,html.dark .client-card strong{color:var(--deep) !important;}
+html.dark .servicio-card,html.dark .serv-header,html.dark .serv-body{background:var(--light) !important;border-color:var(--border) !important;}
+html.dark .servicio-card h4,html.dark .servicio-card h5{color:var(--deep) !important;}
+html.dark .servicio-card p,html.dark .serv-body *{color:var(--text);}
+/* Badges de problemáticas → translúcido legible */
+html.dark .badge-rose,html.dark .badge-red{background:rgba(196,99,122,0.2) !important;color:#e8b0bd !important;}
+html.dark .badge-sage{background:rgba(106,158,122,0.2) !important;color:#9ed8ae !important;}
+html.dark .badge-gold{background:rgba(184,151,106,0.2) !important;color:#e0c088 !important;}
+/* Cajas .highlight (guía de compras, servicios) */
+html.dark .highlight{background:rgba(255,255,255,0.05) !important;color:var(--text) !important;}
+html.dark .highlight strong{color:var(--deep) !important;}
+/* Alertas de colores */
+html.dark .alert-warning{background:rgba(184,151,106,0.15) !important;color:#e0c088 !important;}
+html.dark .alert-info{background:rgba(74,144,217,0.15) !important;color:#9ec8f0 !important;}
+html.dark .alert-success{background:rgba(90,158,106,0.15) !important;color:#9ed8ae !important;}
+html.dark .serv-section h5{color:var(--deep) !important;}
 html.dark .empty-state{color:var(--muted);}
 html.dark .est-confirmado{background:rgba(90,158,106,0.2);color:#8fd89a;}
 html.dark .est-pendiente{background:rgba(255,255,255,0.08);color:#aab8ac;}
