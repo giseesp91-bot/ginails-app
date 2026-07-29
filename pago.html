@@ -102,17 +102,79 @@
     /* Planes */
     .planes {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.9rem;
       width: 100%;
-      max-width: 560px;
+      max-width: 860px;
       margin-bottom: 1.5rem;
       animation: fadeUp 0.5s ease both;
+      align-items: stretch;
     }
 
-    @media(max-width: 480px) {
-      .planes { grid-template-columns: 1fr; }
+    @media(max-width: 760px) {
+      .planes { grid-template-columns: 1fr; max-width: 460px; }
     }
+
+    /* Selector Mensual / Anual */
+    .periodo-switch {
+      display: inline-flex;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 999px;
+      padding: 4px;
+      margin-bottom: 1.6rem;
+      animation: fadeUp 0.5s ease both;
+    }
+    .periodo-switch button {
+      border: none;
+      background: transparent;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      padding: 8px 20px;
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .periodo-switch button.activo {
+      background: var(--rosa);
+      color: white;
+    }
+    .periodo-ahorro {
+      font-size: 0.75rem;
+      color: var(--rosa);
+      margin: -1.1rem 0 1.5rem;
+      font-weight: 500;
+      min-height: 1rem;
+    }
+
+    /* Lo que incluye cada plan */
+    .plan-incluye {
+      list-style: none;
+      margin: 0.9rem 0 0;
+      padding: 0.9rem 0 0;
+      border-top: 1px solid var(--border);
+      text-align: left;
+    }
+    .plan-incluye li {
+      font-size: 0.78rem;
+      color: var(--text);
+      padding: 4px 0 4px 18px;
+      position: relative;
+      line-height: 1.35;
+    }
+    .plan-incluye li::before {
+      content: '·';
+      position: absolute;
+      left: 4px;
+      color: var(--rosa);
+      font-weight: 700;
+      font-size: 1.1rem;
+      line-height: 1.1;
+    }
+    .plan-incluye li.apagado { color: var(--text-muted); opacity: 0.55; }
+    .plan-incluye li.apagado::before { content: '·'; color: var(--text-muted); }
 
     .plan-card {
       background: var(--white);
@@ -187,6 +249,17 @@
       margin-top: 8px;
       font-weight: 500;
     }
+
+    /* Precio anterior tachado, solo se muestra si hay descuento */
+    .plan-antes {
+      display: none;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      text-decoration: line-through;
+      margin-bottom: 2px;
+    }
+    .plan-card.con-descuento .plan-antes { display: block; }
+    .plan-card.con-descuento .plan-precio { color: var(--rosa); }
 
     .plan-check {
       width: 20px; height: 20px;
@@ -339,21 +412,63 @@
     <p>Tu período de prueba terminó · Seguí usando Ginails Pro</p>
   </div>
 
+  <!-- Mensual / Anual -->
+  <div class="periodo-switch">
+    <button id="btn-per-mensual" class="activo" onclick="setPeriodo('mensual')">Mensual</button>
+    <button id="btn-per-anual" onclick="setPeriodo('anual')">Anual</button>
+  </div>
+  <div class="periodo-ahorro" id="periodo-ahorro"></div>
+
   <!-- Planes -->
   <div class="planes">
-    <div class="plan-card" id="card-mensual" onclick="seleccionar('mensual')">
-      <div class="plan-nombre">Mensual</div>
-      <div class="plan-precio">$5.000<span> ARS</span></div>
-      <div class="plan-periodo">por mes</div>
+    <div class="plan-card" id="card-esencial" onclick="seleccionar('esencial')">
+      <div class="plan-nombre">Esencial</div>
+      <div class="plan-antes" id="antes-esencial"></div>
+      <div class="plan-precio" id="precio-esencial">$29.900<span> ARS</span></div>
+      <div class="plan-periodo" id="periodo-esencial">por mes</div>
+      <div class="plan-equiv" id="equiv-esencial"></div>
+      <ul class="plan-incluye">
+        <li>Panel de inicio de la jornada</li>
+        <li>Agenda inteligente: Día, Semana y Mes</li>
+        <li>Fichas de clientas e historial</li>
+        <li>Control financiero y caja</li>
+        <li class="apagado">Tarjeta VIP de fidelización</li>
+        <li class="apagado">Asistente de IA</li>
+        <li class="apagado">Contenido para redes</li>
+      </ul>
       <div class="plan-check"></div>
     </div>
 
-    <div class="plan-card destacado" id="card-anual" onclick="seleccionar('anual')">
-      <div class="badge-ahorro">⭐ Ahorrás $20.000</div>
-      <div class="plan-nombre">Anual</div>
-      <div class="plan-precio">$40.000<span> ARS</span></div>
-      <div class="plan-periodo">por año</div>
-      <div class="plan-equiv">= $3.333/mes</div>
+    <div class="plan-card destacado" id="card-pro" onclick="seleccionar('pro')">
+      <div class="badge-ahorro">⭐ El más elegido</div>
+      <div class="plan-nombre">Pro</div>
+      <div class="plan-antes" id="antes-pro"></div>
+      <div class="plan-precio" id="precio-pro">$39.900<span> ARS</span></div>
+      <div class="plan-periodo" id="periodo-pro">por mes</div>
+      <div class="plan-equiv" id="equiv-pro"></div>
+      <ul class="plan-incluye">
+        <li>Todo lo del plan Esencial</li>
+        <li>Tarjeta VIP digital de fidelización</li>
+        <li>Registro de visitas y beneficios</li>
+        <li>Asistente de IA completo</li>
+        <li>Alertas y recordatorios automáticos</li>
+        <li class="apagado">Contenido para redes</li>
+      </ul>
+      <div class="plan-check"></div>
+    </div>
+
+    <div class="plan-card" id="card-elite" onclick="seleccionar('elite')">
+      <div class="plan-nombre">Elite</div>
+      <div class="plan-antes" id="antes-elite"></div>
+      <div class="plan-precio" id="precio-elite">$54.900<span> ARS</span></div>
+      <div class="plan-periodo" id="periodo-elite">por mes</div>
+      <div class="plan-equiv" id="equiv-elite"></div>
+      <ul class="plan-incluye">
+        <li>Todo lo del plan Pro</li>
+        <li>Generador de contenido para redes</li>
+        <li>Automatización de historias de Instagram</li>
+        <li>Ideas de publicaciones con IA</li>
+      </ul>
       <div class="plan-check"></div>
     </div>
   </div>
@@ -401,6 +516,8 @@
       if (!user) { window.location.href = "login.html"; return; }
       window._userEmail = user.email;
       window._userName  = user.displayName || user.email.split("@")[0];
+      // Traer el precio que le corresponde a esta usuaria
+      if (typeof window.cargarPrecios === "function") window.cargarPrecios(user.email);
     });
 
     window.cerrarSesion = async () => {
@@ -410,51 +527,109 @@
   </script>
 
   <script>
-    let planSeleccionado = null;
+    let planSeleccionado = null;   // esencial / pro / elite
+    let periodoActual    = "mensual"; // mensual / anual
 
-    const PLANES = {
-      mensual: {
-        nombre:      "Plan Mensual",
-        precio:      5000,
-        descripcion: "Ginails Pro · Suscripción mensual"
-      },
-      anual: {
-        nombre:      "Plan Anual",
-        precio:      40000,
-        descripcion: "Ginails Pro · Suscripción anual (ahorrás $20.000)"
-      }
+    const NIVELES = ["esencial", "pro", "elite"];
+    const NOMBRES = { esencial: "Esencial", pro: "Pro", elite: "Elite" };
+
+    // Precios de lista. Se sobreescriben con lo que diga el servidor.
+    let PRECIOS = {
+      esencial: { mensual: 29900, anual: 299000 },
+      pro:      { mensual: 39900, anual: 380000 },
+      elite:    { mensual: 54900, anual: 520000 }
     };
+    let PRECIOS_LISTA = JSON.parse(JSON.stringify(PRECIOS));
+    let hayDescuento  = false;
 
-    function seleccionar(plan) {
-      planSeleccionado = plan;
-      document.getElementById("card-mensual").classList.toggle("selected", plan === "mensual");
-      document.getElementById("card-anual").classList.toggle("selected", plan === "anual");
-      const btn = document.getElementById("btn-pagar");
-      const p   = PLANES[plan];
-      btn.textContent = `Pagar ${p.nombre} · $${p.precio.toLocaleString("es-AR")} ARS`;
+    const fmt = n => "$" + Number(n).toLocaleString("es-AR");
+    const $   = id => document.getElementById(id);
+
+    /** Repinta las tres tarjetas según el período elegido */
+    function pintarPrecios() {
+      const anual = periodoActual === "anual";
+
+      NIVELES.forEach(n => {
+        const precio = PRECIOS[n][periodoActual];
+        const lista  = PRECIOS_LISTA[n][periodoActual];
+
+        $("precio-" + n).innerHTML  = fmt(precio) + "<span> ARS</span>";
+        $("periodo-" + n).textContent = anual ? "por año" : "por mes";
+        $("equiv-" + n).textContent   = anual ? "= " + fmt(Math.round(precio / 12)) + "/mes" : "";
+
+        const card = $("card-" + n);
+        if (hayDescuento && lista > precio) {
+          $("antes-" + n).textContent = fmt(lista);
+          card.classList.add("con-descuento");
+        } else {
+          $("antes-" + n).textContent = "";
+          card.classList.remove("con-descuento");
+        }
+      });
+
+      // Cuánto ahorra pagando por año, tomando el plan Pro de referencia
+      const ahorro = PRECIOS.pro.mensual * 12 - PRECIOS.pro.anual;
+      $("periodo-ahorro").textContent = anual && ahorro > 0
+        ? "Pagando por año ahorrás " + fmt(ahorro) + " en el plan Pro"
+        : "";
+
+      if (planSeleccionado) seleccionar(planSeleccionado);
+    }
+
+    function setPeriodo(p) {
+      periodoActual = p;
+      $("btn-per-mensual").classList.toggle("activo", p === "mensual");
+      $("btn-per-anual").classList.toggle("activo", p === "anual");
+      pintarPrecios();
+    }
+
+    function seleccionar(nivel) {
+      planSeleccionado = nivel;
+      NIVELES.forEach(n => $("card-" + n).classList.toggle("selected", n === nivel));
+      const btn = $("btn-pagar");
+      btn.textContent = `Elegir plan ${NOMBRES[nivel]} · ${fmt(PRECIOS[nivel][periodoActual])} ARS`;
       btn.disabled = false;
+    }
+
+    /**
+     * Le pregunta al servidor qué precios le corresponden a esta usuaria.
+     * Si es fundadora muestra el precio con descuento y tacha el de lista.
+     * No se menciona ningún contador de lugares.
+     * Si la consulta falla, quedan los precios de lista ya puestos.
+     */
+    async function cargarPrecios(email) {
+      try {
+        const res = await fetch("/api/precios?email=" + encodeURIComponent(email || ""));
+        if (!res.ok) return;
+        const data = await res.json();
+        if (!data || !data.precios) return;
+
+        PRECIOS       = data.precios;
+        PRECIOS_LISTA = data.lista || data.precios;
+        hayDescuento  = !!data.conDescuento;
+        pintarPrecios();
+      } catch (e) {
+        console.log("No pude traer los precios, quedan los de lista:", e);
+      }
     }
 
     async function pagar() {
       if (!planSeleccionado) return;
 
-      document.getElementById("loading-overlay").classList.add("show");
+      $("loading-overlay").classList.add("show");
 
-      const plan  = PLANES[planSeleccionado];
-      const email = window._userEmail || "";
-      const nombre = window._userName || "Usuaria";
+      const email  = window._userEmail || "";
+      const nombre = window._userName  || "Usuaria";
 
       try {
-       
-
-        // Crear preferencia de pago via worker
         const res = await fetch("/api/crear-pago", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            plan:        planSeleccionado,
-            precio:      plan.precio,
-            descripcion: plan.descripcion,
+            nivel:       planSeleccionado,
+            periodo:     periodoActual,
+            precio:      PRECIOS[planSeleccionado][periodoActual],
+            descripcion: `Ginails Pro · Plan ${NOMBRES[planSeleccionado]} ${periodoActual}`,
             email,
             nombre
           })
@@ -470,13 +645,17 @@
 
       } catch (err) {
         console.error(err);
-        document.getElementById("loading-overlay").classList.remove("show");
+        $("loading-overlay").classList.remove("show");
         alert("Hubo un error al procesar el pago. Intentá de nuevo o escribinos por WhatsApp.");
       }
     }
 
+    pintarPrecios();
+
     window.pagar = pagar;
     window.seleccionar = seleccionar;
+    window.cargarPrecios = cargarPrecios;
+    window.setPeriodo = setPeriodo;
   </script>
 
 </body>
