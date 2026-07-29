@@ -12,8 +12,10 @@
  * preferimos cobrar de más y arreglarlo a mano, antes que regalar
  * un descuento de por vida por error.
  *
- * SECRET a cargar en Cloudflare (Configuración → Variables → Secret):
+ * SECRETS a cargar en Cloudflare (Configuración → Variables y secretos):
  *   MP_ACCESS_TOKEN → Access Token de producción de MercadoPago
+ *   ADMIN_SECRET    → la MISMA clave que tenés en el worker del webhook.
+ *                     Se usa solo de servidor a servidor, nunca llega al navegador.
  *
  * VARIABLE normal (opcional):
  *   WEBHOOK_URL → https://ginails-mp-webhook.gis-eesp91.workers.dev
@@ -89,6 +91,151 @@ const JSON_HEADERS = {
   "Access-Control-Allow-Origin": "*"
 };
 
+const FIREBASE_PROJECT_ID = "ginails-cosmetologia";
+
+/* ==========================================================
+   VERIFICACIÓN DEL TOKEN DE FIREBASE
+   ----------------------------------------------------------
+   Sin esto, cualquiera podría cambiarle el plan a otra persona
+   mandando su email. Acá comprobamos de verdad la FIRMA del token
+   contra las claves públicas de Google. No alcanza con leer el
+   contenido del token: eso lo falsifica cualquiera.
+   ========================================================== */
+let certsCache = { certs: null, exp: 0 };
+
+async function certificadosDeGoogle() {
+  const ahora = Date.now();
+  if (certsCache.certs && certsCache.exp > ahora) return certsCache.certs;
+  const res = await fetch(
+    "https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com"
+  );
+  if (!res.ok) throw new Error("No pude traer las claves de Google");
+  const certs = await res.json();
+  // Respetamos el max-age que manda Google
+  const cc = res.headers.get("cache-control") || "";
+  const m = cc.match(/max-age=(\d+)/);
+  certsCache = { certs, exp: ahora + (m ? Number(m[1]) : 3600) * 1000 };
+  return certs;
+}
+
+function b64urlABytes(s) {
+  s = s.replace(/-/g, "+").replace(/_/g, "/");
+  while (s.length % 4) s += "=";
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+function pemADer(pem) {
+  const limpio = pem
+    .replace(/-----BEGIN CERTIFICATE-----/, "")
+    .replace(/-----END CERTIFICATE-----/, "")
+    .replace(/\s/g, "");
+  const bin = atob(limpio);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+/** Saca la clave pública RSA de dentro de un certificado X.509 (formato DER). */
+function clavePublicaDelCertificado(der) {
+  // Recorremos la estructura ASN.1 hasta el SubjectPublicKeyInfo.
+  let i = 0;
+  const leerLargo = () => {
+    let largo = der[i++];
+    if (largo & 0x80) {
+      const n = largo & 0x7f;
+      largo = 0;
+      for (let k = 0; k < n; k++) largo = (largo << 8) | der[i++];
+    }
+    return largo;
+  };
+  const entrar = () => { i++; leerLargo(); };          // entrar en una secuencia
+  const saltar = () => { i++; const l = leerLargo(); i += l; };
+
+  entrar();          // Certificate
+  entrar();          // tbsCertificate
+  if (der[i] === 0xa0) saltar();                        // version
+  saltar();          // serialNumber
+  saltar();          // signature
+  saltar();          // issuer
+  saltar();          // validity
+  saltar();          // subject
+  const ini = i;     // acá arranca subjectPublicKeyInfo
+  saltar();
+  return der.slice(ini, i);
+}
+
+/**
+ * Devuelve el email verificado del token, o null si el token no sirve.
+ */
+async function emailDelToken(request) {
+  try {
+    const auth = request.headers.get("Authorization") || "";
+    const token = auth.replace(/^Bearer\s+/i, "").trim();
+    if (!token) return null;
+
+    const partes = token.split(".");
+    if (partes.length !== 3) return null;
+
+    const header = JSON.parse(new TextDecoder().decode(b64urlABytes(partes[0])));
+    const payload = JSON.parse(new TextDecoder().decode(b64urlABytes(partes[1])));
+
+    if (header.alg !== "RS256" || !header.kid) return null;
+
+    // Comprobaciones del contenido
+    const ahora = Math.floor(Date.now() / 1000);
+    if (payload.aud !== FIREBASE_PROJECT_ID) return null;
+    if (payload.iss !== `https://securetoken.google.com/${FIREBASE_PROJECT_ID}`) return null;
+    if (!payload.exp || payload.exp < ahora) return null;
+    if (payload.iat && payload.iat > ahora + 300) return null;
+    if (!payload.email) return null;
+
+    // Comprobación de la firma
+    const certs = await certificadosDeGoogle();
+    const pem = certs[header.kid];
+    if (!pem) return null;
+
+    const clave = await crypto.subtle.importKey(
+      "spki",
+      clavePublicaDelCertificado(pemADer(pem)),
+      { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+      false,
+      ["verify"]
+    );
+    const firmaOk = await crypto.subtle.verify(
+      "RSASSA-PKCS1-v1_5",
+      clave,
+      b64urlABytes(partes[2]),
+      new TextEncoder().encode(partes[0] + "." + partes[1])
+    );
+    if (!firmaOk) return null;
+
+    return String(payload.email).trim();
+  } catch (e) {
+    console.log("Token inválido:", e.message);
+    return null;
+  }
+}
+
+/** Llama al worker del webhook, que es el que tiene acceso a Firestore. */
+async function llamarWebhook(env, ruta, opciones = {}) {
+  const base = env.WEBHOOK_URL || WEBHOOK_URL_DEFAULT;
+  const res = await fetch(`${base}${ruta}`, {
+    method: opciones.method || "GET",
+    headers: {
+      "X-Admin-Secret": env.ADMIN_SECRET || "",
+      ...(opciones.body ? { "Content-Type": "application/json" } : {})
+    },
+    body: opciones.body ? JSON.stringify(opciones.body) : undefined
+  });
+  const txt = await res.text();
+  let data = {};
+  try { data = JSON.parse(txt); } catch (_) {}
+  return { ok: res.ok, status: res.status, data };
+}
+
 /**
  * Le pregunta al webhook si esta usuaria tiene derecho al precio de fundadora.
  * Ante CUALQUIER problema devuelve elegible:false → precio de lista.
@@ -125,7 +272,7 @@ export default {
         headers: {
           "Access-Control-Allow-Origin": "*",
           "Access-Control-Allow-Methods": "GET,POST,OPTIONS",
-          "Access-Control-Allow-Headers": "Content-Type"
+          "Access-Control-Allow-Headers": "Content-Type, Authorization"
         }
       });
     }
@@ -152,6 +299,40 @@ export default {
         }),
         { headers: JSON_HEADERS }
       );
+    }
+
+    /* ---------- MI PLAN (requiere estar logueada) ---------- */
+    if (url.pathname === "/api/mi-plan") {
+      const email = await emailDelToken(request);
+      if (!email) return new Response(JSON.stringify({ error: "no-autenticada" }), { status: 401, headers: JSON_HEADERS });
+
+      const r = await llamarWebhook(env, `/plan-estado?email=${encodeURIComponent(email)}`);
+      if (!r.ok) return new Response(JSON.stringify({ error: "sin-datos" }), { status: 502, headers: JSON_HEADERS });
+      return new Response(JSON.stringify({ ...r.data, email, esOwner: email.toLowerCase() === OWNER_EMAIL.toLowerCase() }), { headers: JSON_HEADERS });
+    }
+
+    /* ---------- CAMBIAR DE PLAN (requiere estar logueada) ---------- */
+    if (url.pathname === "/api/cambiar-plan" && request.method === "POST") {
+      const email = await emailDelToken(request);
+      if (!email) return new Response(JSON.stringify({ error: "no-autenticada" }), { status: 401, headers: JSON_HEADERS });
+
+      let body = {};
+      try { body = await request.json(); } catch (_) {}
+      const nivel = String(body.nivel || "").toLowerCase();
+      if (!NIVELES.includes(nivel))
+        return new Response(JSON.stringify({ error: "Plan no válido" }), { status: 400, headers: JSON_HEADERS });
+
+      // OJO: el email sale del token verificado, NUNCA de lo que manda el navegador.
+      const r = await llamarWebhook(env, "/cambiar-plan", { method: "POST", body: { email, nivel } });
+      return new Response(JSON.stringify(r.data), { status: r.ok ? 200 : 502, headers: JSON_HEADERS });
+    }
+
+    /* ---------- DAR DE BAJA UN CAMBIO PENDIENTE ---------- */
+    if (url.pathname === "/api/cancelar-cambio" && request.method === "POST") {
+      const email = await emailDelToken(request);
+      if (!email) return new Response(JSON.stringify({ error: "no-autenticada" }), { status: 401, headers: JSON_HEADERS });
+      const r = await llamarWebhook(env, "/cancelar-cambio", { method: "POST", body: { email } });
+      return new Response(JSON.stringify(r.data), { status: r.ok ? 200 : 502, headers: JSON_HEADERS });
     }
 
     // Crear suscripción MercadoPago
