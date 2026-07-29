@@ -200,6 +200,8 @@ html.dark .turno-card,
 html.dark .modal,
 html.dark .nav-menu,
 html.dark #modal-turno > div,
+html.dark #modal-finalizar > div,
+html.dark #modal-finalizar [style*="background:white"],
 html.dark #onboarding-overlay > div{
   background:var(--light) !important;
   border-color:var(--border) !important;
@@ -245,6 +247,35 @@ html.dark [style*="background:#e8f5e9"],
 html.dark [style*="background:#fff9f5"]{
   background:rgba(255,255,255,0.055) !important;
 }
+/* --- FIX cajitas que quedaban claras (alertas CRM info/exito y afines) --- */
+html.dark [style*="background:#e8f4fd"],
+html.dark [style*="background:#e8f7ee"],
+html.dark [style*="background:#e3edf8"],
+html.dark [style*="background:#e3f0e3"],
+html.dark [style*="background:#e3f2fd"],
+html.dark [style*="background:#eaf4fb"],
+html.dark [style*="background:#eef7f0"]{
+  background:rgba(255,255,255,0.055) !important;
+}
+/* Textos oscuros hardcodeados que faltaban → claros */
+html.dark [style*="color:#1a5a3a"],
+html.dark [style*="color:#2a5a3a"],
+html.dark [style*="color:#1a3a5a"],
+html.dark [style*="color:#1a4a2a"],
+html.dark [style*="color:#5a2a2a"],
+html.dark [style*="color:#6a1a1a"],
+html.dark [style*="color:#6a4a10"],
+html.dark [style*="color:#7a2a4a"],
+html.dark [style*="color:#7a5a10"],
+html.dark [style*="color:#8a6a10"],
+html.dark [style*="color:#8a6a20"],
+html.dark [style*="color:#8a2a2a"],
+html.dark [style*="color:#3a5a8a"],
+html.dark [style*="color:#4a7a4a"],
+html.dark [style*="color:#1565c0"]{
+  color:var(--text) !important;
+}
+html.dark .badge-blue{background:rgba(90,140,196,0.2) !important;color:#90c0f0 !important;}
 /* Dentro de esas cajitas y en tarjetas oscuras: forzar texto legible.
    Los títulos y textos que estaban en tonos oscuros pasan a claros. */
 html.dark .card *[style*="color:#2"],
@@ -289,6 +320,19 @@ html.dark .est-pendiente{background:rgba(255,255,255,0.08);color:#aab8ac;}
 html.dark .est-atencion{background:rgba(230,120,20,0.2);color:#f0b070;}
 html.dark .est-finalizado{background:rgba(90,140,196,0.2);color:#90c0f0;}
 html.dark .mes-dia{background:var(--light);}
+/* Cuadro de resultado de la IA (análisis y protocolo) */
+html.dark .ai-box{background:var(--light) !important;border-color:var(--border) !important;}
+html.dark .ai-content,html.dark .ai-content *{color:var(--text) !important;}
+html.dark .ai-content strong,html.dark .ai-content b{color:var(--deep) !important;}
+html.dark .ai-loading{color:var(--muted) !important;}
+/* El selector de tratamiento y su contenedor */
+html.dark [style*="linear-gradient(135deg,#fdf4f2"],
+html.dark [style*="linear-gradient(135deg,#f0faf0"],
+html.dark [style*="linear-gradient(135deg,#f8fdf8"],
+html.dark [style*="linear-gradient(135deg,#f0f8f2"],
+html.dark [style*="linear-gradient(135deg,#f5fdf5"]{
+  background:var(--light) !important;
+}
 html.dark .vista-btn.vista-activa{background:#2c3038;}
 html.dark header{background:#1c1f24 !important;}
 html.dark nav{background:linear-gradient(180deg,#1c1f24,#16181c) !important;border-bottom-color:#2c3038 !important;}
@@ -374,9 +418,6 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     <p style="font-size:0.82rem;color:#7a8e7a;margin-top:3px">Resumen de tu negocio · <span style="color:#6a9e7a;font-weight:600" id="mes-label"></span></p>
   </div>
 
-  <!-- PANEL DEL DÍA -->
-  <div id="panel-dia" style="margin-bottom:18px"></div>
-
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
     <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md);cursor:pointer;transition:all 0.2s">
@@ -417,6 +458,9 @@ html.dark .logo-text{color:#e8d8c0 !important;}
       </button>
     </div>
   </div>
+
+  <!-- PANEL DEL DÍA (agenda de hoy) -->
+  <div id="panel-dia" style="margin-top:18px"></div>
 
   <div class="alert alert-info" id="fb-config-alert" style="display:none">⚠️ Firebase no configurado — modo local activo.</div>
   <div id="crm-alertas-inicio"></div>
@@ -2565,6 +2609,97 @@ html.dark .logo-text{color:#e8d8c0 !important;}
   </div>
 </div>
 
+<!-- MODAL FINALIZAR ATENCION (Agenda - Entrega 2) -->
+<div id="modal-finalizar" style="display:none;position:fixed;inset:0;background:rgba(45,74,53,0.5);backdrop-filter:blur(3px);z-index:9998;align-items:center;justify-content:center;padding:16px">
+  <div style="background:white;border-radius:20px;max-width:480px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg)">
+    <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;border-radius:20px 20px 0 0;z-index:2">
+      <div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--deep)">Finalizar atención</div>
+        <div id="fin-subtitulo" style="font-size:0.78rem;color:var(--muted);margin-top:2px"></div>
+      </div>
+      <button onclick="cerrarFinalizar()" style="background:none;border:none;cursor:pointer;color:var(--muted)"><span data-ic-html="cerrar-20"></span></button>
+    </div>
+    <div style="padding:20px">
+
+      <div id="fin-alertas" style="margin-bottom:12px"></div>
+
+      <div class="form-group" style="margin-bottom:12px"><label>Tratamiento realizado *</label>
+        <select id="fin-tratamiento" style="width:100%">
+          <option value="">Seleccionar</option>
+          <option>Limpieza Facial Profunda</option>
+          <option>Hidratación Profunda</option>
+          <option>Control de Acné</option>
+          <option>Despigmentación &amp; Luminosidad</option>
+          <option>Anti-Edad &amp; Lifting Facial</option>
+          <option>Calmante &amp; Barrera Protectora</option>
+          <option>Revitalización &amp; Glow</option>
+          <option>Peeling Químico Superficial</option>
+          <option>Dermaplaning</option>
+          <option>Radiofrecuencia</option>
+          <option>Microneedling</option>
+          <option>Lifting de Pestañas</option>
+          <option>Laminado de Cejas</option>
+          <option>Henna de Cejas</option>
+          <option>Tinte Cejas &amp; Pestañas</option>
+          <option>Diseño &amp; Perfilado de Cejas</option>
+          <option>Control / Seguimiento</option>
+          <option>Consulta / Primera vez</option>
+        </select>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="form-group"><label>Estado de la piel</label>
+          <select id="fin-estado-piel" style="width:100%"><option value="">Seleccionar</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option><option>Con brote activo</option><option>Deshidratada</option><option>Sensible / reactiva</option><option>Irritada</option></select>
+        </div>
+        <div class="form-group"><label>Duración real (min)</label><input type="number" id="fin-duracion" min="5" step="5" placeholder="60"></div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px"><label>Productos y aparatología usados</label>
+        <input type="text" id="fin-productos" placeholder="Ej: sérum hialurónico, vaporizador, alta frecuencia...">
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px"><label>Observaciones / cómo reaccionó</label>
+        <textarea id="fin-reaccion" placeholder="¿Toleró bien? ¿Enrojecimiento? ¿Notó mejoría? ¿Qué observaste?"></textarea>
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px">
+        <label class="check-item" style="width:fit-content"><input type="checkbox" id="fin-rechazo" onchange="toggleRechazoFin()"> Hubo rechazo o reacción adversa</label>
+        <div id="fin-rechazo-box" style="display:none;margin-top:7px">
+          <input type="text" id="fin-rechazo-prod" placeholder="¿A qué producto reaccionó?" style="margin-bottom:6px">
+          <textarea id="fin-rechazo-desc" placeholder="Describir la reacción: enrojecimiento, picazón, hinchazón..." style="min-height:55px;margin-bottom:6px"></textarea>
+          <input type="text" id="fin-reemplazo" placeholder="Producto con el que se reemplazó (si aplica)">
+        </div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:12px">
+        <div style="font-weight:700;font-size:0.88rem;color:var(--deep);margin-bottom:9px">Cobro</div>
+        <div id="fin-sena-info" style="display:none;font-size:0.78rem;margin-bottom:9px;padding:7px 10px;border-radius:9px;background:#fff8e3;color:#8a6a10"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div class="form-group"><label>Precio cobrado ($)</label><input type="number" id="fin-precio" min="0" placeholder="0"></div>
+          <div class="form-group"><label>Forma de pago</label>
+            <select id="fin-pago" style="width:100%"><option value="">—</option><option>Efectivo</option><option>Transferencia</option><option>Débito</option><option>Crédito</option><option>Sin cobrar</option></select>
+          </div>
+        </div>
+        <div id="fin-precio-ref" style="font-size:0.75rem;color:var(--muted);margin-top:2px"></div>
+      </div>
+
+      <div style="border-top:1px solid var(--border);padding-top:14px;margin-bottom:16px">
+        <label class="check-item" style="width:fit-content"><input type="checkbox" id="fin-proximo" onchange="toggleProximoFin()"> Programar próximo control</label>
+        <div id="fin-proximo-box" style="display:none;margin-top:9px">
+          <div class="form-group" style="margin-bottom:9px"><label>Fecha sugerida</label><input type="date" id="fin-proxima-fecha"></div>
+          <div class="form-group"><label>Nota para la próxima sesión</label><textarea id="fin-proxima-nota" placeholder="¿Qué cambiar? ¿Qué reforzar? ¿Qué recordar la próxima vez?"></textarea></div>
+          <div style="font-size:0.74rem;color:var(--muted);margin-top:5px">Queda guardado como recordatorio en la ficha. El turno lo cargás vos desde la agenda cuando lo confirme.</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px">
+        <button onclick="cerrarFinalizar()" class="btn-secondary" style="padding:13px 16px;border-radius:12px;border:1.5px solid var(--border);background:white;color:var(--deep);font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;cursor:pointer">Cancelar</button>
+        <button onclick="guardarFinalizarAtencion()" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer">Guardar y finalizar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL SESION -->
 <div class="modal-overlay" id="modal-sesion">
   <div class="modal">
@@ -3207,7 +3342,12 @@ function renderVistaDia(cont){
       <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">
         ${sena}
         ${c?`<button onclick="abrirFicha('${t.clientaId}')" style="padding:8px 14px;background:white;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;color:var(--deep);cursor:pointer;display:inline-flex;align-items:center;gap:5px"><span data-ic-html="persona-14"></span>Ver ficha</button>`:''}
-        <button onclick="iniciarAtencion('${t.id}')" style="padding:8px 14px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;flex:1;min-width:120px">${t.estado==='finalizado'?'Ver sesión':'Iniciar atención'}</button>
+        ${(()=>{
+          const est=t.estado||'pendiente';
+          if(est==='finalizado') return `<button onclick="verSesionDeTurno('${t.id}')" style="padding:8px 14px;background:none;border:1.5px solid var(--sage);color:var(--sage);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;flex:1;min-width:120px">Ver sesión</button>`;
+          if(est==='atencion') return `<button onclick="abrirFinalizarAtencion('${t.id}')" style="padding:8px 14px;background:linear-gradient(135deg,var(--sage),#4d8060);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;flex:1;min-width:120px">Finalizar atención</button>`;
+          return `<button onclick="iniciarAtencion('${t.id}')" style="padding:8px 14px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;flex:1;min-width:120px">Iniciar atención</button>`;
+        })()}
         <button onclick="editarTurno('${t.id}')" style="padding:8px 10px;background:none;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;color:var(--muted)"><span data-ic-html="editar-14"></span></button>
       </div>
     </div>`;
@@ -3477,6 +3617,181 @@ function iniciarAtencion(turnoId){
     if(st){ st.value=t.tratamiento; }
     renderAgenda();
   },400);
+}
+
+// ---------- FINALIZAR ATENCIÓN (Entrega 2) ----------
+let _turnoFinalizarId=null;
+
+// Precio de lista del tratamiento (solo informativo, no autocompleta el campo)
+function precioDeTratamiento(trat){
+  if(!trat) return 0;
+  try{
+    const info=(typeof PRECIOS_INFO!=='undefined'?PRECIOS_INFO:[]).find(p=>p.nombre===trat);
+    if(info && typeof misPrecios!=='undefined' && misPrecios[info.id]) return Number(misPrecios[info.id])||0;
+  }catch(e){}
+  return 0;
+}
+
+function toggleRechazoFin(){
+  const box=document.getElementById('fin-rechazo-box');
+  const chk=document.getElementById('fin-rechazo');
+  if(box&&chk) box.style.display=chk.checked?'block':'none';
+}
+function toggleProximoFin(){
+  const box=document.getElementById('fin-proximo-box');
+  const chk=document.getElementById('fin-proximo');
+  if(box&&chk) box.style.display=chk.checked?'block':'none';
+}
+function cerrarFinalizar(){
+  const m=document.getElementById('modal-finalizar');
+  if(m) m.style.display='none';
+  _turnoFinalizarId=null;
+}
+
+function abrirFinalizarAtencion(turnoId){
+  const t=turnos[turnoId]; if(!t) return;
+  const c=clientas[t.clientaId];
+  if(!c){ alert('Esta clienta no tiene ficha cargada. Cargala primero para poder guardar la sesión.'); return; }
+  _turnoFinalizarId=turnoId;
+
+  const sub=document.getElementById('fin-subtitulo');
+  if(sub){
+    const fechaTxt=t.fecha?t.fecha.split('-').reverse().join('/'):'';
+    sub.textContent=`${c.nombre} · ${fechaTxt}${t.hora?' · '+t.hora+' hs':''}`;
+  }
+
+  // Alertas de la ficha (las mismas que muestra la agenda)
+  const cajaAl=document.getElementById('fin-alertas');
+  if(cajaAl){
+    const al=(typeof alertasClienta==='function'?alertasClienta(c):[])||[];
+    cajaAl.innerHTML=al.length
+      ? `<div style="padding:8px 11px;background:#fff0f0;border-radius:9px;font-size:0.77rem;color:var(--danger);display:flex;align-items:flex-start;gap:6px"><span data-ic-html="alerta-14" style="flex-shrink:0"></span><div>${al.join(' · ')}</div></div>`
+      : '';
+  }
+
+  // Campos precargados desde el turno
+  const setVal=(id,val)=>{const el=document.getElementById(id);if(el)el.value=val;};
+  setVal('fin-tratamiento', t.tratamiento||'');
+  setVal('fin-estado-piel','');
+  setVal('fin-duracion', t.duracion||'');
+  setVal('fin-productos','');
+  setVal('fin-reaccion','');
+  setVal('fin-rechazo-prod','');
+  setVal('fin-rechazo-desc','');
+  setVal('fin-reemplazo','');
+  setVal('fin-precio','');            // precio siempre vacío, lo ponés vos
+  setVal('fin-pago','');
+  setVal('fin-proxima-fecha','');
+  setVal('fin-proxima-nota', t.nota||'');
+  const chkR=document.getElementById('fin-rechazo'); if(chkR) chkR.checked=false;
+  const chkP=document.getElementById('fin-proximo'); if(chkP) chkP.checked=false;
+  toggleRechazoFin(); toggleProximoFin();
+
+  // Seña ya pagada (informativa)
+  const infoSena=document.getElementById('fin-sena-info');
+  if(infoSena){
+    if(t.sena&&Number(t.sena)>0){
+      infoSena.style.display='block';
+      infoSena.textContent=`Ya dejó una seña de $${Number(t.sena).toLocaleString('es-AR')}.`;
+    }else{ infoSena.style.display='none'; infoSena.textContent=''; }
+  }
+  actualizarRefPrecioFin();
+  const selT=document.getElementById('fin-tratamiento');
+  if(selT&&!selT._refBound){ selT.addEventListener('change',actualizarRefPrecioFin); selT._refBound=true; }
+
+  const modal=document.getElementById('modal-finalizar');
+  if(modal) modal.style.display='flex';
+  if(typeof aplicarIconos==='function') aplicarIconos(modal);
+}
+
+function actualizarRefPrecioFin(){
+  const ref=document.getElementById('fin-precio-ref');
+  if(!ref) return;
+  const trat=document.getElementById('fin-tratamiento')?.value||'';
+  const p=precioDeTratamiento(trat);
+  ref.textContent = p ? `Precio de lista: $${p.toLocaleString('es-AR')}` : '';
+}
+
+async function guardarFinalizarAtencion(){
+  const turnoId=_turnoFinalizarId;
+  const t=turnos[turnoId];
+  if(!t){ alert('No encontré el turno.'); return; }
+  const trat=document.getElementById('fin-tratamiento')?.value||'';
+  if(!trat){ alert('Confirmá el tratamiento realizado.'); return; }
+
+  const clientaId=t.clientaId;
+  const plan=Object.values(planes).find(p=>p.clientaId===clientaId&&p.activo);
+  const tuvoRechazo=!!document.getElementById('fin-rechazo')?.checked;
+  const gv=id=>document.getElementById(id)?.value||'';
+
+  // Número de sesión: siguiente según el historial de esa clienta
+  const previas=Object.values(sesiones).filter(s=>s.clientaId===clientaId).length;
+
+  // Nota de próxima sesión (solo recordatorio, no crea turno)
+  let notaProxima='';
+  if(document.getElementById('fin-proximo')?.checked){
+    const f=gv('fin-proxima-fecha');
+    const n=gv('fin-proxima-nota');
+    const fTxt=f?f.split('-').reverse().join('/'):'';
+    notaProxima=[fTxt?`Próximo control: ${fTxt}`:'',n].filter(Boolean).join(' — ');
+  }else{
+    notaProxima=gv('fin-proxima-nota');
+  }
+
+  // Fecha de la sesión = la fecha del turno
+  const fechaSesion = t.fecha ? t.fecha.split('-').reverse().join('/') : new Date().toLocaleDateString('es-AR');
+  const fechaTs = t.fecha ? new Date(t.fecha+'T'+((t.hora||'12:00'))).getTime() : Date.now();
+
+  const id=uid();
+  const ses={
+    id, clientaId, planId:plan?plan.id:null,
+    fecha:fechaSesion, fechaTs: isNaN(fechaTs)?Date.now():fechaTs,
+    numero:previas+1,
+    tratamiento:trat,
+    estadoPiel:gv('fin-estado-piel'),
+    duracion:gv('fin-duracion'),
+    productos:gv('fin-productos'),
+    reaccion:gv('fin-reaccion'),
+    tuvoRechazo,
+    rechazoProd:tuvoRechazo?gv('fin-rechazo-prod'):'',
+    rechazoDesc:tuvoRechazo?gv('fin-rechazo-desc'):'',
+    productoReemplazo:tuvoRechazo?gv('fin-reemplazo'):'',
+    notaProxima,
+    precio:parseInt(gv('fin-precio'))||0,
+    pago:gv('fin-pago'),
+    turnoId: turnoId
+  };
+
+  sesiones[id]=ses;
+  await saveDoc('sesiones',id,ses);
+
+  // Marcar el turno como finalizado y dejarlo enlazado a la sesión
+  t.estado='finalizado';
+  t.sesionId=id;
+  t.tratamiento=trat;
+  turnos[turnoId]=t;
+  await saveDoc('turnos',turnoId,t);
+
+  cerrarFinalizar();
+  renderAgenda();
+  if(typeof renderPanelDia==='function') renderPanelDia();
+  if(typeof renderClientas==='function') renderClientas();
+  if(typeof updateStats==='function') updateStats();
+  if(typeof renderCRMAlertas==='function') renderCRMAlertas();
+  if(clientaActualId===clientaId){
+    if(typeof renderHistorialModal==='function') renderHistorialModal();
+    if(typeof renderPlanModal==='function') renderPlanModal();
+  }
+  alert('✅ Atención finalizada y guardada en el historial.');
+}
+
+// Ver la sesión ya registrada de un turno finalizado
+function verSesionDeTurno(turnoId){
+  const t=turnos[turnoId]; if(!t) return;
+  if(!clientas[t.clientaId]){ alert('Esta clienta no tiene ficha cargada.'); return; }
+  clientaActualId=t.clientaId;
+  abrirFicha(t.clientaId);
+  setTimeout(()=>{ if(typeof renderHistorialModal==='function') renderHistorialModal(); },400);
 }
 
 
