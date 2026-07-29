@@ -21,10 +21,10 @@
 
 const OWNER_EMAIL = "gis.eesp91@gmail.com";
 
-// ⚠️ IMPORTANTE: este valor está acá solo para que nada deje de funcionar
-// mientras cargás el Secret. Una vez que cargues MP_ACCESS_TOKEN en
-// Cloudflare, borrá la línea de abajo y dejá solo la cadena vacía.
-const MP_TOKEN_VIEJO = "APP_USR-206002900110129-040911-e9f1c65cad33e33720702c71a3f53cb5-125485692";
+// El token de MercadoPago vive como Secret en Cloudflare (MP_ACCESS_TOKEN).
+// Acá queda vacío a propósito: nunca hay que escribirlo en el código,
+// porque este archivo está en GitHub y quedaría a la vista de cualquiera.
+const MP_TOKEN_VIEJO = "";
 
 const WEBHOOK_URL_DEFAULT = "https://ginails-mp-webhook.gis-eesp91.workers.dev";
 
