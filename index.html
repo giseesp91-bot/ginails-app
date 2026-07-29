@@ -4,6 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ginails · Cosmetología Pro</title>
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#2d4a35">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ginails Pro">
+<link rel="apple-touch-icon" href="/icon.png">
 <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.gstatic.com https://apis.google.com https://fonts.googleapis.com https://*.firebaseapp.com https://*.firebase.com; connect-src *; font-src *; img-src * data:; frame-src *;">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -268,6 +275,14 @@ html.dark .alert-warning{background:rgba(184,151,106,0.15) !important;color:#e0c
 html.dark .alert-info{background:rgba(74,144,217,0.15) !important;color:#9ec8f0 !important;}
 html.dark .alert-success{background:rgba(90,158,106,0.15) !important;color:#9ed8ae !important;}
 html.dark .serv-section h5{color:var(--deep) !important;}
+/* Botones que quedaban blancos con texto claro */
+html.dark .btn-secondary{background:var(--light) !important;color:var(--text) !important;border-color:var(--border) !important;}
+html.dark .btn-secondary:hover{background:#2c3038 !important;color:var(--deep) !important;}
+html.dark .btn-secondary .ic{color:var(--text) !important;}
+html.dark .btn.btn-secondary,html.dark button.btn-secondary{background:var(--light) !important;color:var(--text) !important;}
+/* El botón "Claro" del selector de modo: mantiene fondo blanco pero con texto oscuro fijo */
+html.dark #btn-modo-claro{background:white !important;color:#2a3a2a !important;}
+html.dark #btn-modo-claro span,html.dark #btn-modo-claro *{color:#2a3a2a !important;}
 html.dark .empty-state{color:var(--muted);}
 html.dark .est-confirmado{background:rgba(90,158,106,0.2);color:#8fd89a;}
 html.dark .est-pendiente{background:rgba(255,255,255,0.08);color:#aab8ac;}
@@ -5941,6 +5956,14 @@ async function guardarEdicionFicha(id){
 
 
 
+</script>
+<script>
+// Registrar Service Worker para que la app sea instalable como PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('/sw.js').catch(e=>console.log('SW no registrado:', e));
+  });
+}
 </script>
 </body>
 </html>
