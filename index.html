@@ -137,7 +137,7 @@ input[type="file"]{display:none;}
 .tag-aviso{background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:8px 12px;font-size:0.82rem;color:#856404;margin-bottom:8px;}
 .ic{flex-shrink:0} .nav-btn .ic{width:16px;height:16px}
 .nav-group{position:relative;display:inline-block}
-.nav-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:white;border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-lg);padding:6px;z-index:200;min-width:210px}
+.nav-menu{display:none;position:fixed;background:white;border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-lg);padding:6px;z-index:9500;min-width:210px}
 .nav-menu.open{display:block;animation:fadeIn 0.18s ease}
 .nav-menu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:none;padding:10px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.86rem;color:var(--text);cursor:pointer;white-space:nowrap}
 .nav-menu button:hover{background:var(--cream);color:var(--deep)}
@@ -3426,6 +3426,16 @@ function toggleNavMenu(menuId, btn){
   // Cerrar todos los menús
   document.querySelectorAll('.nav-menu').forEach(m=>m.classList.remove('open'));
   if(!yaAbierto){
+    // Posicionar el menú justo debajo del botón (position:fixed escapa del overflow del nav)
+    const r = btn.getBoundingClientRect();
+    menu.style.top = (r.bottom + 6) + 'px';
+    let left = r.left;
+    // Que no se salga por la derecha de la pantalla
+    const anchoMenu = 210;
+    if(left + anchoMenu > window.innerWidth - 10){
+      left = window.innerWidth - anchoMenu - 10;
+    }
+    menu.style.left = Math.max(10, left) + 'px';
     menu.classList.add('open');
     if(typeof aplicarIconos==='function') aplicarIconos(menu);
   }
@@ -3447,6 +3457,9 @@ document.addEventListener('click', function(e){
     document.querySelectorAll('.nav-menu').forEach(m=>m.classList.remove('open'));
   }
 });
+// Cerrar menús al scrollear el nav o la página (position:fixed quedaría desalineado)
+window.addEventListener('resize', ()=>document.querySelectorAll('.nav-menu.open').forEach(m=>m.classList.remove('open')));
+document.addEventListener('scroll', ()=>document.querySelectorAll('.nav-menu.open').forEach(m=>m.classList.remove('open')), true);
 
 function showSection(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
