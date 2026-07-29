@@ -136,6 +136,100 @@ input[type="file"]{display:none;}
 .highlight strong{color:var(--rose);}
 .tag-aviso{background:#fff3cd;border:1px solid #ffc107;border-radius:10px;padding:8px 12px;font-size:0.82rem;color:#856404;margin-bottom:8px;}
 .ic{flex-shrink:0} .nav-btn .ic{width:16px;height:16px}
+.nav-group{position:relative;display:inline-block}
+.nav-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;background:white;border:1px solid var(--border);border-radius:14px;box-shadow:var(--sh-lg);padding:6px;z-index:200;min-width:210px}
+.nav-menu.open{display:block;animation:fadeIn 0.18s ease}
+.nav-menu button{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:none;padding:10px 12px;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.86rem;color:var(--text);cursor:pointer;white-space:nowrap}
+.nav-menu button:hover{background:var(--cream);color:var(--deep)}
+.nav-menu button .ic{width:16px;height:16px;color:var(--sage)}
+/* AGENDA */
+.vista-btn{flex:1;padding:9px;border:none;background:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.vista-btn.vista-activa{background:white;color:var(--deep);box-shadow:var(--sh-sm)}
+.turno-card{background:white;border-radius:16px;border:1px solid var(--border);border-left:5px solid var(--sage);padding:14px 16px;margin-bottom:12px;box-shadow:var(--sh-sm);transition:box-shadow 0.2s,transform 0.2s}
+.turno-card:hover{box-shadow:var(--sh-md);transform:translateY(-1px)}
+.turno-hora{font-weight:700;color:var(--deep);font-size:1rem}
+.turno-foto{width:46px;height:46px;border-radius:50%;object-fit:cover;background:var(--cream);display:flex;align-items:center;justify-content:center;color:var(--sage);font-weight:700;flex-shrink:0}
+.vip-badge{background:linear-gradient(135deg,var(--gold),#a07850);color:white;font-size:0.6rem;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:0.5px}
+.turno-estado{font-size:0.75rem;font-weight:600;padding:3px 9px;border-radius:20px;display:inline-flex;align-items:center;gap:4px}
+.est-confirmado{background:#e8f5e9;color:#2e7d32}
+.est-pendiente{background:#f5f5f5;color:#757575}
+.est-atencion{background:#fff3e0;color:#e65100}
+.est-finalizado{background:#e3f2fd;color:#1565c0}
+.mes-dia{min-height:64px;border:1px solid var(--border);border-radius:10px;padding:5px;cursor:pointer;transition:background 0.15s;background:white;overflow:hidden}
+.mes-dia:hover{background:var(--cream)}
+.mes-dia.otro-mes{opacity:0.35}
+.mes-dia.hoy{border-color:var(--rose);border-width:2px}
+.mes-punto{width:6px;height:6px;border-radius:50%;display:inline-block;margin:1px}
+
+/* ===================== MODO OSCURO ROBUSTO ===================== */
+html.dark{
+  --cream:#16211a; --light:#1f2e24; --border:#33473a;
+  --text:#d8ead8; --muted:#8faa93; --deep:#c8e0cc; --blush:#3a2a30;
+}
+html.dark body{background:#16211a;color:var(--text);}
+/* Todos los fondos blancos hardcodeados → superficie oscura */
+html.dark [style*="background:white"],
+html.dark [style*="background:#fff"],
+html.dark [style*="background:#ffffff"],
+html.dark [style*="background:#f8faf8"],
+html.dark [style*="background:#f8fdf8"],
+html.dark [style*="background:#f0f8f2"],
+html.dark [style*="background:#f0faf5"],
+html.dark [style*="background:#fdfaf0"],
+html.dark [style*="background:#fdf8f0"],
+html.dark [style*="background:#fff9f5"],
+html.dark [style*="background-color:white"],
+html.dark [style*="background-color:#fff"]{
+  background:var(--light) !important;
+}
+/* Gradientes claros de cards → superficie oscura */
+html.dark [style*="linear-gradient(135deg,#fff"],
+html.dark [style*="linear-gradient(135deg,#f8fdf8"],
+html.dark [style*="linear-gradient(135deg,#f8faf8"]{
+  background:var(--light) !important;
+}
+html.dark .card,
+html.dark .turno-card,
+html.dark .modal,
+html.dark .nav-menu,
+html.dark #modal-turno > div,
+html.dark #onboarding-overlay > div{
+  background:var(--light) !important;
+  border-color:var(--border) !important;
+}
+html.dark input,html.dark select,html.dark textarea{
+  background:#1a281f !important;color:var(--text) !important;border-color:var(--border) !important;
+}
+html.dark input::placeholder,html.dark textarea::placeholder{color:#6a8470;}
+/* Textos oscuros hardcodeados → claros */
+html.dark [style*="color:#2d4a35"],
+html.dark [style*="color:#2a3a2a"],
+html.dark [style*="color:#2a4a"],
+html.dark [style*="color:#5a3a10"],
+html.dark [style*="color:#3d1f1a"],
+html.dark [style*="color:#4a2d28"]{
+  color:var(--text) !important;
+}
+html.dark .section-title,html.dark .card-title{color:var(--deep) !important;}
+/* Cajitas de color muy claras (alertas suaves) → tono oscuro translúcido */
+html.dark [style*="background:#fff0f0"],
+html.dark [style*="background:#fff0f7"],
+html.dark [style*="background:#fde8e8"],
+html.dark [style*="background:#f0f7ff"],
+html.dark [style*="background:#fff8e3"],
+html.dark [style*="background:#e0f0e8"],
+html.dark [style*="background:#f5ead8"],
+html.dark [style*="background:#e8f5e9"]{
+  background:rgba(255,255,255,0.06) !important;
+}
+html.dark .empty-state{color:var(--muted);}
+html.dark .est-confirmado{background:rgba(90,158,106,0.2);color:#8fd89a;}
+html.dark .est-pendiente{background:rgba(255,255,255,0.08);color:#aab8ac;}
+html.dark .est-atencion{background:rgba(230,120,20,0.2);color:#f0b070;}
+html.dark .est-finalizado{background:rgba(90,140,196,0.2);color:#90c0f0;}
+html.dark .mes-dia{background:var(--light);}
+html.dark .vista-btn.vista-activa{background:#2a3d30;}
+/* Header y nav se mantienen (ya son verdes oscuros) */
 </style>
 </head>
 <body>
@@ -155,17 +249,39 @@ input[type="file"]{display:none;}
 </header>
 <nav>
   <button class="nav-btn active" onclick="showSection('inicio',this)" data-ic="inicio">Inicio</button>
-  <button class="nav-btn" onclick="showSection('nueva-clienta',this)" data-ic="nueva-clienta">Nueva Clienta</button>
-  <button class="nav-btn" onclick="showSection('clientas',this)" data-ic="clientas">Clientas</button>
-  <button class="nav-btn" onclick="showSection('servicios',this)" data-ic="servicios">Servicios</button>
-  <button class="nav-btn" onclick="showSection('insumos',this)" data-ic="insumos">Mis Insumos</button>
-  <button class="nav-btn" onclick="showSection('precios',this)" data-ic="precios">Precios</button>
-  <button class="nav-btn" onclick="showSection('presupuestos',this)" data-ic="presupuestos">Presupuestos</button>
-  <button class="nav-btn" onclick="showSection('gastos',this)" data-ic="gastos">Gastos</button>
-  <button class="nav-btn" onclick="showSection('compras',this)" data-ic="compras">Compras</button>
+  <button class="nav-btn" onclick="showSection('agenda',this)" data-ic="historial">Agenda</button>
+
+  <div class="nav-group">
+    <button class="nav-btn" onclick="toggleNavMenu('menu-clientas',this)" data-ic="clientas">Clientas ▾</button>
+    <div class="nav-menu" id="menu-clientas">
+      <button onclick="navGo('clientas',this)" data-ic="clientas">Ver clientas</button>
+      <button onclick="navGo('nueva-clienta',this)" data-ic="nueva-clienta">Nueva clienta</button>
+      <button onclick="navGo('crm',this)" data-ic="crm">CRM & Alertas <span id="crm-badge" style="display:none;background:var(--danger);color:white;border-radius:20px;padding:1px 6px;font-size:0.65rem;margin-left:3px">0</span></button>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-btn" onclick="toggleNavMenu('menu-servicios',this)" data-ic="servicios">Servicios ▾</button>
+    <div class="nav-menu" id="menu-servicios">
+      <button onclick="navGo('servicios',this)" data-ic="servicios">Servicios & Protocolos</button>
+      <button onclick="navGo('precios',this)" data-ic="precios">Precios</button>
+    </div>
+  </div>
+
+  <div class="nav-group">
+    <button class="nav-btn" onclick="toggleNavMenu('menu-finanzas',this)" data-ic="gastos">Finanzas ▾</button>
+    <div class="nav-menu" id="menu-finanzas">
+      <button onclick="navGo('gastos',this)" data-ic="gastos">Gastos & Rentabilidad</button>
+      <button onclick="navGo('insumos',this)" data-ic="insumos">Mis Insumos</button>
+      <button onclick="navGo('compras',this)" data-ic="compras">Guía de Compras</button>
+      <button onclick="navGo('presupuestos',this)" data-ic="presupuestos">Presupuestos</button>
+    </div>
+  </div>
+
   <button class="nav-btn" onclick="showSection('config',this)" data-ic="config">Config</button>
-  <button class="nav-btn" onclick="showSection('crm',this)" id="nav-crm" data-ic="crm">CRM <span id="crm-badge" style="display:none;background:var(--danger);color:white;border-radius:20px;padding:1px 6px;font-size:0.65rem;margin-left:3px">0</span></button>
 </nav>
+<!-- botón CRM oculto legacy para compatibilidad -->
+<button id="nav-crm" style="display:none" onclick="showSection('crm',this)"></button>
 
 <main>
 
@@ -193,6 +309,9 @@ input[type="file"]{display:none;}
     <div id="saludo-inicio" style="font-family:'Playfair Display',serif;font-size:1.5rem;color:#2d4a35;display:flex;align-items:center;gap:8px"><span data-ic-html="hormonal-20" style="display:inline-flex;vertical-align:-0.15em;margin-right:6px"></span>Bienvenida/o</div>
     <p style="font-size:0.82rem;color:#7a8e7a;margin-top:3px">Resumen de tu negocio · <span style="color:#6a9e7a;font-weight:600" id="mes-label"></span></p>
   </div>
+
+  <!-- PANEL DEL DÍA -->
+  <div id="panel-dia" style="margin-bottom:18px"></div>
 
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
@@ -472,11 +591,39 @@ input[type="file"]{display:none;}
   <div id="ia-resultado"></div>
 </div>
 
+<!-- AGENDA -->
+<div id="agenda" class="section">
+  <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:14px">
+    <div class="section-title" style="margin-bottom:0"><span data-ic-html="historial-18" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Agenda</div>
+    <button onclick="abrirNuevoTurno()" style="padding:10px 16px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;box-shadow:var(--sh-sm);display:inline-flex;align-items:center;gap:6px"><span data-ic-html="agregar-16"></span>Nuevo turno</button>
+  </div>
+
+  <!-- Selector de vista -->
+  <div style="display:flex;gap:6px;margin-bottom:14px;background:var(--cream);padding:5px;border-radius:14px;border:1px solid var(--border)">
+    <button id="vista-dia-btn" onclick="setVistaAgenda('dia')" class="vista-btn vista-activa">Día</button>
+    <button id="vista-semana-btn" onclick="setVistaAgenda('semana')" class="vista-btn">Semana</button>
+    <button id="vista-mes-btn" onclick="setVistaAgenda('mes')" class="vista-btn">Mes</button>
+  </div>
+
+  <!-- Navegador de fecha -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+    <button onclick="navegarAgenda(-1)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;color:var(--deep);display:inline-flex;align-items:center;justify-content:center"><span data-ic-html="flecha-izquierda-16"></span></button>
+    <div style="text-align:center">
+      <div id="agenda-fecha-label" style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--deep)">Hoy</div>
+      <button onclick="agendaHoy()" style="font-size:0.74rem;color:var(--rose);background:none;border:none;cursor:pointer;font-weight:600">Volver a hoy</button>
+    </div>
+    <button onclick="navegarAgenda(1)" style="width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;color:var(--deep);display:inline-flex;align-items:center;justify-content:center"><span data-ic-html="flecha-derecha-16"></span></button>
+  </div>
+
+  <div id="agenda-contenido"></div>
+</div>
+
 <!-- MIS CLIENTAS -->
 <div id="clientas" class="section">
   <div class="section-title"><span data-ic-html="persona-18" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Mis Clientas</div>
-  <div style="margin-bottom:12px">
-    <input type="text" id="buscar-clienta" placeholder="🔍 Buscar clienta..." oninput="renderClientas()" style="width:100%">
+  <div style="margin-bottom:12px;position:relative">
+    <span data-ic-html="buscar-18" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none;display:inline-flex"></span>
+    <input type="text" id="buscar-clienta" placeholder="Buscar clienta por nombre..." oninput="renderClientas()" style="width:100%;padding-left:38px">
   </div>
   <div id="lista-clientas"><div class="empty-state"><div class="icon">🌸</div><p>Cargando...</p></div></div>
 </div>
@@ -2297,6 +2444,63 @@ input[type="file"]{display:none;}
   </div>
 </div>
 
+<!-- MODAL NUEVO/EDITAR TURNO -->
+<div id="modal-turno" style="display:none;position:fixed;inset:0;background:rgba(45,74,53,0.5);backdrop-filter:blur(3px);z-index:9998;align-items:center;justify-content:center;padding:16px">
+  <div style="background:white;border-radius:20px;max-width:440px;width:100%;max-height:92vh;overflow-y:auto;box-shadow:var(--sh-lg)">
+    <div style="padding:18px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:white;border-radius:20px 20px 0 0">
+      <div id="turno-modal-titulo" style="font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--deep)">Nuevo turno</div>
+      <button onclick="document.getElementById('modal-turno').style.display='none'" style="background:none;border:none;cursor:pointer;color:var(--muted)"><span data-ic-html="cerrar-20"></span></button>
+    </div>
+    <div style="padding:20px">
+      <div class="form-group" style="margin-bottom:12px"><label>Clienta *</label>
+        <select id="turno-clienta" style="width:100%"></select>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="form-group"><label>Fecha *</label><input type="date" id="turno-fecha"></div>
+        <div class="form-group"><label>Hora *</label><input type="time" id="turno-hora"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">
+        <div class="form-group"><label>Duración (min)</label><input type="number" id="turno-duracion" value="60" step="15"></div>
+        <div class="form-group"><label>Seña ($)</label><input type="number" id="turno-sena" placeholder="0"></div>
+      </div>
+      <div class="form-group" style="margin-bottom:12px"><label>Tratamiento *</label>
+        <select id="turno-tratamiento" style="width:100%">
+          <option value="">Seleccionar</option>
+          <option>Limpieza Facial Profunda</option>
+          <option>Hidratación Profunda</option>
+          <option>Control de Acné</option>
+          <option>Despigmentación & Luminosidad</option>
+          <option>Anti-Edad & Lifting Facial</option>
+          <option>Calmante & Barrera Protectora</option>
+          <option>Revitalización & Glow</option>
+          <option>Peeling Químico Superficial</option>
+          <option>Dermaplaning</option>
+          <option>Radiofrecuencia</option>
+          <option>Microneedling</option>
+          <option>Lifting de Pestañas</option>
+          <option>Laminado de Cejas</option>
+          <option>Henna de Cejas</option>
+          <option>Diseño & Perfilado de Cejas</option>
+          <option>Control / Seguimiento</option>
+          <option>Consulta / Primera vez</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:12px"><label>Estado</label>
+        <select id="turno-estado" style="width:100%">
+          <option value="pendiente">Sin confirmar</option>
+          <option value="confirmado">Confirmado</option>
+          <option value="finalizado">Finalizado</option>
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:16px"><label>Nota (opcional)</label><input type="text" id="turno-nota" placeholder="Ej: viene con su hija, pidió turno temprano..."></div>
+      <div style="display:flex;gap:10px">
+        <button onclick="guardarTurno()" style="flex:1;padding:13px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer">Guardar turno</button>
+        <button id="turno-btn-borrar" onclick="borrarTurno()" style="display:none;padding:13px 16px;background:none;border:1.5px solid var(--danger);color:var(--danger);border-radius:12px;cursor:pointer"><span data-ic-html="eliminar-16"></span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL SESION -->
 <div class="modal-overlay" id="modal-sesion">
   <div class="modal">
@@ -2559,7 +2763,7 @@ if(typeof MutationObserver!=='undefined'){
 // ===================== ESTADO GLOBAL =====================
 let db=null,fs=null,useFirebase=false;
 let clientaActualId=null,iaTextoActual='';
-let clientas={},sesiones={},planes={},gastosD={},presupuestos={},serviciosCustom={};
+let clientas={},sesiones={},planes={},gastosD={},presupuestos={},serviciosCustom={},turnos={};
 let presItems=[];
 
 // INSUMOS - lista maestra con categorías
@@ -2750,13 +2954,14 @@ function initLocal(){
   gastosD=JSON.parse(localStorage.getItem('g_gastos')||'{}');
   presupuestos=JSON.parse(localStorage.getItem('g_presupuestos')||'{}');
   serviciosCustom=JSON.parse(localStorage.getItem('g_servicios_custom')||'{}');
+  turnos=JSON.parse(localStorage.getItem('g_turnos')||'{}');
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
 }
 
 async function loadFirebase(){
   const base = `usuarios/${userEmail}`;
   const cols=[['clientas',clientas],['sesiones',sesiones],['planes',planes],
-              ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom]];
+              ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom],['turnos',turnos]];
   for(const[col,obj] of cols){
     const snap=await fs.getDocs(fs.collection(db, base, col));
     snap.forEach(d=>obj[d.id]=d.data());
@@ -2777,6 +2982,7 @@ async function loadFirebase(){
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
   initCRM();
   await checkFormulariosFirebase();
+  if(typeof renderPanelDia==='function') renderPanelDia();
   chequearOnboarding();
 }
 
@@ -2784,7 +2990,7 @@ async function saveDoc(col,id,data){
   if(useFirebase){
     await fs.setDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id), data);
   } else {
-    const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
+    const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom,turnos};
     if(map[col]){map[col][id]=data;localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
 }
@@ -2792,7 +2998,7 @@ async function delDoc(col,id){
   if(useFirebase){
     await fs.deleteDoc(fs.doc(db, `usuarios/${userEmail}/${col}`, id));
   } else {
-    const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom};
+    const map={clientas,sesiones,planes,gastos:gastosD,presupuestos,servicios_custom:serviciosCustom,turnos};
     if(map[col]){delete map[col][id];localStorage.setItem('g_'+col,JSON.stringify(map[col]));}
   }
 }
@@ -2820,6 +3026,425 @@ function updateStats(){
 
 // ===================== NAV =====================
 let _navHistory=['inicio'];
+// ===================== AGENDA PROFESIONAL =====================
+let _vistaAgenda = 'dia';
+let _fechaAgenda = new Date();
+
+// Colores por tipo de tratamiento (usa la paleta de la app)
+function colorTratamiento(trat){
+  const t = (trat||'').toLowerCase();
+  if(t.includes('limpieza')) return '#6a9e7a';        // sage
+  if(t.includes('dermaplaning')) return '#c4637a';    // rose
+  if(t.includes('peeling')) return '#b8976a';         // gold
+  if(t.includes('radiofrecuencia')||t.includes('lifting')) return '#8a6ac4';
+  if(t.includes('microneedling')||t.includes('micro')) return '#c46a9e';
+  if(t.includes('acné')||t.includes('acne')) return '#5a9e6a';
+  if(t.includes('hidrata')) return '#5a8ec4';
+  if(t.includes('control')||t.includes('consulta')) return '#7a8e7a';
+  if(t.includes('cejas')||t.includes('pestañas')||t.includes('lifting')||t.includes('laminado')||t.includes('henna')) return '#c49a6a';
+  return '#6a9e7a';
+}
+
+function fmtFechaISO(d){ return d.toISOString().slice(0,10); }
+function fmtFechaLarga(d){
+  const dias=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  return `${dias[d.getDay()]}, ${d.getDate()} de ${meses[d.getMonth()]}`;
+}
+
+function setVistaAgenda(v){
+  _vistaAgenda = v;
+  document.querySelectorAll('.vista-btn').forEach(b=>b.classList.remove('vista-activa'));
+  document.getElementById('vista-'+v+'-btn').classList.add('vista-activa');
+  renderAgenda();
+}
+function navegarAgenda(dir){
+  if(_vistaAgenda==='dia') _fechaAgenda.setDate(_fechaAgenda.getDate()+dir);
+  else if(_vistaAgenda==='semana') _fechaAgenda.setDate(_fechaAgenda.getDate()+dir*7);
+  else _fechaAgenda.setMonth(_fechaAgenda.getMonth()+dir);
+  renderAgenda();
+}
+function agendaHoy(){ _fechaAgenda=new Date(); renderAgenda(); }
+
+// Devuelve turnos de una fecha (YYYY-MM-DD), ordenados por hora
+function turnosDeFecha(iso){
+  return Object.values(turnos)
+    .filter(t=>t.fecha===iso)
+    .sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+}
+
+// Detecta alertas de la ficha de la clienta (reusa datos existentes)
+function alertasClienta(c){
+  if(!c) return [];
+  const al=[];
+  const cond=(c.condiciones||[]);
+  if(cond.some(x=>/embaraz/i.test(x))) al.push('Embarazo');
+  if(cond.some(x=>/herpes/i.test(x))) al.push('Herpes activo');
+  if(cond.some(x=>/marcapaso/i.test(x))) al.push('Marcapasos');
+  if(cond.some(x=>/epilep/i.test(x))) al.push('Epilepsia');
+  if(cond.some(x=>/rosácea|rosacea/i.test(x))) al.push('Rosácea');
+  if((c.medicacion||'').match(/isotretino|roacutan|retinoide/i)) al.push('Retinoides');
+  if((c.alergias||'').trim() && !/ninguna|no|nada/i.test(c.alergias)) al.push('Alergias: '+c.alergias);
+  if((c.alegTinte||'').trim() && !/ninguna|no|nada/i.test(c.alegTinte)) al.push('Reacción a tinturas');
+  return al;
+}
+
+function renderAgenda(){
+  const cont=document.getElementById('agenda-contenido');
+  if(!cont) return;
+  const lbl=document.getElementById('agenda-fecha-label');
+  if(_vistaAgenda==='dia'){
+    if(lbl) lbl.textContent=fmtFechaLarga(_fechaAgenda);
+    renderVistaDia(cont);
+  } else if(_vistaAgenda==='semana'){
+    renderVistaSemana(cont,lbl);
+  } else {
+    renderVistaMes(cont,lbl);
+  }
+  if(typeof aplicarIconos==='function') aplicarIconos(cont);
+}
+
+// ---------- VISTA DÍA ----------
+function renderVistaDia(cont){
+  const iso=fmtFechaISO(_fechaAgenda);
+  const lista=turnosDeFecha(iso);
+  if(!lista.length){
+    cont.innerHTML=`<div class="empty-state" style="padding:40px 20px"><div style="color:var(--sage);margin-bottom:8px"><span data-ic-html="historial-40"></span></div><p>No hay turnos para este día.</p><br><button onclick="abrirNuevoTurno()" style="padding:10px 18px;background:var(--rose);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Agendar turno</button></div>`;
+    return;
+  }
+  cont.innerHTML=lista.map(t=>{
+    const c=clientas[t.clientaId];
+    const nombre=c?c.nombre:(t.nombreManual||'Clienta');
+    const color=colorTratamiento(t.tratamiento);
+    const inicial=(nombre||'?').trim()[0]||'?';
+    const foto=c&&c.foto?`<img src="${c.foto}" class="turno-foto">`:`<div class="turno-foto">${inicial.toUpperCase()}</div>`;
+    const vip=c&&c.vip?`<span class="vip-badge">VIP</span>`:'';
+    const alertas=alertasClienta(c);
+    const estados={confirmado:['est-confirmado','Confirmado'],pendiente:['est-pendiente','Sin confirmar'],atencion:['est-atencion','En atención'],finalizado:['est-finalizado','Finalizado']};
+    const [ecls,etxt]=estados[t.estado||'pendiente']||estados.pendiente;
+    const sena = t.sena ? `<span class="turno-estado est-confirmado" style="background:#fff8e3;color:#8a6a10">Seña $${Number(t.sena).toLocaleString('es-AR')}</span>` : (t.pagado?`<span class="turno-estado est-confirmado">Pagado</span>`:'');
+    return `
+    <div class="turno-card" style="border-left-color:${color}">
+      <div style="display:flex;align-items:center;gap:12px">
+        <div class="turno-hora" style="min-width:52px;text-align:center">
+          ${t.hora||'--:--'}
+          ${t.duracion?`<div style="font-size:0.68rem;color:var(--muted);font-weight:500">${t.duracion} min</div>`:''}
+        </div>
+        ${foto}
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+            <strong style="font-size:0.98rem;color:var(--deep)">${nombre}</strong>${vip}
+          </div>
+          <div style="font-size:0.86rem;color:${color};font-weight:600;margin-top:1px">${t.tratamiento||'—'}</div>
+        </div>
+        <span class="turno-estado ${ecls}">${etxt}</span>
+      </div>
+      ${alertas.length?`<div style="margin-top:10px;padding:7px 10px;background:#fff0f0;border-radius:9px;font-size:0.76rem;color:var(--danger);display:flex;align-items:center;gap:6px"><span data-ic-html="alerta-14"></span> ${alertas.join(' · ')}</div>`:''}
+      <div style="display:flex;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap">
+        ${sena}
+        ${c?`<button onclick="abrirFicha('${t.clientaId}')" style="padding:8px 14px;background:white;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;color:var(--deep);cursor:pointer;display:inline-flex;align-items:center;gap:5px"><span data-ic-html="persona-14"></span>Ver ficha</button>`:''}
+        <button onclick="iniciarAtencion('${t.id}')" style="padding:8px 14px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;cursor:pointer;flex:1;min-width:120px">${t.estado==='finalizado'?'Ver sesión':'Iniciar atención'}</button>
+        <button onclick="editarTurno('${t.id}')" style="padding:8px 10px;background:none;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;color:var(--muted)"><span data-ic-html="editar-14"></span></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ---------- VISTA SEMANA ----------
+function renderVistaSemana(cont,lbl){
+  const base=new Date(_fechaAgenda);
+  const dow=base.getDay();
+  const lunes=new Date(base); lunes.setDate(base.getDate()-((dow+6)%7));
+  const dias=[];
+  for(let i=0;i<7;i++){ const d=new Date(lunes); d.setDate(lunes.getDate()+i); dias.push(d); }
+  if(lbl){
+    const fin=dias[6];
+    lbl.textContent=`${lunes.getDate()}/${lunes.getMonth()+1} - ${fin.getDate()}/${fin.getMonth()+1}`;
+  }
+  const nombresDia=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const hoyIso=fmtFechaISO(new Date());
+  cont.innerHTML=`<div style="display:flex;flex-direction:column;gap:10px">${dias.map((d,i)=>{
+    const iso=fmtFechaISO(d);
+    const lista=turnosDeFecha(iso);
+    const esHoy=iso===hoyIso;
+    return `
+    <div style="background:white;border-radius:14px;border:1px solid var(--border);${esHoy?'border-color:var(--rose);border-width:1.5px;':''}padding:12px 14px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:${lista.length?'10px':'0'}">
+        <div style="font-weight:700;color:var(--deep);font-size:0.9rem">${nombresDia[i]} ${d.getDate()}${esHoy?' <span style="color:var(--rose);font-size:0.72rem">· Hoy</span>':''}</div>
+        <button onclick="abrirNuevoTurno('${iso}')" style="width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;color:var(--sage);display:inline-flex;align-items:center;justify-content:center;font-size:1rem">+</button>
+      </div>
+      ${lista.length?lista.map(t=>{
+        const c=clientas[t.clientaId];
+        const nombre=c?c.nombre:(t.nombreManual||'Clienta');
+        const color=colorTratamiento(t.tratamiento);
+        return `<div onclick="expandirTurnoSemana('${t.id}')" style="display:flex;align-items:center;gap:9px;padding:8px 10px;background:var(--cream);border-radius:10px;border-left:4px solid ${color};margin-bottom:6px;cursor:pointer">
+          <div style="font-weight:700;color:var(--deep);font-size:0.82rem;min-width:42px">${t.hora||'--:--'}</div>
+          <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:0.84rem;color:var(--deep)">${nombre}</div><div style="font-size:0.76rem;color:${color}">${t.tratamiento||'—'}</div></div>
+          ${c&&c.vip?'<span class="vip-badge">VIP</span>':''}
+        </div>`;
+      }).join(''):'<div style="font-size:0.8rem;color:var(--muted);padding:4px 0">Sin turnos</div>'}
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function expandirTurnoSemana(id){
+  const t=turnos[id]; if(!t) return;
+  editarTurno(id);
+}
+
+// ---------- VISTA MES ----------
+function renderVistaMes(cont,lbl){
+  const y=_fechaAgenda.getFullYear(), m=_fechaAgenda.getMonth();
+  const meses=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  if(lbl) lbl.textContent=`${meses[m]} ${y}`;
+  const primer=new Date(y,m,1);
+  const offset=(primer.getDay()+6)%7; // lunes primero
+  const diasMes=new Date(y,m+1,0).getDate();
+  const hoyIso=fmtFechaISO(new Date());
+  const nombresDia=['L','M','M','J','V','S','D'];
+  let celdas='';
+  // dias vacios antes
+  for(let i=0;i<offset;i++) celdas+=`<div class="mes-dia otro-mes"></div>`;
+  for(let dia=1;dia<=diasMes;dia++){
+    const d=new Date(y,m,dia);
+    const iso=fmtFechaISO(d);
+    const lista=turnosDeFecha(iso);
+    const esHoy=iso===hoyIso;
+    const puntos=lista.slice(0,4).map(t=>`<span class="mes-punto" style="background:${colorTratamiento(t.tratamiento)}"></span>`).join('');
+    celdas+=`<div class="mes-dia${esHoy?' hoy':''}" onclick="abrirDiaMes('${iso}')">
+      <div style="font-size:0.78rem;font-weight:${esHoy?'700':'500'};color:${esHoy?'var(--rose)':'var(--text)'}">${dia}</div>
+      <div style="margin-top:2px;line-height:1">${puntos}</div>
+      ${lista.length>4?`<div style="font-size:0.6rem;color:var(--muted)">+${lista.length-4}</div>`:''}
+    </div>`;
+  }
+  cont.innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:6px">
+      ${nombresDia.map(n=>`<div style="text-align:center;font-size:0.72rem;font-weight:700;color:var(--muted)">${n}</div>`).join('')}
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">${celdas}</div>
+    <div id="mes-panel-dia" style="margin-top:14px"></div>`;
+}
+
+function abrirDiaMes(iso){
+  const lista=turnosDeFecha(iso);
+  const panel=document.getElementById('mes-panel-dia');
+  if(!panel) return;
+  const [y,mo,d]=iso.split('-');
+  const fecha=new Date(parseInt(y),parseInt(mo)-1,parseInt(d));
+  if(!lista.length){
+    panel.innerHTML=`<div style="background:white;border-radius:14px;border:1px solid var(--border);padding:16px;text-align:center">
+      <div style="font-weight:700;color:var(--deep);margin-bottom:8px">${fmtFechaLarga(fecha)}</div>
+      <div style="font-size:0.84rem;color:var(--muted);margin-bottom:12px">Sin turnos este día</div>
+      <button onclick="abrirNuevoTurno('${iso}')" style="padding:9px 16px;background:var(--rose);color:white;border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer">Agendar turno</button>
+    </div>`;
+  } else {
+    panel.innerHTML=`<div style="background:white;border-radius:14px;border:1px solid var(--border);padding:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <div style="font-weight:700;color:var(--deep)">${fmtFechaLarga(fecha)}</div>
+        <button onclick="abrirNuevoTurno('${iso}')" style="width:28px;height:28px;border-radius:50%;border:1.5px solid var(--border);background:white;cursor:pointer;color:var(--sage);font-size:1.1rem">+</button>
+      </div>
+      ${lista.map(t=>{
+        const c=clientas[t.clientaId];
+        const nombre=c?c.nombre:(t.nombreManual||'Clienta');
+        const color=colorTratamiento(t.tratamiento);
+        return `<div onclick="editarTurno('${t.id}')" style="display:flex;align-items:center;gap:10px;padding:10px;background:var(--cream);border-radius:10px;border-left:4px solid ${color};margin-bottom:7px;cursor:pointer">
+          <div style="font-weight:700;color:var(--deep);font-size:0.85rem;min-width:44px">${t.hora||'--:--'}</div>
+          <div style="flex:1"><div style="font-weight:600;font-size:0.86rem;color:var(--deep)">${nombre}</div><div style="font-size:0.78rem;color:${color}">${t.tratamiento||'—'}</div></div>
+          ${c&&c.vip?'<span class="vip-badge">VIP</span>':''}
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  if(typeof aplicarIconos==='function') aplicarIconos(panel);
+  panel.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+
+// ---------- PANEL DEL DÍA (en el inicio) ----------
+function renderPanelDia(){
+  const cont=document.getElementById('panel-dia');
+  if(!cont) return;
+  const hoyIso=fmtFechaISO(new Date());
+  const lista=turnosDeFecha(hoyIso);
+  const pendientes=lista.filter(t=>t.estado!=='finalizado');
+
+  if(!lista.length){
+    cont.innerHTML=`
+    <div style="background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid #d0e8d8;border-radius:18px;padding:18px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--deep);display:flex;align-items:center;gap:7px"><span data-ic-html="historial-18" style="color:var(--sage)"></span>Tu día de hoy</div>
+        <button onclick="showSection('agenda',document.querySelector('[data-ic=historial]'))" style="font-size:0.76rem;color:var(--rose);background:none;border:none;cursor:pointer;font-weight:600">Ver agenda →</button>
+      </div>
+      <div style="font-size:0.86rem;color:var(--muted)">No tenés turnos agendados para hoy. ¡Buen momento para ponerte al día! ✨</div>
+    </div>`;
+    if(typeof aplicarIconos==='function') aplicarIconos(cont);
+    return;
+  }
+
+  const proximaHora = pendientes.length ? pendientes[0].hora : null;
+  cont.innerHTML=`
+  <div style="background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid #d0e8d8;border-radius:18px;padding:18px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--deep);display:flex;align-items:center;gap:7px"><span data-ic-html="historial-18" style="color:var(--sage)"></span>Tu día de hoy</div>
+      <button onclick="showSection('agenda',document.querySelector('[data-ic=historial]'))" style="font-size:0.76rem;color:var(--rose);background:none;border:none;cursor:pointer;font-weight:600">Ver agenda →</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <div style="flex:1;background:white;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:700;color:var(--rose)">${lista.length}</div>
+        <div style="font-size:0.68rem;color:var(--muted);font-weight:600">Turnos hoy</div>
+      </div>
+      <div style="flex:1;background:white;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:700;color:var(--sage)">${proximaHora||'--'}</div>
+        <div style="font-size:0.68rem;color:var(--muted);font-weight:600">Próximo turno</div>
+      </div>
+      <div style="flex:1;background:white;border-radius:12px;padding:10px;text-align:center;border:1px solid var(--border)">
+        <div style="font-size:1.4rem;font-weight:700;color:var(--gold)">${lista.filter(t=>t.estado==='finalizado').length}</div>
+        <div style="font-size:0.68rem;color:var(--muted);font-weight:600">Atendidos</div>
+      </div>
+    </div>
+    ${lista.slice(0,4).map(t=>{
+      const c=clientas[t.clientaId];
+      const nombre=c?c.nombre:(t.nombreManual||'Clienta');
+      const color=colorTratamiento(t.tratamiento);
+      const fin=t.estado==='finalizado';
+      return `<div onclick="showSection('agenda',document.querySelector('[data-ic=historial]'))" style="display:flex;align-items:center;gap:10px;padding:9px 11px;background:white;border-radius:11px;border-left:4px solid ${color};margin-bottom:7px;cursor:pointer;${fin?'opacity:0.55':''}">
+        <div style="font-weight:700;color:var(--deep);font-size:0.85rem;min-width:44px">${t.hora||'--:--'}</div>
+        <div style="flex:1;min-width:0"><div style="font-weight:600;font-size:0.86rem;color:var(--deep)">${nombre}${c&&c.vip?' <span class="vip-badge">VIP</span>':''}</div><div style="font-size:0.76rem;color:${color}">${t.tratamiento||'—'}</div></div>
+        ${fin?'<span data-ic-html="check-16" style="color:var(--success)"></span>':''}
+      </div>`;
+    }).join('')}
+    ${lista.length>4?`<div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:4px">y ${lista.length-4} turno${lista.length-4>1?'s':''} más...</div>`:''}
+  </div>`;
+  if(typeof aplicarIconos==='function') aplicarIconos(cont);
+}
+
+// ---------- CRUD DE TURNOS ----------
+let _turnoEditId = null;
+
+function abrirNuevoTurno(iso){
+  _turnoEditId=null;
+  const modal=document.getElementById('modal-turno');
+  document.getElementById('turno-modal-titulo').textContent='Nuevo turno';
+  document.getElementById('turno-fecha').value = iso || fmtFechaISO(_fechaAgenda);
+  document.getElementById('turno-hora').value='';
+  document.getElementById('turno-duracion').value='60';
+  document.getElementById('turno-tratamiento').value='';
+  document.getElementById('turno-sena').value='';
+  document.getElementById('turno-estado').value='pendiente';
+  document.getElementById('turno-nota').value='';
+  document.getElementById('turno-btn-borrar').style.display='none';
+  // Poblar select de clientas
+  const sel=document.getElementById('turno-clienta');
+  sel.innerHTML='<option value="">— Elegí una clienta —</option>'+
+    Object.values(clientas).sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''))
+      .map(c=>`<option value="${c.id}">${c.nombre}</option>`).join('');
+  modal.style.display='flex';
+}
+
+function editarTurno(id){
+  const t=turnos[id]; if(!t) return;
+  _turnoEditId=id;
+  const modal=document.getElementById('modal-turno');
+  document.getElementById('turno-modal-titulo').textContent='Editar turno';
+  document.getElementById('turno-fecha').value=t.fecha||'';
+  document.getElementById('turno-hora').value=t.hora||'';
+  document.getElementById('turno-duracion').value=t.duracion||'60';
+  document.getElementById('turno-tratamiento').value=t.tratamiento||'';
+  document.getElementById('turno-sena').value=t.sena||'';
+  document.getElementById('turno-estado').value=t.estado||'pendiente';
+  document.getElementById('turno-nota').value=t.nota||'';
+  document.getElementById('turno-btn-borrar').style.display='inline-flex';
+  const sel=document.getElementById('turno-clienta');
+  sel.innerHTML='<option value="">— Elegí una clienta —</option>'+
+    Object.values(clientas).sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||''))
+      .map(c=>`<option value="${c.id}"${c.id===t.clientaId?' selected':''}>${c.nombre}</option>`).join('');
+  modal.style.display='flex';
+}
+
+async function guardarTurno(){
+  const clientaId=document.getElementById('turno-clienta').value;
+  const fecha=document.getElementById('turno-fecha').value;
+  const hora=document.getElementById('turno-hora').value;
+  const trat=document.getElementById('turno-tratamiento').value;
+  if(!fecha){alert('Poné la fecha');return;}
+  if(!hora){alert('Poné la hora');return;}
+  if(!clientaId){alert('Elegí la clienta');return;}
+  if(!trat){alert('Elegí el tratamiento');return;}
+  const id=_turnoEditId||uid();
+  const t={
+    id, clientaId, fecha, hora,
+    duracion:document.getElementById('turno-duracion').value||'60',
+    tratamiento:trat,
+    sena:parseInt(document.getElementById('turno-sena').value)||0,
+    estado:document.getElementById('turno-estado').value||'pendiente',
+    nota:document.getElementById('turno-nota').value||'',
+    fechaTs: turnos[id]?.fechaTs || Date.now()
+  };
+  turnos[id]=t;
+  await saveDoc('turnos',id,t);
+  document.getElementById('modal-turno').style.display='none';
+  renderAgenda();
+  if(typeof renderPanelDia==='function') renderPanelDia();
+}
+
+async function borrarTurno(){
+  if(!_turnoEditId) return;
+  if(!confirm('¿Eliminar este turno?')) return;
+  delete turnos[_turnoEditId];
+  await delDoc('turnos',_turnoEditId);
+  document.getElementById('modal-turno').style.display='none';
+  renderAgenda();
+  if(typeof renderPanelDia==='function') renderPanelDia();
+}
+
+// ---------- INICIAR ATENCIÓN ----------
+function iniciarAtencion(turnoId){
+  const t=turnos[turnoId]; if(!t) return;
+  const c=clientas[t.clientaId];
+  if(!c){ alert('Esta clienta no tiene ficha cargada.'); return; }
+  // marcar en atención
+  if(t.estado!=='finalizado'){ t.estado='atencion'; turnos[turnoId]=t; saveDoc('turnos',turnoId,t); }
+  // abrir la ficha de la clienta directamente en su historial/sesión
+  clientaActualId=t.clientaId;
+  abrirFicha(t.clientaId);
+  // pre-cargar tratamiento en el registro de sesión si el modal existe
+  setTimeout(()=>{
+    const st=document.getElementById('ses-tratamiento');
+    if(st){ st.value=t.tratamiento; }
+    renderAgenda();
+  },400);
+}
+
+
+// ===================== NAV AGRUPADO =====================
+function toggleNavMenu(menuId, btn){
+  const menu = document.getElementById(menuId);
+  const yaAbierto = menu.classList.contains('open');
+  // Cerrar todos los menús
+  document.querySelectorAll('.nav-menu').forEach(m=>m.classList.remove('open'));
+  if(!yaAbierto){
+    menu.classList.add('open');
+    if(typeof aplicarIconos==='function') aplicarIconos(menu);
+  }
+}
+
+function navGo(id, btn){
+  // Cerrar menús
+  document.querySelectorAll('.nav-menu').forEach(m=>m.classList.remove('open'));
+  // Marcar el botón de grupo padre como activo
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  const grupo = btn.closest('.nav-group');
+  if(grupo){ const gb=grupo.querySelector('.nav-btn'); if(gb) gb.classList.add('active'); }
+  showSection(id, null);
+}
+
+// Cerrar menús al tocar fuera
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.nav-group')){
+    document.querySelectorAll('.nav-menu').forEach(m=>m.classList.remove('open'));
+  }
+});
+
 function showSection(id,btn){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -2837,6 +3462,8 @@ function showSection(id,btn){
   if(id==='gastos'){renderGastos();actualizarResumen();setHoy('gasto-fecha');}
   if(id==='servicios')renderServiciosCustom();
   if(id==='crm'){renderCRMAlertas();renderCRMClientas();renderCRMConsumo();renderCRMFormularios();}
+  if(id==='agenda'){renderAgenda();}
+  if(id==='inicio'){ if(typeof renderPanelDia==='function') renderPanelDia(); }
   if(typeof aplicarIconos==='function') aplicarIconos();
 }
 
@@ -5035,21 +5662,11 @@ function aplicarApariencia(){
   document.getElementById('fuente-preview') && (document.getElementById('fuente-preview').textContent = 
     _fontSize===14?'Pequeño (14px)':_fontSize===16?'Normal (16px)':_fontSize===18?'Grande (18px)':'Muy grande (20px)');
   if(_modo==='oscuro'){
-    document.documentElement.style.setProperty('--cream','#1a2a1a');
-    document.documentElement.style.setProperty('--light','#223322');
-    document.documentElement.style.setProperty('--border','#3a5a3a');
-    document.documentElement.style.setProperty('--text','#c8e8c8');
-    document.documentElement.style.setProperty('--muted','#8aaa8a');
-    document.body.style.background='#1a2a1a';
+    document.documentElement.classList.add('dark');
     document.getElementById('btn-modo-oscuro') && (document.getElementById('btn-modo-oscuro').style.border='2px solid var(--sage)');
     document.getElementById('btn-modo-claro') && (document.getElementById('btn-modo-claro').style.border='2px solid var(--border)');
   } else {
-    document.documentElement.style.setProperty('--cream','#f8faf8');
-    document.documentElement.style.setProperty('--light','#ffffff');
-    document.documentElement.style.setProperty('--border','#e0ead8');
-    document.documentElement.style.setProperty('--text','#2a3a2a');
-    document.documentElement.style.setProperty('--muted','#7a8e7a');
-    document.body.style.background='#f8faf8';
+    document.documentElement.classList.remove('dark');
     document.getElementById('btn-modo-claro') && (document.getElementById('btn-modo-claro').style.border='2px solid var(--sage)');
     document.getElementById('btn-modo-oscuro') && (document.getElementById('btn-modo-oscuro').style.border='2px solid var(--border)');
   }
