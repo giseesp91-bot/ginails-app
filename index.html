@@ -163,10 +163,10 @@ input[type="file"]{display:none;}
 
 /* ===================== MODO OSCURO ROBUSTO ===================== */
 html.dark{
-  --cream:#16211a; --light:#1f2e24; --border:#33473a;
-  --text:#d8ead8; --muted:#8faa93; --deep:#c8e0cc; --blush:#3a2a30;
+  --cream:#16181c; --light:#22252b; --border:#363a42;
+  --text:#e2e5ea; --muted:#9aa0ab; --deep:#e8ebf0; --blush:#2e2a30;
 }
-html.dark body{background:#16211a;color:var(--text);}
+html.dark body{background:#16181c;color:var(--text);}
 /* Todos los fondos blancos hardcodeados → superficie oscura */
 html.dark [style*="background:white"],
 html.dark [style*="background:#fff"],
@@ -198,9 +198,9 @@ html.dark #onboarding-overlay > div{
   border-color:var(--border) !important;
 }
 html.dark input,html.dark select,html.dark textarea{
-  background:#1a281f !important;color:var(--text) !important;border-color:var(--border) !important;
+  background:#1b1e23 !important;color:var(--text) !important;border-color:var(--border) !important;
 }
-html.dark input::placeholder,html.dark textarea::placeholder{color:#6a8470;}
+html.dark input::placeholder,html.dark textarea::placeholder{color:#6c727d;}
 /* Textos oscuros hardcodeados → claros */
 html.dark [style*="color:#2d4a35"],
 html.dark [style*="color:#2a3a2a"],
@@ -228,7 +228,10 @@ html.dark .est-pendiente{background:rgba(255,255,255,0.08);color:#aab8ac;}
 html.dark .est-atencion{background:rgba(230,120,20,0.2);color:#f0b070;}
 html.dark .est-finalizado{background:rgba(90,140,196,0.2);color:#90c0f0;}
 html.dark .mes-dia{background:var(--light);}
-html.dark .vista-btn.vista-activa{background:#2a3d30;}
+html.dark .vista-btn.vista-activa{background:#2c3038;}
+html.dark header{background:#1c1f24 !important;}
+html.dark nav{background:linear-gradient(180deg,#1c1f24,#16181c) !important;border-bottom-color:#2c3038 !important;}
+html.dark .logo-text{color:#e8d8c0 !important;}
 /* Header y nav se mantienen (ya son verdes oscuros) */
 </style>
 </head>
