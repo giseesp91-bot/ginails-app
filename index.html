@@ -20,7 +20,7 @@
   --r-sm:10px; --r-md:14px; --r-lg:18px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;font-size:var(--app-font-size,16px);}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
 header{background:var(--deep);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,74,53,0.25);gap:10px;}
 .logo{display:flex;align-items:center;gap:10px;white-space:nowrap;}
 .logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
@@ -5720,7 +5720,8 @@ let _fontSize = parseInt(localStorage.getItem('gp_fontsize')||'16');
 let _modo = localStorage.getItem('gp_modo')||'claro';
 
 function aplicarApariencia(){
-  document.body.style.fontSize = _fontSize+'px';
+  // Todo el texto usa rem → escala desde <html>. Base 16px.
+  document.documentElement.style.fontSize = _fontSize+'px';
   document.getElementById('fuente-preview') && (document.getElementById('fuente-preview').textContent = 
     _fontSize===14?'Pequeño (14px)':_fontSize===16?'Normal (16px)':_fontSize===18?'Grande (18px)':'Muy grande (20px)');
   if(_modo==='oscuro'){
