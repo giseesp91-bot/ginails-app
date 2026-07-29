@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ginails · Cosmetología Pro</title>
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#2d4a35">
+<meta name="theme-color" content="#b7cd7f">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -43,7 +43,7 @@ header{background:var(--verde-claro);padding:14px 18px;display:flex;align-items:
 .logo-text{font-family:'Playfair Display',serif;color:var(--verde-texto);font-size:1.2rem;letter-spacing:1px;}
 .logo-text span{color:#48562a;font-style:italic;}
 .fb-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
-.fb-ok{background:#1a4a2a;color:#90e0a0;}.fb-err{background:#4a1a1a;color:#e09090;}.fb-wait{background:#3a2a0a;color:#e0c070;}
+.fb-ok{background:#a84e65;color:#fff;}.fb-err{background:#7e3547;color:#ffd0d8;}.fb-wait{background:#6b5a2a;color:#f0e0b0;}
 
 /* ---- CUENTA Y PLAN (esquina del header) ---- */
 .cuenta-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.7);border-radius:999px;padding:4px 6px 4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
@@ -442,7 +442,7 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
     <div class="logo-text">Ginails <span>Pro</span></div>
   </div>
   <button class="cuenta-btn" id="cuenta-btn" onclick="toggleCuentaPanel()" title="Tu cuenta y tu plan">
-    <span class="plan-pill pill-prueba" id="cuenta-plan">—</span>
+    <span class="plan-pill pill-esencial" id="cuenta-plan" style="display:none"></span>
     <span class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</span>
     <span class="cuenta-flecha">▾</span>
   </button>
@@ -3965,7 +3965,10 @@ async function cargarMiPlan(){
 function renderPlanPill(){
   const pill = _$('cuenta-plan');
   if (!pill) return;
-  if (!miPlan) { pill.textContent='—'; return; }
+  // Mientras no sepamos el plan, la píldora ni se muestra:
+  // un guión suelto no le dice nada a nadie.
+  if (!miPlan) { pill.style.display='none'; return; }
+  pill.style.display='';
   if (miPlan.esOwner) { pill.textContent='Dueña'; pill.className='plan-pill pill-elite'; return; }
   if (miPlan.vigente && miPlan.plan) {
     pill.textContent = PLANES_INFO[miPlan.plan]?.nombre || miPlan.plan;
@@ -6729,9 +6732,18 @@ function initCRM(){renderCRMAlertas();}
 let _fontSize = parseInt(localStorage.getItem('gp_fontsize')||'16');
 let _modo = localStorage.getItem('gp_modo')||'claro';
 
+// La barra de la ventana (cuando la app está instalada) toma su color
+// de la etiqueta theme-color. La cambiamos junto con el modo para que
+// no quede un verde claro arriba y la app oscura abajo.
+function pintarBarraDeVentana(modo){
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', modo === 'oscuro' ? '#1c1f24' : '#b7cd7f');
+}
+
 function aplicarApariencia(){
   // Todo el texto usa rem → escala desde <html>. Base 16px.
   document.documentElement.style.fontSize = _fontSize+'px';
+  pintarBarraDeVentana(_modo);
   document.getElementById('fuente-preview') && (document.getElementById('fuente-preview').textContent = 
     _fontSize===14?'Pequeño (14px)':_fontSize===16?'Normal (16px)':_fontSize===18?'Grande (18px)':'Muy grande (20px)');
   if(_modo==='oscuro'){
