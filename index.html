@@ -43,6 +43,16 @@ nav::-webkit-scrollbar{display:none;}
 main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .section{display:none;animation:fadeIn 0.3s ease;}
 
+/* ---- INICIO: dos columnas en pantallas grandes ---- */
+.inicio-layout{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;}
+.inicio-col-izq,.inicio-col-der{min-width:0;}
+@media(min-width:1024px){
+  main:has(#inicio.active){max-width:1240px;}
+  .inicio-layout{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;}
+  .inicio-col-der #panel-dia{margin-top:0;}
+  .inicio-col-izq > div:last-child{margin-bottom:0;}
+}
+
 /* ---- AGENDA: asistente al costado en pantallas grandes ---- */
 .agenda-layout{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;}
 .agenda-lateral{min-width:0;}
@@ -457,6 +467,9 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     <p style="font-size:0.82rem;color:#7a8e7a;margin-top:3px">Resumen de tu negocio · <span style="color:#6a9e7a;font-weight:600" id="mes-label"></span></p>
   </div>
 
+  <div class="inicio-layout">
+  <div class="inicio-col-izq">
+
   <!-- STATS -->
   <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:18px">
     <div onclick="showSection('clientas',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md);cursor:pointer;transition:all 0.2s">
@@ -498,11 +511,18 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     </div>
   </div>
 
+  </div><!-- /inicio-col-izq -->
+
+  <div class="inicio-col-der">
+
   <!-- PANEL DEL DÍA (agenda de hoy) -->
   <div id="panel-dia" style="margin-top:18px"></div>
 
   <div class="alert alert-info" id="fb-config-alert" style="display:none">⚠️ Firebase no configurado — modo local activo.</div>
   <div id="crm-alertas-inicio"></div>
+
+  </div><!-- /inicio-col-der -->
+  </div><!-- /inicio-layout -->
 </div>
 
 <!-- CRM -->
