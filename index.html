@@ -42,6 +42,22 @@ nav::-webkit-scrollbar{display:none;}
 .nav-btn.active{background:linear-gradient(135deg,#6a9e7a,#4a8a5a);border-color:#6a9e7a;color:white;box-shadow:0 3px 12px rgba(106,158,122,0.4);}
 main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .section{display:none;animation:fadeIn 0.3s ease;}
+
+/* ---- AGENDA: asistente al costado en pantallas grandes ---- */
+.agenda-layout{display:grid;grid-template-columns:1fr;gap:14px;align-items:start;}
+.agenda-lateral{min-width:0;}
+.agenda-principal{min-width:0;}
+/* En pantallas angostas el asistente va arriba, plegado */
+@media(max-width:1023px){ .agenda-lateral{order:-1;} }
+/* En PC va a la derecha, en una columna propia que acompaña el scroll */
+@media(min-width:1024px){
+  main:has(#agenda.active){max-width:1240px;}
+  .agenda-layout{grid-template-columns:minmax(0,1fr) 330px;gap:18px;}
+  .agenda-lateral{position:sticky;top:14px;}
+  .agenda-lateral .card{margin-bottom:0;}
+}
+/* Respaldo para navegadores sin :has() — el costado igual funciona,
+   solo que dentro del ancho normal de 920px. */
 .section.active{display:block;}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .card{background:white;border-radius:18px;padding:18px;box-shadow:var(--sh-md);border:1px solid var(--border);margin-bottom:14px;transition:box-shadow 0.25s ease, transform 0.25s ease;}
@@ -195,6 +211,17 @@ html.dark [style*="linear-gradient(135deg,#f8fdf8"],
 html.dark [style*="linear-gradient(135deg,#f8faf8"]{
   background:var(--light) !important;
 }
+/* Bordes verdes claros escritos en el HTML → borde fino y neutro,
+   igual al de las cards. Sin esto quedaba un contorno claro y grueso. */
+html.dark [style*="border:1.5px solid #e0ead8"],
+html.dark [style*="border:1.5px solid #d0e8d8"],
+html.dark [style*="border:1.5px solid #e8dcc8"],
+html.dark [style*="border:1.5px solid #d0e8e0"],
+html.dark [style*="border:1.5px solid var(--blush)"],
+html.dark .card[style*="border:1.5px"]{
+  border-color:var(--border) !important;
+  border-width:1px !important;
+}
 html.dark .card,
 html.dark .turno-card,
 html.dark .modal,
@@ -305,6 +332,18 @@ html.dark .highlight strong{color:var(--deep) !important;}
 html.dark .alert-warning{background:rgba(184,151,106,0.15) !important;color:#e0c088 !important;}
 html.dark .alert-info{background:rgba(74,144,217,0.15) !important;color:#9ec8f0 !important;}
 html.dark .alert-success{background:rgba(90,158,106,0.15) !important;color:#9ed8ae !important;}
+html.dark .alert-danger{background:rgba(196,99,122,0.15) !important;color:#f0a8b5 !important;}
+html.dark .alert-danger strong{color:#f5c2cb !important;}
+/* Sesiones del historial de la clienta */
+html.dark .sesion-item{background:var(--light) !important;border-color:var(--border) !important;}
+html.dark .sesion-item,html.dark .sesion-item *{color:var(--text);}
+html.dark .sesion-item strong{color:var(--deep);}
+html.dark .sesion-num{color:white !important;}
+/* Etiquetas de contraindicaciones y avisos */
+html.dark .contraind-tag{background:rgba(196,99,122,0.2) !important;color:#e8b0bd !important;}
+html.dark .tag-aviso{background:rgba(184,151,106,0.15) !important;border-color:rgba(184,151,106,0.45) !important;color:#e0c088 !important;}
+/* Checkbox marcado (condiciones médicas, hábitos, etc.) */
+html.dark .check-item:has(input:checked){background:rgba(196,99,122,0.18) !important;border-color:var(--rose) !important;color:#f0a8b5 !important;}
 html.dark .serv-section h5{color:var(--deep) !important;}
 /* Botones que quedaban blancos con texto claro */
 html.dark .btn-secondary{background:var(--light) !important;color:var(--text) !important;border-color:var(--border) !important;}
@@ -706,8 +745,8 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     <button onclick="abrirNuevoTurno()" style="padding:10px 16px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;box-shadow:var(--sh-sm);display:inline-flex;align-items:center;gap:6px"><span data-ic-html="agregar-16"></span>Nuevo turno</button>
   </div>
 
-  <!-- ASISTENTE DE LA AGENDA -->
-  <div id="asistente-agenda"></div>
+  <div class="agenda-layout">
+  <div class="agenda-principal">
 
   <!-- Selector de vista -->
   <div style="display:flex;gap:6px;margin-bottom:14px;background:var(--cream);padding:5px;border-radius:14px;border:1px solid var(--border)">
@@ -727,6 +766,15 @@ html.dark .logo-text{color:#e8d8c0 !important;}
   </div>
 
   <div id="agenda-contenido"></div>
+
+  </div><!-- /agenda-principal -->
+
+  <!-- ASISTENTE DE LA AGENDA -->
+  <aside class="agenda-lateral">
+    <div id="asistente-agenda"></div>
+  </aside>
+
+  </div><!-- /agenda-layout -->
 </div>
 
 <!-- MIS CLIENTAS -->
