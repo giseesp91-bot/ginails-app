@@ -706,6 +706,9 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     <button onclick="abrirNuevoTurno()" style="padding:10px 16px;background:linear-gradient(135deg,var(--rose),#a84e65);color:white;border:none;border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;box-shadow:var(--sh-sm);display:inline-flex;align-items:center;gap:6px"><span data-ic-html="agregar-16"></span>Nuevo turno</button>
   </div>
 
+  <!-- ASISTENTE DE LA AGENDA -->
+  <div id="asistente-agenda"></div>
+
   <!-- Selector de vista -->
   <div style="display:flex;gap:6px;margin-bottom:14px;background:var(--cream);padding:5px;border-radius:14px;border:1px solid var(--border)">
     <button id="vista-dia-btn" onclick="setVistaAgenda('dia')" class="vista-btn vista-activa">Día</button>
@@ -3289,6 +3292,7 @@ function alertasClienta(c){
 }
 
 function renderAgenda(){
+  if(typeof renderAsistenteAgenda==='function') renderAsistenteAgenda();
   const cont=document.getElementById('agenda-contenido');
   if(!cont) return;
   const lbl=document.getElementById('agenda-fecha-label');
@@ -3480,6 +3484,7 @@ function renderPanelDia(){
         <button onclick="showSection('agenda',document.querySelector('[data-ic=historial]'))" style="font-size:0.76rem;color:var(--rose);background:none;border:none;cursor:pointer;font-weight:600">Ver agenda →</button>
       </div>
       <div style="font-size:0.86rem;color:var(--muted)">No tenés turnos agendados para hoy. ¡Buen momento para ponerte al día! ✨</div>
+      ${typeof resumenAsistenteInicio==='function'?resumenAsistenteInicio():''}
     </div>`;
     if(typeof aplicarIconos==='function') aplicarIconos(cont);
     return;
@@ -3518,6 +3523,7 @@ function renderPanelDia(){
       </div>`;
     }).join('')}
     ${lista.length>4?`<div style="text-align:center;font-size:0.78rem;color:var(--muted);margin-top:4px">y ${lista.length-4} turno${lista.length-4>1?'s':''} más...</div>`:''}
+    ${typeof resumenAsistenteInicio==='function'?resumenAsistenteInicio():''}
   </div>`;
   if(typeof aplicarIconos==='function') aplicarIconos(cont);
 }
@@ -3794,6 +3800,355 @@ function verSesionDeTurno(turnoId){
   setTimeout(()=>{ if(typeof renderHistorialModal==='function') renderHistorialModal(); },400);
 }
 
+
+// ===================== ASISTENTE DE LA AGENDA (Entrega 3) =====================
+// Todo se calcula con reglas locales: es instantáneo, gratis y no depende del worker.
+// El resumen con IA es un botón aparte y opcional.
+
+// Insumos y aparatos clave que necesita cada tratamiento.
+// Los nombres son EXACTOS a INSUMOS_MASTER para poder cruzarlos con el checklist.
+const REQUISITOS_TRAT = {
+  'Limpieza Facial Profunda':{productos:['Leche desmaquillante','Gel de limpieza facial','Agua micelar / tónico','Exfoliante enzimático (papaya/piña)','Arcilla verde (granel)','SPF 50 facial (fórmula normal)'],aparatos:['Vaporizador facial','Alta frecuencia','Lupa con luz LED'],descartables:['Guantes nitrilo','Gasas estériles','Algodones','Espátulas de madera','Cubre camilla descartable']},
+  'Hidratación Profunda':{productos:['Leche desmaquillante','Gel de limpieza facial','Agua micelar / tónico','Sérum hialurónico','Mascarilla lámina colágeno','Crema hidratante con ceramidas','SPF 50 facial (fórmula normal)'],aparatos:['Vaporizador facial'],descartables:['Guantes nitrilo','Algodones','Espátulas de madera']},
+  'Control de Acné':{productos:['Gel de limpieza facial','Tónico astringente / hamamelis','Peeling BHA (salicílico)','Arcilla verde (granel)','Sérum niacinamida 10%','SPF 50 oil-free (acné)'],aparatos:['Vaporizador facial','Alta frecuencia','Panel LED azul','Lupa con luz LED'],descartables:['Guantes nitrilo','Gasas estériles','Algodones']},
+  'Despigmentación & Luminosidad':{productos:['Gel de limpieza facial','Agua micelar / tónico','Sérum vitamina C 15-20%','Sérum despigmentante (arbutina / kójico)','Peeling AHA (glicólico / láctico)','SPF 50 facial (fórmula normal)'],aparatos:['Lupa con luz LED'],descartables:['Guantes nitrilo','Algodones','Espátulas de madera']},
+  'Anti-Edad & Lifting Facial':{productos:['Leche desmaquillante','Agua micelar / tónico','Sérum retinol / péptidos','Crema anti-edad / reafirmante','Contorno de ojos','SPF 50 facial (fórmula normal)'],aparatos:['Microcorrientes','Panel LED rojo','Galvánica (iontoforesis)'],descartables:['Guantes nitrilo','Algodones']},
+  'Calmante & Barrera Protectora':{productos:['Leche desmaquillante','Sérum centella asiática','Crema barrera','Mascarilla lámina aloe vera','SPF mineral con zinc (sensible)'],aparatos:['Panel LED amarillo/verde'],descartables:['Guantes nitrilo','Algodones']},
+  'Revitalización & Glow':{productos:['Gel de limpieza facial','Agua micelar / tónico','Exfoliante enzimático (papaya/piña)','Sérum vitamina C 15-20%','Ampollas hialurónico / activos','SPF 50 facial (fórmula normal)'],aparatos:['Vaporizador facial','Panel LED rojo'],descartables:['Guantes nitrilo','Algodones']},
+  'Peeling Químico Superficial':{productos:['Gel de limpieza facial','Peeling mandélico','Crema barrera','SPF 50 facial (fórmula normal)'],aparatos:['Lupa con luz LED'],descartables:['Guantes nitrilo','Gasas estériles','Vasitos descartables','Hisopos','Bols de cerámica (reutilizable)']},
+  'Dermaplaning':{productos:['Gel de limpieza facial','Agua micelar / tónico','Sérum hialurónico','Crema barrera','SPF 50 facial (fórmula normal)'],aparatos:['Lupa con luz LED'],descartables:['Guantes nitrilo','Gasas estériles','Espátulas acero inox (reutilizable)']},
+  'Radiofrecuencia':{productos:['Gel de limpieza facial','Crema anti-edad / reafirmante','SPF 50 facial (fórmula normal)'],aparatos:['Microcorrientes','Panel LED rojo'],descartables:['Guantes nitrilo','Algodones']},
+  'Microneedling':{productos:['Gel de limpieza facial','Ampollas hialurónico / activos','Crema barrera','SPF mineral con zinc (sensible)'],aparatos:['Lupa con luz LED','Panel LED rojo'],descartables:['Guantes nitrilo','Gasas estériles','Alcohol 70°','Cofias descartables']},
+  'Lifting de Pestañas':{productos:['Vaselina pura'],aparatos:['Lupa con luz LED'],cejas:['Kit lifting pestañas (S1+S2+adhesivo)','Rodillos silicona S/M/L/XL','Removedor sin aceite','Spoolies / cepillos de ceja'],descartables:['Parches de gel bajo ojo','Hisopos','Guantes nitrilo']},
+  'Laminado de Cejas':{aparatos:['Lupa con luz LED'],cejas:['Kit laminado de cejas (S1+S2)','Spoolies / cepillos de ceja','Gel fijador de cejas','Pinzas punta fina'],descartables:['Hisopos','Guantes nitrilo','Algodones']},
+  'Henna de Cejas':{cejas:['Henna cejas marrón oscuro','Pincel fino para henna / tinte','Spoolies / cepillos de ceja','Pinzas punta fina'],descartables:['Hisopos','Algodones','Bols de cerámica (reutilizable)','Guantes nitrilo']},
+  'Tinte Cejas & Pestañas':{cejas:['Tinte RefectoCil marrón','Oxidante 10 vol','Pincel fino para henna / tinte','Removedor sin aceite'],descartables:['Hisopos','Algodones','Parches de gel bajo ojo','Guantes nitrilo']},
+  'Diseño & Perfilado de Cejas':{cejas:['Pinzas punta fina','Tijera de cejas','Spoolies / cepillos de ceja','Hilo de algodón para depilación','Gel fijador de cejas'],aparatos:['Lupa con luz LED'],descartables:['Algodones','Guantes nitrilo']},
+  'Control / Seguimiento':{aparatos:['Lupa con luz LED'],descartables:['Guantes nitrilo']},
+  'Consulta / Primera vez':{aparatos:['Lupa con luz LED'],descartables:['Guantes nitrilo']}
+};
+
+function _keyInsumo(cat,item){ return cat+'_'+item.replace(/\s+/g,'_'); }
+
+// Devuelve {falta:[{cat,item}], total:n} de un tratamiento según el checklist de Mis Insumos
+function insumosFaltantesDe(trat){
+  const req=REQUISITOS_TRAT[trat];
+  if(!req) return {falta:[],total:0};
+  const falta=[]; let total=0;
+  Object.keys(req).forEach(cat=>{
+    (req[cat]||[]).forEach(item=>{
+      total++;
+      if(!misInsumos[_keyInsumo(cat,item)]) falta.push({cat,item});
+    });
+  });
+  return {falta,total};
+}
+
+// Productos del inventario marcados como SIN stock
+function productosSinStock(){
+  return Object.values(miInventario).filter(p=>p.stock===false);
+}
+
+function _isoHoy(){ return fmtFechaISO(new Date()); }
+function _isoMas(dias){ const d=new Date(); d.setDate(d.getDate()+dias); return fmtFechaISO(d); }
+function _fechaCorta(iso){ return iso?iso.split('-').reverse().slice(0,2).join('/'):''; }
+
+// Turnos futuros (de hoy en adelante), ordenados
+function turnosDesdeHoy(diasAdelante){
+  const hoy=_isoHoy(), tope=_isoMas(diasAdelante==null?7:diasAdelante);
+  return Object.values(turnos)
+    .filter(t=>t.fecha>=hoy && t.fecha<=tope && t.estado!=='finalizado')
+    .sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora));
+}
+
+// ---------- MOTOR DE AVISOS ----------
+// Devuelve { volver:[], controles:[], stock:[], jornada:{} , total:n }
+function avisosAgenda(){
+  const hoy=_isoHoy();
+  const res={volver:[],controles:[],stock:[],jornada:null,total:0};
+
+  // Clientas con turno agendado de acá en adelante: no hace falta avisarlas
+  const conTurno=new Set(Object.values(turnos).filter(t=>t.fecha>=hoy&&t.estado!=='finalizado').map(t=>t.clientaId));
+
+  Object.values(clientas).forEach(c=>{
+    const dias=diasDesdeUltimaVisita(c.id);
+    const freq=frecuenciaPromedio(c.id);
+    const ses=Object.values(sesiones).filter(s=>s.clientaId===c.id).sort((a,b)=>b.fechaTs-a.fechaTs);
+    const plan=Object.values(planes).find(p=>p.clientaId===c.id&&p.activo);
+
+    // 1) DEBE VOLVER — según su frecuencia habitual
+    if(!conTurno.has(c.id) && dias!==null){
+      if(freq && dias>=freq){
+        const atraso=dias-freq;
+        res.volver.push({
+          clientaId:c.id, nombre:c.nombre, vip:!!c.vip,
+          urgencia: atraso>=freq ? 'alta' : 'media',
+          msg: atraso<=2 ? 'Le toca volver ahora' : `Atrasada ${atraso} día${atraso>1?'s':''}`,
+          detalle:`Viene cada ${freq} días · última hace ${dias}`
+        });
+      } else if(!freq && dias>=45){
+        res.volver.push({clientaId:c.id,nombre:c.nombre,vip:!!c.vip,urgencia:'media',
+          msg:`Hace ${dias} días que no viene`,detalle:'Sin frecuencia definida todavía'});
+      }
+    }
+
+    // 2) CONTROLES Y PLANES PENDIENTES
+    if(plan){
+      const sesPlan=ses.filter(s=>s.planId===plan.id);
+      const faltan=(plan.totalSesiones||0)-sesPlan.length;
+      if(faltan>0 && !conTurno.has(c.id)){
+        res.controles.push({clientaId:c.id,nombre:c.nombre,tipo:'plan',
+          urgencia: (dias!==null&&dias>20)?'alta':'media',
+          msg:`Plan ${plan.servicio}: falta${faltan>1?'n':''} ${faltan} ${faltan>1?'sesiones':'sesión'}`,
+          detalle:`${sesPlan.length}/${plan.totalSesiones} hechas${dias!==null?' · última hace '+dias+' días':''}`});
+      }
+    }
+    // Notas de "próximo control" que dejaste al finalizar una atención
+    const conNota=ses.find(s=>s.notaProxima&&/Próximo control:\s*(\d{2})\/(\d{2})\/(\d{4})/.test(s.notaProxima));
+    if(conNota && !conTurno.has(c.id)){
+      const m=conNota.notaProxima.match(/Próximo control:\s*(\d{2})\/(\d{2})\/(\d{4})/);
+      const isoCtrl=`${m[3]}-${m[2]}-${m[1]}`;
+      if(isoCtrl<=_isoMas(7)){
+        const vencido=isoCtrl<hoy;
+        res.controles.push({clientaId:c.id,nombre:c.nombre,tipo:'control',
+          urgencia: vencido?'alta':'media',
+          msg: vencido?`Control vencido (era el ${_fechaCorta(isoCtrl)})`:`Control el ${_fechaCorta(isoCtrl)}`,
+          detalle: conNota.notaProxima.replace(/Próximo control:\s*\d{2}\/\d{2}\/\d{4}\s*—?\s*/,'')||conNota.tratamiento});
+      }
+    }
+  });
+
+  const ordUrg={alta:0,media:1,baja:2};
+  res.volver.sort((a,b)=>(ordUrg[a.urgencia]-ordUrg[b.urgencia])||(b.vip-a.vip));
+  res.controles.sort((a,b)=>ordUrg[a.urgencia]-ordUrg[b.urgencia]);
+
+  // 3) STOCK PARA LOS TURNOS DE LA SEMANA
+  const proximos=turnosDesdeHoy(7);
+  const faltaPorItem={};
+  proximos.forEach(t=>{
+    const {falta}=insumosFaltantesDe(t.tratamiento);
+    falta.forEach(f=>{
+      const k=f.cat+'|'+f.item;
+      if(!faltaPorItem[k]) faltaPorItem[k]={item:f.item,cat:f.cat,turnos:[]};
+      faltaPorItem[k].turnos.push(t);
+    });
+  });
+  res.stock=Object.values(faltaPorItem).sort((a,b)=>b.turnos.length-a.turnos.length).map(x=>({
+    item:x.item, cat:x.cat, cantidad:x.turnos.length,
+    detalle:`Lo necesitás para ${x.turnos.length} turno${x.turnos.length>1?'s':''}: ${[...new Set(x.turnos.map(t=>t.tratamiento))].join(', ')}`,
+    primeraFecha:x.turnos[0].fecha
+  }));
+  // Productos del inventario marcados sin stock
+  const sinStock=productosSinStock();
+  if(sinStock.length){
+    res.stock.push({item:`${sinStock.length} producto${sinStock.length>1?'s':''} marcado${sinStock.length>1?'s':''} sin stock`,
+      cat:'inventario', cantidad:0, esInventario:true,
+      detalle:sinStock.slice(0,5).map(p=>(p.marca?p.marca+' ':'')+p.nombre).join(', ')+(sinStock.length>5?'…':''),
+      primeraFecha:''});
+  }
+
+  // 4) PREPARAR LA JORNADA SIGUIENTE (próximo día con turnos)
+  const futuros=Object.values(turnos).filter(t=>t.fecha>hoy&&t.estado!=='finalizado').sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const proxDia=futuros.length?futuros[0].fecha:null;
+  if(proxDia){
+    const delDia=turnosDeFecha(proxDia);
+    const equipos=new Set(), faltantes=new Set(), alertas=[];
+    delDia.forEach(t=>{
+      const req=REQUISITOS_TRAT[t.tratamiento]||{};
+      (req.aparatos||[]).forEach(a=>equipos.add(a));
+      insumosFaltantesDe(t.tratamiento).falta.forEach(f=>faltantes.add(f.item));
+      const c=clientas[t.clientaId];
+      const al=alertasClienta(c);
+      if(al.length) alertas.push({nombre:c?c.nombre:'Clienta',hora:t.hora,avisos:al});
+    });
+    res.jornada={
+      fecha:proxDia, cantidad:delDia.length,
+      desde:delDia.length?delDia[0].hora:'', hasta:delDia.length?delDia[delDia.length-1].hora:'',
+      tratamientos:[...new Set(delDia.map(t=>t.tratamiento).filter(Boolean))],
+      equipos:[...equipos], faltantes:[...faltantes], alertas
+    };
+  }
+
+  res.total=res.volver.length+res.controles.length+res.stock.length+(res.jornada&&res.jornada.alertas.length?1:0);
+  return res;
+}
+
+// ---------- TARJETA DEL ASISTENTE (sección Agenda) ----------
+let _asisAbierto = localStorage.getItem('gp_asistente_abierto')!=='no';
+
+function toggleAsistente(){
+  _asisAbierto=!_asisAbierto;
+  localStorage.setItem('gp_asistente_abierto',_asisAbierto?'si':'no');
+  renderAsistenteAgenda();
+}
+
+function _filaAviso(color,titulo,detalle,acciones){
+  return `<div style="display:flex;align-items:flex-start;gap:9px;padding:9px 0;border-bottom:1px solid var(--border)">
+    <span style="width:8px;height:8px;border-radius:50%;background:${color};flex-shrink:0;margin-top:6px"></span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:0.85rem;font-weight:600;color:var(--deep)">${titulo}</div>
+      <div style="font-size:0.76rem;color:var(--muted);margin-top:1px">${detalle}</div>
+    </div>
+    ${acciones||''}
+  </div>`;
+}
+
+function _btnMini(onclick,texto,bg,color,borde){
+  return `<button onclick="event.stopPropagation();${onclick}" style="padding:5px 10px;background:${bg};color:${color};border:${borde||'none'};border-radius:9px;font-family:'DM Sans',sans-serif;font-size:0.72rem;font-weight:600;cursor:pointer;flex-shrink:0">${texto}</button>`;
+}
+
+function renderAsistenteAgenda(){
+  const cont=document.getElementById('asistente-agenda');
+  if(!cont) return;
+  const a=avisosAgenda();
+  const col={alta:'var(--danger)',media:'var(--gold)',baja:'var(--sage)'};
+
+  const cabecera=`
+    <div onclick="toggleAsistente()" style="display:flex;align-items:center;gap:9px;cursor:pointer">
+      <span data-ic-html="robot-20" style="color:var(--rose);display:inline-flex"></span>
+      <div style="flex:1">
+        <div style="font-family:'Playfair Display',serif;font-size:1.02rem;color:var(--deep)">Asistente de la agenda</div>
+        <div style="font-size:0.75rem;color:var(--muted)">${a.total?`${a.total} cosa${a.total>1?'s':''} para revisar`:'Todo al día'}</div>
+      </div>
+      ${a.total?`<span style="background:var(--rose);color:white;border-radius:999px;padding:2px 8px;font-size:0.72rem;font-weight:700">${a.total}</span>`:''}
+      <span style="color:var(--muted);font-size:0.9rem;transform:rotate(${_asisAbierto?'90deg':'0deg'});transition:transform 0.2s">›</span>
+    </div>`;
+
+  if(!_asisAbierto){
+    cont.innerHTML=`<div class="card" style="margin-bottom:14px;padding:13px 15px">${cabecera}</div>`;
+    if(typeof aplicarIconos==='function') aplicarIconos(cont);
+    return;
+  }
+
+  let cuerpo='';
+
+  if(a.volver.length){
+    cuerpo+=`<div style="margin-top:13px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--rose);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px">Deberían volver (${a.volver.length})</div>
+      ${a.volver.slice(0,6).map(x=>_filaAviso(col[x.urgencia],
+        `${x.nombre}${x.vip?' <span class="vip-badge">VIP</span>':''} — ${x.msg}`, x.detalle,
+        `<div style="display:flex;gap:5px">${_btnMini(`recordatorioWhatsApp('${x.clientaId}')`,'WA','var(--success)','white')}${_btnMini(`abrirNuevoTurno()`,'Agendar','none','var(--deep)','1.5px solid var(--border)')}</div>`
+      )).join('')}
+      ${a.volver.length>6?`<div style="font-size:0.75rem;color:var(--muted);padding-top:7px">y ${a.volver.length-6} más — miralas en el CRM</div>`:''}
+    </div>`;
+  }
+
+  if(a.controles.length){
+    cuerpo+=`<div style="margin-top:13px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px">Controles y planes (${a.controles.length})</div>
+      ${a.controles.slice(0,6).map(x=>_filaAviso(col[x.urgencia],`${x.nombre} — ${x.msg}`,x.detalle,
+        `<div style="display:flex;gap:5px">${_btnMini(`abrirFicha('${x.clientaId}')`,'Ficha','none','var(--deep)','1.5px solid var(--border)')}${_btnMini(`recordatorioWhatsApp('${x.clientaId}')`,'WA','var(--success)','white')}</div>`
+      )).join('')}
+      ${a.controles.length>6?`<div style="font-size:0.75rem;color:var(--muted);padding-top:7px">y ${a.controles.length-6} más</div>`:''}
+    </div>`;
+  }
+
+  if(a.stock.length){
+    cuerpo+=`<div style="margin-top:13px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:2px">Stock para tus turnos (${a.stock.length})</div>
+      ${a.stock.slice(0,7).map(x=>_filaAviso('var(--danger)',x.item,x.detalle,
+        _btnMini(x.esInventario?`showSection('compras',null)`:`showSection('insumos',null)`,x.esInventario?'Inventario':'Insumos','none','var(--deep)','1.5px solid var(--border)')
+      )).join('')}
+      ${a.stock.length>7?`<div style="font-size:0.75rem;color:var(--muted);padding-top:7px">y ${a.stock.length-7} ítem${a.stock.length-7>1?'s':''} más</div>`:''}
+    </div>`;
+  }
+
+  if(a.jornada){
+    const j=a.jornada;
+    cuerpo+=`<div style="margin-top:13px">
+      <div style="font-size:0.78rem;font-weight:700;color:var(--sage);text-transform:uppercase;letter-spacing:0.4px;margin-bottom:7px">Preparar el ${_fechaCorta(j.fecha)}</div>
+      <div style="background:var(--cream);border-radius:12px;padding:11px 13px;font-size:0.81rem">
+        <div style="margin-bottom:5px"><strong>${j.cantidad} turno${j.cantidad>1?'s':''}</strong>${j.desde?` · de ${j.desde} a ${j.hasta}`:''}</div>
+        ${j.tratamientos.length?`<div style="margin-bottom:5px;color:var(--muted)">${j.tratamientos.join(' · ')}</div>`:''}
+        ${j.equipos.length?`<div style="margin-bottom:5px"><strong>Equipos a preparar:</strong> ${j.equipos.join(', ')}</div>`:''}
+        ${j.faltantes.length?`<div style="margin-bottom:5px;color:var(--danger)"><strong>Te falta:</strong> ${j.faltantes.slice(0,6).join(', ')}${j.faltantes.length>6?'…':''}</div>`:''}
+        ${j.alertas.length?`<div style="margin-top:7px;padding-top:7px;border-top:1px solid var(--border)">${j.alertas.map(al=>`<div style="color:var(--danger);font-size:0.78rem;margin-bottom:2px"><strong>${al.hora||''} ${al.nombre}:</strong> ${al.avisos.join(' · ')}</div>`).join('')}</div>`:''}
+      </div>
+    </div>`;
+  }
+
+  if(!cuerpo){
+    cuerpo=`<div style="margin-top:13px;padding:16px;text-align:center;color:var(--muted);font-size:0.84rem">
+      <div style="color:var(--success);margin-bottom:5px"><span data-ic-html="check-26"></span></div>
+      No hay nada pendiente. Ninguna clienta atrasada, planes al día y stock cubierto para los próximos turnos.
+    </div>`;
+  }
+
+  cuerpo+=`<div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+    <button onclick="resumenIAAgenda()" id="btn-resumen-ia" style="width:100%;padding:11px;background:none;border:1.5px solid var(--rose);color:var(--rose);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.83rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px">
+      <span data-ic-html="idea-16"></span>Pedirle un resumen a la IA
+    </button>
+    <div id="asistente-ia-resultado" style="margin-top:10px"></div>
+  </div>`;
+
+  cont.innerHTML=`<div class="card" style="margin-bottom:14px;padding:13px 15px">${cabecera}${cuerpo}</div>`;
+  if(typeof aplicarIconos==='function') aplicarIconos(cont);
+}
+
+// ---------- RESUMEN CON IA (opcional, solo si lo apretás) ----------
+async function resumenIAAgenda(){
+  const out=document.getElementById('asistente-ia-resultado');
+  const btn=document.getElementById('btn-resumen-ia');
+  if(!out) return;
+  const a=avisosAgenda();
+  if(!a.total && !a.jornada){ out.innerHTML=`<div class="alert alert-info">No hay nada que resumir todavía.</div>`; return; }
+
+  if(btn){ btn.disabled=true; btn.style.opacity='0.6'; btn.innerHTML='Pensando...'; }
+  out.innerHTML=`<div style="font-size:0.82rem;color:var(--muted);text-align:center;padding:8px">Armando el resumen...</div>`;
+
+  const L=[];
+  L.push('Sos la asistente de una cosmetóloga argentina. Hablá en rioplatense con voseo, cálido y directo.');
+  L.push('Con estos datos escribile un resumen corto (máximo 10 líneas) de en qué enfocarse. Nada de inventar datos que no estén acá.');
+  L.push('');
+  L.push('CLIENTAS QUE DEBERÍAN VOLVER:');
+  L.push(a.volver.length?a.volver.slice(0,10).map(x=>`- ${x.nombre}${x.vip?' (VIP)':''}: ${x.msg}. ${x.detalle}`).join('\n'):'- Ninguna');
+  L.push('');
+  L.push('CONTROLES Y PLANES PENDIENTES:');
+  L.push(a.controles.length?a.controles.slice(0,10).map(x=>`- ${x.nombre}: ${x.msg}. ${x.detalle}`).join('\n'):'- Ninguno');
+  L.push('');
+  L.push('STOCK QUE FALTA PARA LOS TURNOS DE LOS PRÓXIMOS 7 DÍAS:');
+  L.push(a.stock.length?a.stock.slice(0,12).map(x=>`- ${x.item}. ${x.detalle}`).join('\n'):'- Nada, está todo cubierto');
+  L.push('');
+  if(a.jornada){
+    const j=a.jornada;
+    L.push(`PRÓXIMA JORNADA (${_fechaCorta(j.fecha)}): ${j.cantidad} turnos${j.desde?', de '+j.desde+' a '+j.hasta:''}.`);
+    if(j.tratamientos.length) L.push(`Tratamientos: ${j.tratamientos.join(', ')}.`);
+    if(j.equipos.length) L.push(`Equipos necesarios: ${j.equipos.join(', ')}.`);
+    if(j.faltantes.length) L.push(`Le falta: ${j.faltantes.join(', ')}.`);
+    if(j.alertas.length) L.push(`Alertas de fichas: ${j.alertas.map(x=>x.nombre+' ('+x.avisos.join(', ')+')').join('; ')}.`);
+  }
+  L.push('');
+  L.push('Terminá con UNA sola sugerencia concreta de por dónde arrancar.');
+
+  try{
+    const r=await fetch(WORKER_URL_IA,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt:L.join('\n')})});
+    const data=await r.json();
+    const text=data.text||'No se pudo generar el resumen.';
+    out.innerHTML=`<div class="ai-box"><div class="ai-content">${text.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>')}</div></div>`;
+  }catch(e){
+    out.innerHTML=`<div class="alert alert-warning">No pude conectarme con la IA. Los avisos de arriba igual están calculados y son correctos.</div>`;
+  }
+  if(btn){ btn.disabled=false; btn.style.opacity='1'; btn.innerHTML='<span data-ic-html="idea-16"></span>Pedirle otro resumen a la IA'; if(typeof aplicarIconos==='function') aplicarIconos(btn); }
+}
+
+// ---------- RESUMEN CORTO PARA EL PANEL DEL INICIO ----------
+function resumenAsistenteInicio(){
+  const a=avisosAgenda();
+  if(!a.total) return '';
+  const chips=[];
+  if(a.volver.length) chips.push({txt:`${a.volver.length} para volver`,col:'var(--rose)'});
+  if(a.controles.length) chips.push({txt:`${a.controles.length} control${a.controles.length>1?'es':''}`,col:'var(--gold)'});
+  if(a.stock.length) chips.push({txt:`${a.stock.length} de stock`,col:'var(--danger)'});
+  if(!chips.length) return '';
+  return `<div onclick="showSection('agenda',document.querySelector('[data-ic=historial]'))" style="margin-top:10px;padding:10px 12px;background:white;border:1px solid var(--border);border-radius:12px;cursor:pointer;display:flex;align-items:center;gap:9px">
+    <span data-ic-html="robot-18" style="color:var(--rose);display:inline-flex;flex-shrink:0"></span>
+    <div style="flex:1;min-width:0">
+      <div style="font-size:0.82rem;font-weight:600;color:var(--deep)">El asistente encontró ${a.total} cosa${a.total>1?'s':''}</div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:4px">${chips.map(c=>`<span style="font-size:0.7rem;font-weight:600;color:${c.col};background:var(--cream);border-radius:999px;padding:2px 8px">${c.txt}</span>`).join('')}</div>
+    </div>
+    <span style="color:var(--muted);font-size:0.9rem">›</span>
+  </div>`;
+}
 
 // ===================== NAV AGRUPADO =====================
 function toggleNavMenu(menuId, btn){
