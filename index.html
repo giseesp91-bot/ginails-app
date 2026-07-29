@@ -19,6 +19,12 @@
   --cream:#f8faf8;--blush:#f0c8d0;--rose:#c4637a;--deep:#2d4a35;
   --sage:#6a9e7a;--gold:#b8976a;--light:#ffffff;--border:#e0ead8;
   --text:#2a3a2a;--muted:#7a8e7a;--success:#5a9e6a;--danger:#c05c5c;
+  /* Verdes de la barra superior (elegidos por Gise) */
+  --verde-claro:#b7cd7f;   /* header */
+  --verde-medio:#96ac60;   /* nav */
+  --verde-hondo:#778c43;   /* detalles y bordes */
+  --verde-acento:#505f2d;  /* botón activo, derivado del hondo para que se lea */
+  --verde-texto:#33401a;   /* letras sobre los verdes claros */
   --shadow:0 4px 24px rgba(61,31,26,0.08);
   /* Sistema unificado: sombras y redondeos */
   --sh-sm:0 2px 10px rgba(45,74,53,0.06);
@@ -28,18 +34,42 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);min-height:100vh;}
-header{background:var(--deep);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 4px 20px rgba(45,74,53,0.25);gap:10px;}
+/* Barra superior: verdes claros con letras oscuras.
+   Se hizo así a propósito: con estos verdes el texto blanco no se lee
+   (2,5:1), mientras que con letra oscura llega a 6,4:1. */
+header{background:var(--verde-claro);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 3px 14px rgba(85,100,48,0.22);gap:10px;}
 .logo{display:flex;align-items:center;gap:10px;white-space:nowrap;}
 .logo img{width:36px;height:36px;border-radius:50%;object-fit:cover;}
-.logo-text{font-family:'Playfair Display',serif;color:#e8d8c0;font-size:1.2rem;letter-spacing:1px;}
-.logo-text span{color:#6a9e7a;font-style:italic;}
+.logo-text{font-family:'Playfair Display',serif;color:var(--verde-texto);font-size:1.2rem;letter-spacing:1px;}
+.logo-text span{color:#48562a;font-style:italic;}
 .fb-badge{font-size:0.7rem;padding:3px 9px;border-radius:20px;font-weight:600;white-space:nowrap;}
 .fb-ok{background:#1a4a2a;color:#90e0a0;}.fb-err{background:#4a1a1a;color:#e09090;}.fb-wait{background:#3a2a0a;color:#e0c070;}
-nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:linear-gradient(180deg,#253d2b,#1e3224);border-bottom:2px solid rgba(106,158,122,0.15);}
+
+/* ---- CUENTA Y PLAN (esquina del header) ---- */
+.cuenta-btn{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.7);border-radius:999px;padding:4px 6px 4px 10px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.2s;}
+.cuenta-btn:hover{background:rgba(255,255,255,0.78);}
+.plan-pill{font-size:0.68rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;padding:3px 9px;border-radius:999px;white-space:nowrap;}
+.pill-esencial{background:var(--verde-acento);color:#fff;}
+.pill-pro{background:linear-gradient(135deg,#c4637a,#a84e65);color:#fff;}
+.pill-elite{background:linear-gradient(135deg,#b8976a,#8a6a3a);color:#fff;}
+.pill-prueba{background:#8a6a10;color:#fff;}
+.pill-vencido{background:#8a2a2a;color:#fff;}
+.cuenta-flecha{color:var(--verde-texto);font-size:0.7rem;padding-right:4px;opacity:0.7;}
+
+#cuenta-fondo{display:none;position:fixed;inset:0;z-index:9600;background:rgba(0,0,0,0.35);}
+#cuenta-panel{display:none;position:fixed;top:60px;right:14px;z-index:9700;width:min(380px,calc(100vw - 28px));max-height:calc(100vh - 80px);overflow-y:auto;background:white;border:1px solid var(--border);border-radius:18px;box-shadow:var(--sh-lg);padding:16px;}
+html.dark #cuenta-panel{background:var(--light);border-color:var(--border);}
+.plan-opcion{border:1.5px solid var(--border);border-radius:14px;padding:12px 13px;margin-bottom:9px;transition:border-color 0.2s;}
+.plan-opcion.actual{border-color:var(--sage);background:var(--cream);}
+html.dark .plan-opcion.actual{background:rgba(255,255,255,0.05) !important;}
+.plan-opcion ul{list-style:none;margin:7px 0 0;padding:0;}
+.plan-opcion li{font-size:0.75rem;color:var(--muted);padding:2px 0 2px 13px;position:relative;line-height:1.35;}
+.plan-opcion li::before{content:'·';position:absolute;left:3px;color:var(--rose);font-weight:700;}
+nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:var(--verde-medio);border-bottom:2px solid var(--verde-hondo);}
 nav::-webkit-scrollbar{display:none;}
-.nav-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:1px solid rgba(106,158,122,0.2);color:rgba(200,232,200,0.85);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:500;}
-.nav-btn:hover{background:rgba(106,158,122,0.2);border-color:#6a9e7a;color:white;transform:translateY(-1px);}
-.nav-btn.active{background:linear-gradient(135deg,#6a9e7a,#4a8a5a);border-color:#6a9e7a;color:white;box-shadow:0 3px 12px rgba(106,158,122,0.4);}
+.nav-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.5);color:var(--verde-texto);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:600;}
+.nav-btn:hover{background:var(--verde-claro);border-color:white;color:var(--verde-texto);transform:translateY(-1px);}
+.nav-btn.active{background:var(--verde-acento);border-color:var(--verde-claro);color:white;box-shadow:0 3px 12px rgba(51,64,26,0.3);}
 main{padding:18px 14px;max-width:920px;margin:0 auto;}
 .section{display:none;animation:fadeIn 0.3s ease;}
 
@@ -386,6 +416,15 @@ html.dark .vista-btn.vista-activa{background:#2c3038;}
 html.dark header{background:#1c1f24 !important;}
 html.dark nav{background:linear-gradient(180deg,#1c1f24,#16181c) !important;border-bottom-color:#2c3038 !important;}
 html.dark .logo-text{color:#e8d8c0 !important;}
+html.dark .logo-text span{color:#9ed8ae !important;}
+/* Los botones de arriba están pensados para el verde claro del modo día,
+   así que en oscuro vuelven a texto claro sobre fondo translúcido. */
+html.dark .nav-btn{background:rgba(255,255,255,0.07) !important;border-color:rgba(255,255,255,0.13) !important;color:#c8d8c8 !important;}
+html.dark .nav-btn:hover{background:rgba(255,255,255,0.14) !important;border-color:#4a5a4a !important;color:#fff !important;}
+html.dark .nav-btn.active{background:linear-gradient(135deg,#6a9e7a,#4a8a5a) !important;border-color:#6a9e7a !important;color:#fff !important;}
+html.dark .cuenta-btn{background:rgba(255,255,255,0.08) !important;border-color:rgba(255,255,255,0.15) !important;}
+html.dark .cuenta-btn:hover{background:rgba(255,255,255,0.15) !important;}
+html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
 /* Header y nav se mantienen (ya son verdes oscuros) */
 </style>
 </head>
@@ -402,8 +441,16 @@ html.dark .logo-text{color:#e8d8c0 !important;}
     <div style="width:38px;height:38px;background:linear-gradient(135deg,#7E4A5F,#c47a6e);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:1.2rem;color:white;font-weight:700;flex-shrink:0">G</div>
     <div class="logo-text">Ginails <span>Pro</span></div>
   </div>
-  <div class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</div>
+  <button class="cuenta-btn" id="cuenta-btn" onclick="toggleCuentaPanel()" title="Tu cuenta y tu plan">
+    <span class="plan-pill pill-prueba" id="cuenta-plan">—</span>
+    <span class="fb-badge fb-wait" id="fb-status">⏳ Conectando...</span>
+    <span class="cuenta-flecha">▾</span>
+  </button>
 </header>
+
+<!-- PANEL DE CUENTA Y PLAN -->
+<div id="cuenta-fondo" onclick="cerrarCuentaPanel()"></div>
+<div id="cuenta-panel"></div>
 <nav>
   <button class="nav-btn active" onclick="showSection('inicio',this)" data-ic="inicio">Inicio</button>
   <button class="nav-btn" onclick="showSection('agenda',this)" data-ic="historial">Agenda</button>
@@ -3119,6 +3166,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.location.href = "login.html";
   };
 
+  // Token de sesión, para que el servidor pueda comprobar quién pide las cosas
+  window._getIdToken = async () => {
+    try { return auth.currentUser ? await auth.currentUser.getIdToken() : null; }
+    catch (e) { return null; }
+  };
+
   onAuthStateChanged(auth, async (user) => {
     const params = new URLSearchParams(window.location.search);
     if (!user) {
@@ -3171,6 +3224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     useFirebase = true;
     document.getElementById('fb-status').textContent = '☁️ ' + user.email;
     document.getElementById('fb-status').className = 'fb-badge fb-ok';
+    cargarMiPlan();
     await loadFirebase();
     await cargarConfigFirebase();
     hideLoading();
@@ -3868,6 +3922,209 @@ function verSesionDeTurno(turnoId){
   setTimeout(()=>{ if(typeof renderHistorialModal==='function') renderHistorialModal(); },400);
 }
 
+
+// ===================== CUENTA Y PLAN =====================
+const PLANES_INFO = {
+  esencial: { nombre:'Esencial', incluye:[
+    'Panel de inicio de la jornada','Agenda: Día, Semana y Mes',
+    'Fichas de clientas e historial','Control financiero y caja'] },
+  pro: { nombre:'Pro', incluye:[
+    'Todo lo del plan Esencial','Tarjeta VIP de fidelización',
+    'Registro de visitas y beneficios','Asistente de IA completo',
+    'Alertas y recordatorios automáticos'] },
+  elite: { nombre:'Elite', incluye:[
+    'Todo lo del plan Pro','Generador de contenido para redes',
+    'Automatización de historias de Instagram'] }
+};
+const ORDEN_NIVELES = ['esencial','pro','elite'];
+let miPlan = null;
+let _cambiandoPlan = false;
+
+const _$ = id => document.getElementById(id);
+const _plata = n => '$' + Number(n||0).toLocaleString('es-AR');
+const _fecha = iso => { const d=new Date(iso); return isNaN(d)?'—':d.toLocaleDateString('es-AR'); };
+
+async function _pedir(ruta, opciones = {}) {
+  const token = window._getIdToken ? await window._getIdToken() : null;
+  if (!token) return { error: 'no-autenticada' };
+  const res = await fetch(ruta, {
+    method: opciones.method || 'GET',
+    headers: { Authorization: 'Bearer ' + token, ...(opciones.body?{'Content-Type':'application/json'}:{}) },
+    body: opciones.body ? JSON.stringify(opciones.body) : undefined
+  });
+  try { return await res.json(); } catch(e) { return { error: 'respuesta-invalida' }; }
+}
+
+async function cargarMiPlan(){
+  try {
+    const d = await _pedir('/api/mi-plan');
+    if (d && !d.error) { miPlan = d; renderPlanPill(); }
+  } catch(e) { console.log('No pude traer tu plan:', e); }
+}
+
+function renderPlanPill(){
+  const pill = _$('cuenta-plan');
+  if (!pill) return;
+  if (!miPlan) { pill.textContent='—'; return; }
+  if (miPlan.esOwner) { pill.textContent='Dueña'; pill.className='plan-pill pill-elite'; return; }
+  if (miPlan.vigente && miPlan.plan) {
+    pill.textContent = PLANES_INFO[miPlan.plan]?.nombre || miPlan.plan;
+    pill.className = 'plan-pill pill-' + miPlan.plan;
+  } else if (miPlan.vigente) {
+    pill.textContent = 'Activa';  pill.className = 'plan-pill pill-esencial';
+  } else if (miPlan.enPrueba) {
+    pill.textContent = `Prueba · ${miPlan.diasPrueba}d`; pill.className = 'plan-pill pill-prueba';
+  } else {
+    pill.textContent = 'Sin plan'; pill.className = 'plan-pill pill-vencido';
+  }
+}
+
+function toggleCuentaPanel(){
+  const p=_$('cuenta-panel');
+  if (p.style.display === 'block') { cerrarCuentaPanel(); return; }
+  renderCuentaPanel();
+  p.style.display='block'; _$('cuenta-fondo').style.display='block';
+}
+function cerrarCuentaPanel(){
+  _$('cuenta-panel').style.display='none';
+  _$('cuenta-fondo').style.display='none';
+}
+
+function renderCuentaPanel(){
+  const p=_$('cuenta-panel'); if(!p) return;
+  const email = miPlan?.email || userEmail || '';
+  let html = `<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:12px">
+    <div style="min-width:0">
+      <div style="font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--deep)">Tu cuenta</div>
+      <div style="font-size:0.76rem;color:var(--muted);word-break:break-all">${email}</div>
+    </div>
+    <button onclick="cerrarCuentaPanel()" style="background:none;border:none;cursor:pointer;color:var(--muted);flex-shrink:0"><span data-ic-html="cerrar-18"></span></button>
+  </div>`;
+
+  if (!miPlan) {
+    html += `<div class="alert alert-info" style="font-size:0.82rem">Cargando los datos de tu plan...</div>`;
+  } else if (miPlan.esOwner) {
+    html += `<div class="alert alert-success" style="font-size:0.82rem">Sos la dueña: tenés acceso completo y permanente a todo.</div>`;
+  } else {
+    html += bloqueEstadoPlan();
+    html += bloquePlanesDisponibles();
+  }
+
+  html += `<button onclick="cerrarSesion()" style="width:100%;margin-top:12px;padding:11px;background:none;border:1.5px solid var(--border);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:0.85rem;font-weight:600;color:var(--muted);cursor:pointer">Cerrar sesión</button>`;
+
+  p.innerHTML = html;
+  if (typeof aplicarIconos==='function') aplicarIconos(p);
+}
+
+function bloqueEstadoPlan(){
+  const m = miPlan;
+  const per = m.periodo === 'anual' ? 'por año' : 'por mes';
+
+  if (m.vigente && m.plan) {
+    const precio = m.precios?.[m.plan]?.[m.periodo];
+    let h = `<div style="background:var(--cream);border-radius:14px;padding:13px;margin-bottom:13px">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700">Tu plan</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--deep);margin-top:2px">${PLANES_INFO[m.plan]?.nombre||m.plan}</div>
+      <div style="font-size:0.82rem;color:var(--muted)">${precio?_plata(precio)+' '+per:''}</div>
+      ${m.esFundadora?`<div style="margin-top:7px"><span class="badge badge-gold">Fundadora · ${m.descuentoPct}% de por vida</span></div>`:''}
+      <div style="font-size:0.78rem;color:var(--muted);margin-top:8px">Se renueva el <strong style="color:var(--deep)">${_fecha(m.vence)}</strong> · quedan ${m.diasRestantes} día${m.diasRestantes===1?'':'s'}</div>
+    </div>`;
+    if (m.planPendiente) {
+      h += `<div class="alert alert-warning" style="font-size:0.8rem;margin-bottom:13px">
+        El <strong>${_fecha(m.cambioEfectivo)}</strong> pasás al plan <strong>${PLANES_INFO[m.planPendiente]?.nombre||m.planPendiente}</strong>.
+        <button onclick="cancelarCambioPendiente()" style="display:block;margin-top:6px;background:none;border:none;padding:0;color:var(--rose);font-weight:700;font-size:0.78rem;cursor:pointer;font-family:'DM Sans',sans-serif">Cancelar este cambio</button>
+      </div>`;
+    }
+    return h;
+  }
+  if (m.vigente) {
+    return `<div style="background:var(--cream);border-radius:14px;padding:13px;margin-bottom:13px">
+      <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--deep)">Suscripción activa</div>
+      <div style="font-size:0.8rem;color:var(--muted);margin-top:3px">Tu suscripción es anterior a los planes, así que tenés acceso completo. Se renueva el ${_fecha(m.vence)}.</div>
+    </div>`;
+  }
+  if (m.enPrueba) {
+    return `<div style="background:var(--cream);border-radius:14px;padding:13px;margin-bottom:13px">
+      <div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700">Prueba gratis</div>
+      <div style="font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--deep);margin-top:2px">Te quedan ${m.diasPrueba} día${m.diasPrueba===1?'':'s'}</div>
+      <div style="font-size:0.79rem;color:var(--muted);margin-top:4px">La prueba incluye lo del plan Esencial. Elegí un plan cuando quieras.</div>
+    </div>`;
+  }
+  return `<div class="alert alert-warning" style="font-size:0.82rem;margin-bottom:13px">No tenés una suscripción activa.</div>`;
+}
+
+function bloquePlanesDisponibles(){
+  const m = miPlan;
+  const per = m.periodo === 'anual' ? 'anual' : 'mensual';
+  const sufijo = per === 'anual' ? '/año' : '/mes';
+  const puedeCambiar = m.vigente && !!m.plan;
+
+  let h = `<div style="font-size:0.72rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:700;margin-bottom:8px">Planes disponibles</div>`;
+
+  ORDEN_NIVELES.forEach(n => {
+    const info = PLANES_INFO[n];
+    const precio = m.precios?.[n]?.[per];
+    const lista  = m.lista?.[n]?.[per];
+    const actual = m.plan === n;
+    const pend   = m.planPendiente === n;
+    const sube   = ORDEN_NIVELES.indexOf(n) > ORDEN_NIVELES.indexOf(m.plan);
+
+    h += `<div class="plan-opcion${actual?' actual':''}">
+      <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+        <div style="font-weight:700;font-size:0.92rem;color:var(--deep)">${info.nombre}${actual?' <span style="font-size:0.7rem;color:var(--sage);font-weight:600">· tu plan</span>':''}${pend?' <span style="font-size:0.7rem;color:var(--gold);font-weight:600">· programado</span>':''}</div>
+        <div style="text-align:right;flex-shrink:0">
+          ${m.esFundadora&&lista&&lista>precio?`<div style="font-size:0.7rem;color:var(--muted);text-decoration:line-through">${_plata(lista)}</div>`:''}
+          <div style="font-weight:700;font-size:0.9rem;color:var(--deep)">${precio?_plata(precio):'—'}<span style="font-size:0.68rem;color:var(--muted);font-weight:400">${sufijo}</span></div>
+        </div>
+      </div>
+      <ul>${info.incluye.map(x=>`<li>${x}</li>`).join('')}</ul>
+      ${(!actual&&!pend&&puedeCambiar)?`<button onclick="cambiarDePlan('${n}')" style="width:100%;margin-top:9px;padding:9px;border-radius:11px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;background:${sube?'linear-gradient(135deg,var(--rose),#a84e65)':'none'};color:${sube?'white':'var(--deep)'};${sube?'':'border:1.5px solid var(--border);'}">${sube?'Pasar a '+info.nombre:'Bajar a '+info.nombre}</button>`:''}
+      ${(!puedeCambiar&&!actual)?`<button onclick="location.href='pago.html'" style="width:100%;margin-top:9px;padding:9px;border-radius:11px;border:1.5px solid var(--border);background:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:0.8rem;font-weight:600;color:var(--deep)">Elegir ${info.nombre}</button>`:''}
+    </div>`;
+  });
+
+  if (puedeCambiar) {
+    h += `<div style="font-size:0.72rem;color:var(--muted);line-height:1.45;margin-top:4px">
+      Si subís de plan lo tenés al instante y pagás solo la diferencia por los días que te quedan.
+      Si bajás, seguís con el plan actual hasta que termine el período ya pago.</div>`;
+  }
+  return h;
+}
+
+async function cambiarDePlan(nivel){
+  if (_cambiandoPlan) return;
+  const info = PLANES_INFO[nivel];
+  const sube = ORDEN_NIVELES.indexOf(nivel) > ORDEN_NIVELES.indexOf(miPlan?.plan);
+  const aviso = sube
+    ? `¿Pasar al plan ${info.nombre}?\n\nLo vas a tener disponible enseguida. Se te cobra solo la diferencia proporcional por los días que te quedan del período actual.`
+    : `¿Bajar al plan ${info.nombre}?\n\nSeguís con tu plan actual hasta que termine el período que ya pagaste. Recién ahí pasás al nuevo y se te cobra menos.`;
+  if (!confirm(aviso)) return;
+
+  _cambiandoPlan = true;
+  try {
+    const d = await _pedir('/api/cambiar-plan', { method:'POST', body:{ nivel } });
+
+    if (d.error === 'no-autenticada') { alert('Se cerró tu sesión. Volvé a entrar e intentá de nuevo.'); return; }
+    if (d.error && d.mensaje) { alert(d.mensaje); return; }
+    if (d.error) { alert('No pude hacer el cambio. Probá de nuevo en un rato.'); return; }
+
+    if (d.tipo === 'subida' && d.init_point) { window.location.href = d.init_point; return; }
+
+    alert(d.mensaje || 'Listo.');
+    await cargarMiPlan();
+    renderCuentaPanel();
+  } catch(e) {
+    alert('No pude hacer el cambio. Revisá tu conexión.');
+  } finally { _cambiandoPlan = false; }
+}
+
+async function cancelarCambioPendiente(){
+  if (!confirm('¿Cancelar el cambio programado y quedarte con tu plan actual?')) return;
+  const d = await _pedir('/api/cancelar-cambio', { method:'POST', body:{} });
+  alert(d.mensaje || 'Listo.');
+  await cargarMiPlan();
+  renderCuentaPanel();
+}
 
 // ===================== ASISTENTE DE LA AGENDA (Entrega 3) =====================
 // Todo se calcula con reglas locales: es instantáneo, gratis y no depende del worker.
