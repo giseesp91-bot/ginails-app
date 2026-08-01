@@ -532,7 +532,8 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
     <div onclick="showSection('gastos',null)" style="background:white;border-radius:18px;padding:16px 10px;text-align:center;border:1.5px solid #e0ead8;box-shadow:var(--sh-md);cursor:pointer;transition:all 0.2s">
       <div style="margin-bottom:6px;color:#b8976a" data-ic-html="dinero-26"></div>
       <div id="stat-ganancia" style="font-size:1.1rem;font-weight:700;color:#b8976a;line-height:1">—</div>
-      <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Ganancia este mes</div>
+      <div style="font-size:0.7rem;color:#7a8e7a;margin-top:4px;font-weight:600">Cobrado este mes</div>
+      <div id="stat-ganancia-sub" style="font-size:0.63rem;color:#9aab9a;margin-top:2px"></div>
     </div>
   </div>
 
@@ -3381,6 +3382,49 @@ function v(id){const el=document.getElementById(id);return el?el.value:'';}
 function vb(id){const el=document.getElementById(id);return el?el.checked:false;}
 function getChecked(sel){return Array.from(document.querySelectorAll(sel+' input[type="checkbox"]:checked')).map(i=>i.parentElement.textContent.trim());}
 
+/**
+ * Fecha real de una sesión, en milisegundos.
+ * Se usa el día que vos cargaste (campo `fecha`), no el momento en que se
+ * guardó: si anotás el lunes una sesión del sábado, cuenta para el sábado.
+ * Acepta "1/8/2026" y "2026-08-01".
+ */
+function fechaDeSesion(s){
+  if(s && typeof s.fecha==='string'){
+    const f=s.fecha.trim();
+    let m=f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(m) return new Date(+m[3], +m[2]-1, +m[1]).getTime();
+    m=f.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(m) return new Date(+m[1], +m[2]-1, +m[3]).getTime();
+  }
+  return (s && typeof s.fechaTs==='number' && !isNaN(s.fechaTs)) ? s.fechaTs : null;
+}
+
+/**
+ * Período contable actual, según el día de corte que configuraste
+ * en Configuración. Con el valor por defecto (día 1) es el mes calendario.
+ */
+function rangoMesContable(ref){
+  const hoy = ref ? new Date(ref) : new Date();
+  let ini = parseInt(localStorage.getItem('gp_mes_inicio'))||1;
+  if(ini<1||ini>28) ini=1;
+  let desde = new Date(hoy.getFullYear(), hoy.getMonth(), ini, 0,0,0,0);
+  if(hoy.getDate() < ini) desde = new Date(hoy.getFullYear(), hoy.getMonth()-1, ini, 0,0,0,0);
+  const hasta = new Date(desde.getFullYear(), desde.getMonth()+1, ini, 0,0,0,0); // exclusivo
+  return { desde, hasta, ini };
+}
+
+/** Todo lo cobrado dentro del período contable actual. */
+function cobradoEsteMes(){
+  const {desde,hasta}=rangoMesContable();
+  const d=desde.getTime(), h=hasta.getTime();
+  let total=0, cuantas=0;
+  Object.values(sesiones).forEach(s=>{
+    const t=fechaDeSesion(s);
+    if(t!==null && t>=d && t<h){ total+=(s.precio||0); cuantas++; }
+  });
+  return { total, cuantas };
+}
+
 function updateStats(){
   document.getElementById('stat-clientas').textContent=Object.keys(clientas).length;
   document.getElementById('stat-sesiones').textContent=Object.keys(sesiones).length;
@@ -3391,10 +3435,19 @@ function updateStats(){
     const nombre = ahora.toLocaleString('es-AR',{month:'long',year:'numeric'});
     mesLabel.textContent = nombre.charAt(0).toUpperCase()+nombre.slice(1);
   }
-  const cobrado=Object.values(sesiones).reduce((s,x)=>s+(x.precio||0),0);
-  const gastado=Object.values(gastosD).reduce((s,x)=>s+(x.monto||0),0);
-  const gan=cobrado-gastado;
-  document.getElementById('stat-ganancia').textContent=(gan>=0?'+':'')+('$'+gan.toLocaleString('es-AR'));
+
+  // Cobrado en el período contable actual (antes decía "ganancia"
+  // pero sumaba todo el histórico, no el mes).
+  const {total,cuantas}=cobradoEsteMes();
+  const el=document.getElementById('stat-ganancia');
+  if(el){
+    el.textContent='$'+total.toLocaleString('es-AR');
+    const sub=document.getElementById('stat-ganancia-sub');
+    if(sub) sub.textContent = cuantas ? `${cuantas} ${cuantas===1?'sesión':'sesiones'} este mes` : 'Sin cobros este mes';
+    const {desde,hasta}=rangoMesContable();
+    const cont=el.closest('div[onclick]');
+    if(cont) cont.title=`Del ${desde.toLocaleDateString('es-AR')} al ${new Date(hasta.getTime()-86400000).toLocaleDateString('es-AR')}`;
+  }
 }
 
 // ===================== NAV =====================
@@ -4867,7 +4920,7 @@ function renderHistorialModal(){
   const cont=document.getElementById('modal-historial');
   const lista=Object.values(sesiones).filter(s=>s.clientaId===clientaActualId).sort((a,b)=>b.fechaTs-a.fechaTs);
   if(!lista.length){cont.innerHTML=`<div class="empty-state" style="padding:18px"><div class="icon">📅</div><p>Sin sesiones todavía.</p></div>`;return;}
-  cont.innerHTML=`<div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px">${lista.length} sesión${lista.length>1?'es':''} en total</div>`+
+  cont.innerHTML=`<div style="font-size:0.8rem;color:var(--muted);margin-bottom:8px">${lista.length} ${lista.length===1?'sesión':'sesiones'} en total</div>`+
   lista.map(s=>`<div class="sesion-item">
     <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:7px"><span class="sesion-num">${s.numero||'?'}</span>
