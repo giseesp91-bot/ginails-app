@@ -3224,10 +3224,16 @@ document.addEventListener('DOMContentLoaded', () => {
     useFirebase = true;
     document.getElementById('fb-status').textContent = '☁️ ' + user.email;
     document.getElementById('fb-status').className = 'fb-badge fb-ok';
-    cargarMiPlan();
-    await loadFirebase();
-    await cargarConfigFirebase();
+    // El plan es un extra: si falla, no puede frenar la carga de los datos.
+    try { cargarMiPlan(); } catch(e){ console.log('[Ginails] Plan:', e && e.message); }
+
+    // Pase lo que pase acá adentro, la app tiene que quedar usable.
+    try { await loadFirebase(); }
+    catch(e){ console.log('[Ginails] Error cargando datos:', e && e.message, e); }
+    try { await cargarConfigFirebase(); }
+    catch(e){ console.log('[Ginails] Error cargando config:', e && e.message); }
     hideLoading();
+    if (typeof redibujarTodo === 'function') redibujarTodo();
 
     // Detectar formulario público
     if (params.get('form') === '1') {
@@ -3282,14 +3288,51 @@ function initLocal(){
   renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
 }
 
+/**
+ * Corre una función y, si se rompe, lo avisa por consola pero SIGUE.
+ * Antes esto era una cadena sin red: si un solo dibujado fallaba,
+ * los de atrás no se ejecutaban y la app quedaba en blanco aunque
+ * los datos estuvieran perfectamente cargados en memoria.
+ */
+function _intentar(nombre, fn){
+  try { const r = fn(); return r; }
+  catch(e){ console.log('[Ginails] Falló "'+nombre+'":', e && e.message, e); return null; }
+}
+
+// Vuelve a dibujar todas las pantallas con los datos que haya en memoria.
+// Se puede llamar en cualquier momento sin miedo.
+function redibujarTodo(){
+  _intentar('renderClientas', ()=>renderClientas());
+  _intentar('updateStats', ()=>updateStats());
+  _intentar('renderInsumos', ()=>renderInsumos());
+  _intentar('renderPreciosSection', ()=>renderPreciosSection());
+  _intentar('initPresItems', ()=>initPresItems());
+  _intentar('initCRM', ()=>initCRM());
+  _intentar('renderInventario', ()=> typeof renderInventario==='function' && renderInventario());
+  _intentar('renderAgenda', ()=> typeof renderAgenda==='function' && renderAgenda());
+  _intentar('renderPanelDia', ()=> typeof renderPanelDia==='function' && renderPanelDia());
+}
+window.redibujarTodo = redibujarTodo;
+
 async function loadFirebase(){
   const base = `usuarios/${userEmail}`;
   const cols=[['clientas',clientas],['sesiones',sesiones],['planes',planes],
               ['gastos',gastosD],['presupuestos',presupuestos],['servicios_custom',serviciosCustom],['turnos',turnos]];
+
+  // Cada colección por separado: si una falla, las otras igual se cargan.
   for(const[col,obj] of cols){
-    const snap=await fs.getDocs(fs.collection(db, base, col));
-    snap.forEach(d=>obj[d.id]=d.data());
+    try {
+      const snap=await fs.getDocs(fs.collection(db, base, col));
+      snap.forEach(d=>obj[d.id]=d.data());
+    } catch(e){
+      console.log('[Ginails] No pude leer la colección "'+col+'":', e && e.message);
+    }
   }
+  console.log('[Ginails] Cargado desde Firebase →',
+    Object.keys(clientas).length,'clientas ·',
+    Object.keys(sesiones).length,'sesiones ·',
+    Object.keys(turnos).length,'turnos');
+
   // Cargar insumos desde Firebase
   try {
     const insnap = await fs.getDoc(fs.doc(db, `usuarios/${userEmail}/config`, 'insumos'));
@@ -3302,12 +3345,18 @@ async function loadFirebase(){
       miInventario = invsnap.data() || {};
       localStorage.setItem('ginails_inventario', JSON.stringify(miInventario));
     }
-  } catch(e){ console.log('Insumos load error', e); }
-  renderClientas();updateStats();renderInsumos();renderPreciosSection();initPresItems();
-  initCRM();
-  await checkFormulariosFirebase();
-  if(typeof renderPanelDia==='function') renderPanelDia();
-  chequearOnboarding();
+  } catch(e){ console.log('[Ginails] Insumos/inventario:', e && e.message); }
+
+  redibujarTodo();
+
+  try { await checkFormulariosFirebase(); }
+  catch(e){ console.log('[Ginails] Formularios pendientes:', e && e.message); }
+
+  _intentar('chequearOnboarding', ()=>chequearOnboarding());
+
+  // Segunda pasada por las dudas: si algo tardó en estar listo
+  // (íconos, elementos del DOM), acá se termina de acomodar.
+  setTimeout(()=>redibujarTodo(), 600);
 }
 
 async function saveDoc(col,id,data){
