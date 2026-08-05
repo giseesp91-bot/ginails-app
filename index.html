@@ -65,6 +65,33 @@ html.dark .plan-opcion.actual{background:rgba(255,255,255,0.05) !important;}
 .plan-opcion ul{list-style:none;margin:7px 0 0;padding:0;}
 .plan-opcion li{font-size:0.75rem;color:var(--muted);padding:2px 0 2px 13px;position:relative;line-height:1.35;}
 .plan-opcion li::before{content:'·';position:absolute;left:3px;color:var(--rose);font-weight:700;}
+
+/* Caja de "Elegí el tratamiento" y botón de volver.
+   Van por clase y no por estilo inline a propósito: cuando el JavaScript
+   pone estilos con style.cssText, el navegador los reescribe (#f8fdf8 pasa
+   a rgb(248,253,248)) y las reglas de modo oscuro que buscan el texto exacto
+   dejan de coincidir. Con clases eso no puede pasar. */
+.caja-selector-trat{margin-top:16px;background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid var(--sage);border-radius:14px;padding:14px;}
+html.dark .caja-selector-trat{background:var(--light) !important;border-color:var(--border) !important;}
+html.dark .caja-selector-trat *{color:var(--text) !important;}
+html.dark .caja-selector-trat select{background:#1b1e23 !important;border-color:var(--border) !important;}
+html.dark .caja-selector-trat button{color:#fff !important;}
+
+.btn-ver-grande{width:100%;margin-top:7px;padding:9px;background:none;border:1.5px solid var(--border);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.79rem;font-weight:600;color:var(--deep);cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.btn-ver-grande:hover{border-color:var(--sage);color:var(--sage);}
+html.dark .btn-ver-grande{background:none !important;color:var(--text) !important;border-color:var(--border) !important;}
+
+/* Lector del análisis a pantalla completa */
+#modal-analisis{display:none;position:fixed;inset:0;z-index:9990;background:rgba(45,74,53,0.55);backdrop-filter:blur(3px);align-items:center;justify-content:center;padding:14px;}
+#modal-analisis > div{background:white;border-radius:18px;width:100%;max-width:760px;max-height:92vh;display:flex;flex-direction:column;box-shadow:var(--sh-lg);}
+html.dark #modal-analisis > div{background:var(--light);}
+#analisis-grande-cuerpo{padding:18px 20px;overflow-y:auto;font-size:0.95rem;line-height:1.85;white-space:pre-wrap;color:var(--text);}
+html.dark #analisis-grande-cuerpo{color:var(--text);}
+#analisis-grande-cuerpo strong{color:var(--deep);}
+
+.btn-volver-trat{width:100%;margin-top:12px;padding:11px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer;}
+html.dark .btn-volver-trat{background:var(--light) !important;color:var(--text) !important;border-color:var(--border) !important;}
+html.dark .btn-volver-trat:hover{background:#2c3038 !important;color:var(--deep) !important;}
 nav{display:flex;gap:5px;overflow-x:auto;padding:10px 14px;background:var(--verde-medio);border-bottom:2px solid var(--verde-hondo);}
 nav::-webkit-scrollbar{display:none;}
 .nav-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.42);border:1px solid rgba(255,255,255,0.5);color:var(--verde-texto);padding:7px 14px;border-radius:22px;font-size:0.78rem;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;transition:all 0.25s;font-weight:600;}
@@ -451,6 +478,23 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
 <!-- PANEL DE CUENTA Y PLAN -->
 <div id="cuenta-fondo" onclick="cerrarCuentaPanel()"></div>
 <div id="cuenta-panel"></div>
+
+<!-- LECTOR DEL ANÁLISIS A PANTALLA COMPLETA -->
+<div id="modal-analisis" onclick="if(event.target===this)cerrarAnalisisGrande()">
+  <div>
+    <div style="padding:15px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0">
+      <div style="min-width:0">
+        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;color:var(--deep)">Análisis de la IA</div>
+        <div id="analisis-grande-fecha" style="font-size:0.76rem;color:var(--muted)"></div>
+      </div>
+      <div style="display:flex;gap:6px;flex-shrink:0">
+        <button onclick="copiarAnalisisGrande()" title="Copiar el texto" style="padding:8px 12px;background:none;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:var(--deep);cursor:pointer">Copiar</button>
+        <button onclick="cerrarAnalisisGrande()" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px"><span data-ic-html="cerrar-20"></span></button>
+      </div>
+    </div>
+    <div id="analisis-grande-cuerpo"></div>
+  </div>
+</div>
 <nav>
   <button class="nav-btn active" onclick="showSection('inicio',this)" data-ic="inicio">Inicio</button>
   <button class="nav-btn" onclick="showSection('agenda',this)" data-ic="historial">Agenda</button>
@@ -4814,7 +4858,8 @@ function abrirFicha(id){
     ${(c.analisisIA||[]).length?`<div class="ficha-section" style="background:#f0fdf4">
       <h4>🤖 Análisis IA guardado</h4>
       <p style="font-size:0.76rem;color:var(--muted);margin-bottom:8px">${(c.analisisIA[c.analisisIA.length-1].fecha)}</p>
-      <div id="ia-guardado-texto" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:10px;padding:10px;border:1px solid var(--border)">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+      <div id="ia-guardado-texto" onclick="verAnalisisGrande()" title="Tocá para verlo en grande" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:10px;padding:10px;border:1px solid var(--border);cursor:zoom-in">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
+      <button onclick="verAnalisisGrande()" class="btn-ver-grande"><span data-ic-html="buscar-14" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Ver en grande</button>
       ${c.analisisIA.length>1?`<div style="font-size:0.74rem;color:var(--muted);margin-top:5px">${c.analisisIA.length} análisis guardados — mostrando el último</div>`:''}
     </div>`:''}
   `;
@@ -5055,9 +5100,8 @@ REGLA CRÍTICA: Leé TODO este inventario antes de armar el protocolo. Antes de 
 // Solo personaliza el producto/aparato/activo de cada paso según el diagnóstico.
 const PROTOCOLOS_BASE = {
   'Limpieza Facial Profunda':[
-    'Recepción y desmaquillado de ojos y labios',
-    'Primera limpieza (leche o gel desmaquillante)',
-    'Segunda limpieza (gel limpiador específico según piel)',
+    'Desmaquillado — UN solo desmaquillante según la piel (leche, agua micelar o aceite). Incluye ojos y labios',
+    'Limpieza profunda (gel o espuma limpiadora específica según tipo de piel)',
     'Tónico equilibrante',
     'Vaporización (u ozono) — omitir si hay rosácea/cuperosis',
     'Exfoliación (enzimática o mecánica según piel)',
@@ -5081,9 +5125,8 @@ const PROTOCOLOS_BASE = {
     'Protector solar'
   ],
   'Control de Acné':[
-    'Desmaquillado',
-    'Primera limpieza',
-    'Segunda limpieza (gel con activo seborregulador)',
+    'Desmaquillado — UN solo desmaquillante según la piel (leche, agua micelar o aceite)',
+    'Limpieza profunda (gel con activo seborregulador)',
     'Tónico astringente',
     'Vaporización (si no hay pústulas inflamadas ni rosácea)',
     'Exfoliación con activo queratolítico (salicílico) si la piel lo tolera',
@@ -5221,6 +5264,135 @@ const PROTOCOLOS_BASE = {
 // Combos: se resuelven concatenando protocolos base en el orden correcto.
 // La lógica de combos ya está descrita en REGLAS_CLINICAS y en las fichas de servicio.
 
+/* ---------- LECTOR DEL ANÁLISIS A PANTALLA COMPLETA ---------- */
+function verAnalisisGrande(){
+  const c=clientas[clientaActualId];
+  const lista=(c&&c.analisisIA)||[];
+  if(!lista.length){ alert('Todavía no hay ningún análisis guardado para esta clienta.'); return; }
+  const ultimo=lista[lista.length-1];
+  const cuerpo=document.getElementById('analisis-grande-cuerpo');
+  const fecha=document.getElementById('analisis-grande-fecha');
+  if(!cuerpo) return;
+  cuerpo.innerHTML=(ultimo.texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+  cuerpo.scrollTop=0;
+  if(fecha) fecha.textContent=`${c.nombre} · ${ultimo.fecha||''}${lista.length>1?` · el último de ${lista.length}`:''}`;
+  const m=document.getElementById('modal-analisis');
+  m.style.display='flex';
+  if(typeof aplicarIconos==='function') aplicarIconos(m);
+}
+function cerrarAnalisisGrande(){
+  const m=document.getElementById('modal-analisis');
+  if(m) m.style.display='none';
+}
+async function copiarAnalisisGrande(){
+  const t=document.getElementById('analisis-grande-cuerpo')?.innerText
+        || document.getElementById('analisis-grande-cuerpo')?.textContent || '';
+  try{ await navigator.clipboard.writeText(t); alert('Copiado ✅'); }
+  catch(e){ alert('No pude copiar. Seleccioná el texto y copialo a mano.'); }
+}
+// Cerrar con la tecla Escape
+document.addEventListener('keydown', e=>{
+  if(e.key==='Escape'){
+    if(document.getElementById('modal-analisis')?.style.display==='flex') cerrarAnalisisGrande();
+    else if(document.getElementById('cuenta-panel')?.style.display==='block') cerrarCuentaPanel();
+  }
+});
+
+/* =====================================================================
+   FICHA DEL SERVICIO COMO FUENTE ÚNICA DE VERDAD
+   ---------------------------------------------------------------------
+   Las fichas de la sección Servicios ya tienen todo: pasos con tiempos,
+   criterios por tipo de piel, adaptaciones rápidas, contraindicaciones.
+   Antes la IA no las veía: recibía solo los nombres pelados de los pasos.
+   Ahora se le manda la ficha entera, así que si Gise corrige una ficha,
+   la IA se entera sola y no hay dos versiones que se contradigan.
+   ===================================================================== */
+
+function _normalizarNombre(s){
+  return (s||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9]+/g,' ').trim();
+}
+
+/** Saca el texto de un nodo respetando los saltos de línea,
+    aunque esté oculto (innerText devuelve vacío si display:none). */
+function _textoDeNodo(el){
+  let out='';
+  el.childNodes.forEach(n=>{
+    if(n.nodeType===3){ out += n.nodeValue.replace(/\s+/g,' '); return; }
+    if(n.nodeType!==1) return;
+    const tag=n.tagName;
+    if(tag==='BR'){ out+='\n'; return; }
+    if(tag==='SCRIPT'||tag==='STYLE') return;
+    const bloque=/^(DIV|P|H1|H2|H3|H4|H5|H6|LI|TR|SECTION|BUTTON)$/.test(tag);
+    if(bloque) out+='\n';
+    out+=_textoDeNodo(n);
+    if(bloque) out+='\n';
+  });
+  return out;
+}
+
+/** Devuelve la ficha completa del servicio tal como la lee la cosmetóloga. */
+function fichaServicioTexto(tratamiento){
+  try{
+    const objetivo=_normalizarNombre(tratamiento);
+    if(!objetivo) return '';
+    const cards=document.querySelectorAll('.servicio-card');
+    let mejor=null, mejorTitulo='';
+    for(const card of cards){
+      const h=card.querySelector('.serv-header h4');
+      if(!h) continue;
+      const t=_normalizarNombre(h.textContent);
+      if(!t) continue;
+      if(t===objetivo){ mejor=card; mejorTitulo=h.textContent.trim(); break; }
+      if(!mejor && (t.includes(objetivo)||objetivo.includes(t))){ mejor=card; mejorTitulo=h.textContent.trim(); }
+    }
+    if(!mejor) return '';
+    const body=mejor.querySelector('.serv-body');
+    if(!body) return '';
+    let txt=_textoDeNodo(body).replace(/[ \t]+/g,' ').replace(/\n{3,}/g,'\n\n').replace(/^\s+|\s+$/g,'');
+    if(txt.length<40) return '';
+    if(txt.length>6000) txt=txt.slice(0,6000)+'\n[...]';
+    return `FICHA OFICIAL DEL SERVICIO "${mejorTitulo}" (la que usa la cosmetóloga en el gabinete)
+Esto es lo que dice la app sobre este tratamiento: sus pasos con tiempos reales, qué producto corresponde según el tipo de piel, las adaptaciones rápidas y las contraindicaciones.
+ES LA FUENTE MÁS IMPORTANTE. Si algo de acá contradice tu criterio general, mandan estos criterios: están escritos por la profesional que atiende.
+
+${txt}
+── fin de la ficha ──`;
+  }catch(e){ console.log('[Ginails] No pude leer la ficha del servicio:', e && e.message); return ''; }
+}
+
+/* =====================================================================
+   GUÍA DE ACTIVOS — para que elija con criterio y no repita siempre
+   lo mismo. Se combina con la descripción que cargó la cosmetóloga
+   en cada producto de su inventario.
+   ===================================================================== */
+const GUIA_ACTIVOS = `GUÍA DE ELECCIÓN DE ACTIVOS (criterio profesional)
+
+QUÉ ACTIVO CORRESPONDE SEGÚN LA PIEL
+· Barrera dañada, descamación, tirantez, post-procedimiento → ceramidas, centella asiática (cica), pantenol, escualano. NADA de ácidos ni exfoliantes hasta reparar.
+· Grasa, mixta, poro dilatado, acné comedónico → ácido salicílico (BHA, entra en el poro), niacinamida, zinc, arcilla verde.
+· Acné inflamatorio → salicílico suave + calmantes + LED azul. Sin exfoliación mecánica.
+· Seca (le falta grasa) → ceramidas, escualano, manteca/aceites, ácido láctico si hay que exfoliar.
+· Deshidratada (le falta agua, puede ser grasa igual) → ácido hialurónico + un oclusivo arriba que lo selle. NO es lo mismo que seca.
+· Sensible o rosácea → centella, pantenol, aloe, azufre suave. Si hay que exfoliar: mandélico o enzimático, nunca mecánico ni glicólico.
+· Manchas e hiperpigmentación → vitamina C de mañana; arbutina, kójico o tranexámico de noche. Fototipo IV-VI: mandélico, nunca glicólico alto.
+· Falta de luminosidad, piel apagada → vitamina C, exfoliación enzimática, hialurónico.
+· Antiedad, flacidez, líneas → péptidos, retinol de noche, vitamina C de mañana, ácido ferúlico.
+
+INCOMPATIBILIDADES QUE NO SE NEGOCIAN
+· Vitamina C + retinol en la misma aplicación → no. Separar mañana/noche.
+· Retinol + ácidos fuertes (glicólico, salicílico alto) juntos → irritación garantizada.
+· Niacinamida es de las más compatibles: se lleva bien con casi todo.
+· Embarazo y lactancia → sin retinoides, sin despigmentantes (kójico, arbutina, hidroquinona), sin salicílico en alta concentración.
+
+CÓMO ELEGIR, PASO A PASO
+1. Leé los activos que la cosmetóloga cargó en la descripción de cada producto de su inventario. Ahí dice para qué sirve y para qué piel es. Esa descripción manda sobre cualquier suposición tuya.
+2. Cruzá esos activos con el diagnóstico de ESTA clienta: tipo de piel, estado de la barrera, problemáticas, fototipo, objetivo.
+3. Elegí el producto cuyo activo resuelve lo que ella necesita HOY. Escribí en "Por qué" qué activo es y por qué ese y no otro.
+4. NO ACUMULES PRODUCTOS DE LA MISMA FUNCIÓN. Si el paso pide un desmaquillante, va UNO solo, el que corresponda a su piel — no tres. Tener tres limpiadores en el inventario significa que hay uno para cada tipo de piel, no que se usen los tres juntos.
+5. Si dos productos sirven para el paso, elegí el más específico para ella y decí en una línea por qué descartaste el otro.
+6. Cuidado con repetir siempre el mismo activo: si en el paso anterior ya usaste niacinamida, revisá si el sérum tratante realmente tiene que ser niacinamida otra vez o si esta clienta necesita otra cosa.`;
+
 function protocoloBaseTexto(tratamiento){
   const pasos = PROTOCOLOS_BASE[tratamiento];
   if(pasos){
@@ -5282,13 +5454,21 @@ Bullets con ❌ o ⚠️. Solo lo que aplica a ella (contraindicaciones reales s
 
 **✅ TRATAMIENTOS RECOMENDADOS**
 Exactamente 3 opciones, en orden de prioridad clínica. Formato por opción:
-**1. [Nombre del tratamiento]** — [por qué ESTE para ella, 1 línea concreta citando su ficha] · Sesiones sugeridas: [nº y frecuencia]
+**1. [Nombre del tratamiento]** — [por qué ESTE para ella, 1 línea concreta citando su ficha]
+· Plan: [cuántas sesiones seguidas y cada cuántos días] · Después: [cada cuánto de mantenimiento]
+
+La frecuencia tiene que salir del caso de ELLA, no de un manual: piel grasa aguanta más seguido que una barrera comprometida. Si la ficha del servicio indica una frecuencia, tomala de base y ajustala a ella.
 
 Nada más. No escribas el protocolo todavía — la cosmetóloga elige primero.`;
 
   await callIA(prompt, document.getElementById('ia-contenido'));
   iaTextoActual=document.getElementById('ia-contenido').innerText;
   window._iaPaso1=document.getElementById('ia-contenido').innerHTML;
+  // Guardamos el análisis para pasárselo después al protocolo.
+  // Con respaldo a textContent: innerText devuelve vacío en algunos contextos.
+  const _cont = document.getElementById('ia-contenido');
+  _analisisPrevio = (iaTextoActual || _cont?.innerText || _cont?.textContent || '').trim();
+  _analisisClientaId = c.id;
   mostrarSelectorTratamiento();
 }
 
@@ -5302,7 +5482,7 @@ function mostrarSelectorTratamiento(){
   const todos=[...SERVICIOS_LISTA,...customs];
   const box=document.createElement('div');
   box.id='selector-tratamiento';
-  box.style.cssText='margin-top:16px;background:linear-gradient(135deg,#f8fdf8,#f0f8f2);border:1.5px solid var(--sage);border-radius:14px;padding:14px';
+  box.className='caja-selector-trat';
   box.innerHTML=`
     <div style="font-weight:700;font-size:0.92rem;color:var(--deep);margin-bottom:4px">👉 Elegí el tratamiento a realizar</div>
     <div style="font-size:0.78rem;color:var(--muted);margin-bottom:10px">Podés elegir cualquiera, no solo los recomendados. Te armo el protocolo completo paso a paso adaptado a ${clientas[clientaActualId]?.nombre||'ella'}.</div>
@@ -5325,6 +5505,30 @@ function pedirProtocoloCompleto(){
   generarProtocoloCompleto(c,trat);
 }
 
+/**
+ * El análisis del paso 1, para que el protocolo no lo contradiga.
+ * Antes el paso 2 era una consulta nueva que no sabía nada de lo que
+ * había dicho el paso 1: por eso el análisis podía recomendar LED amarilla
+ * y el protocolo después ni mencionarla.
+ */
+let _analisisPrevio = '';
+let _analisisClientaId = null;
+function _analisisPrevioTexto(){
+  // Solo si el análisis es de ESTA clienta, para no mezclar fichas
+  if(_analisisClientaId && _analisisClientaId !== clientaActualId) return '';
+  const t=(_analisisPrevio||'').trim();
+  if(!t) return '';
+  return `
+TU PROPIO ANÁLISIS DE ESTA CLIENTA (lo escribiste vos hace un momento y la cosmetóloga ya lo leyó en pantalla):
+${t}
+
+QUÉ HACER CON ESTO — OBLIGATORIO:
+· Todo lo que prometiste acá tiene que aparecer en el protocolo. Si dijiste que va LED amarilla, LED amarilla tiene que estar en un paso.
+· Si al armar el protocolo te das cuenta de que algo del análisis no corresponde, no lo borres calladamente: escribí una línea "Corrección respecto del análisis:" explicando por qué cambiaste de opinión.
+· Las contraindicaciones que marcaste arriba se respetan sin excepción.
+`;
+}
+
 // ---------- PASO 2: PROTOCOLO COMPLETO ----------
 async function generarProtocoloCompleto(c,tratamiento){
   const cont=document.getElementById('ia-contenido');
@@ -5334,17 +5538,23 @@ async function generarProtocoloCompleto(c,tratamiento){
 
 ${REGLAS_CLINICAS}
 
+${GUIA_ACTIVOS}
+
 ${perfilClientaTexto(c)}
 
 ${inventarioTexto()}
 
-${protocoloBaseTexto(tratamiento)}
+${fichaServicioTexto(tratamiento)}
 
+${protocoloBaseTexto(tratamiento)}
+${_analisisPrevioTexto()}
 TRATAMIENTO ELEGIDO POR LA COSMETÓLOGA: **${tratamiento}**
 
 ════════════════════════════════
 CÓMO TENÉS QUE ARMAR EL PROTOCOLO
 ════════════════════════════════
+
+0. QUÉ MANDA SOBRE QUÉ: si hay FICHA OFICIAL DEL SERVICIO más arriba, ESA es la que vale: sus pasos, sus tiempos y sobre todo sus criterios de "qué producto según qué piel" (ej: "salicílico para grasa/acné, suave para seca/sensible", "arcilla verde para grasa, blanca para seca"). El protocolo base es el resumen de esa misma ficha; si difieren, seguí la ficha. Y aplicá las "Adaptaciones rápidas" que figuren ahí al caso de esta clienta.
 
 1. ESTRUCTURA FIJA: Usá el PROTOCOLO BASE OFICIAL de arriba como esqueleto. Escribí TODOS sus pasos, en el MISMO orden, sin saltear ninguno. No inventes un protocolo nuevo ni reordenes pasos. El orden profesional es sagrado (ejemplo de orden correcto al final: sérum → mascarilla → LED → crema → protector solar; la crema y el protector SIEMPRE después del LED, nunca antes).
 
@@ -5400,8 +5610,14 @@ Noche: [pasos con productos del inventario]
 **📊 EXPECTATIVAS REALES**
 [Qué va a ver y cuándo. Cuántas sesiones. Qué depende de ella.]
 
-**🎯 PRÓXIMA SESIÓN**
-[Qué hacer la próxima vez y en cuántos días]
+**🎯 PLAN Y CADA CUÁNTO VOLVER**
+Esta sección la lee la clienta cuando pregunta "¿puedo seguir? ¿cada cuánto vengo?". Sé concreta con los días, nada de rangos de manual.
+· Próxima sesión: [en cuántos días exactos y qué se hace esa vez]
+· Plan de ataque: [cuántas sesiones seguidas y cada cuántos días, hasta lograr el objetivo]
+· Mantenimiento: [una vez logrado, cada cuánto volver para sostenerlo]
+· Cuándo re-evaluar: [en qué sesión o fecha conviene revisar si sigue este mismo plan]
+· Se puede combinar con: [qué otro tratamiento del gabinete podría alternar, y cada cuánto] o "Por ahora solo este"
+La frecuencia sale de SU caso: su tipo de piel, el estado de su barrera y su objetivo. Si la ficha del servicio da una frecuencia, usala de base y ajustala a ella explicando el ajuste.
 
 **🛒 TE FALTARÍA** (SOLO si de verdad no hay un producto apto en el inventario)
 [Productos que no tenés y que mejorarían este protocolo. Si el inventario ya cubre todo, escribí "Tenés todo lo necesario para este protocolo ✅"]`;
@@ -5411,7 +5627,7 @@ Noche: [pasos con productos del inventario]
 
   // Botón para volver a elegir otro tratamiento
   const volver=document.createElement('button');
-  volver.style.cssText='width:100%;margin-top:12px;padding:11px;background:white;color:var(--deep);border:2px solid var(--border);border-radius:14px;font-family:\'DM Sans\',sans-serif;font-size:0.86rem;font-weight:600;cursor:pointer';
+  volver.className='btn-volver-trat';
   volver.textContent='↩ Elegir otro tratamiento';
   volver.onclick=()=>{ const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
   cont.appendChild(volver);
@@ -5622,9 +5838,15 @@ function inventarioParaIA(){
   if(!lista.length)return '';
   const grupos={};
   lista.forEach(p=>{const c=p.categoria||'otros';if(!grupos[c])grupos[c]=[];grupos[c].push(p);});
-  return Object.keys(INV_CATS).filter(c=>grupos[c]).map(cat=>
-    `${INV_CATS[cat].replace(/[^\w\sáéíóúñÁÉÍÓÚÑ&]/g,'').trim()}:\n${grupos[cat].map(p=>`  · "${p.marca?p.marca+' ':''}${p.nombre}"${p.tamano?' ('+p.tamano+')':''}${p.notas?' → '+p.notas:''}`).join('\n')}`
-  ).join('\n');
+  // Primero las categorías conocidas, y después CUALQUIER otra que haya.
+  // Si no, un producto con una categoría rara quedaba invisible para la IA.
+  const conocidas=Object.keys(INV_CATS).filter(c=>grupos[c]);
+  const sueltas=Object.keys(grupos).filter(c=>!INV_CATS[c]);
+  const fila=p=>`  · "${p.marca?p.marca+' ':''}${p.nombre}"${p.tamano?' ('+p.tamano+')':''}${p.notas?' → '+p.notas:''}`;
+  return [
+    ...conocidas.map(cat=>`${INV_CATS[cat].replace(/[^\w\sáéíóúñÁÉÍÓÚÑ&]/g,'').trim()}:\n${grupos[cat].map(fila).join('\n')}`),
+    ...sueltas.map(cat=>`${cat}:\n${grupos[cat].map(fila).join('\n')}`)
+  ].join('\n');
 }
 
 function actualizarResumenInsumos(){
