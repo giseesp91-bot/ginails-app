@@ -77,6 +77,9 @@ html.dark .caja-selector-trat *{color:var(--text) !important;}
 html.dark .caja-selector-trat select{background:#1b1e23 !important;border-color:var(--border) !important;}
 html.dark .caja-selector-trat button{color:#fff !important;}
 
+.btn-registrar-ses{width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,var(--sage),#4d8060);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(106,158,122,0.3);}
+html.dark .btn-registrar-ses{color:#fff !important;}
+
 .btn-ver-grande{width:100%;margin-top:7px;padding:9px;background:none;border:1.5px solid var(--border);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:0.79rem;font-weight:600;color:var(--deep);cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .btn-ver-grande:hover{border-color:var(--sage);color:var(--sage);}
 html.dark .btn-ver-grande{background:none !important;color:var(--text) !important;border-color:var(--border) !important;}
@@ -2899,6 +2902,11 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
           <input type="text" id="ses-reemplazo" placeholder="Producto con el que se reemplazó (si aplica)">
         </div>
       </div>
+      <div class="form-group full" id="ses-cambios-wrap" style="display:none">
+        <label>¿Cambiaste algo del protocolo? ¿Por qué?</label>
+        <textarea id="ses-cambios" placeholder="Ej: en vez de la arcilla verde usé la blanca porque tenía la piel más reactiva de lo esperado"></textarea>
+        <div style="font-size:0.72rem;color:var(--muted);margin-top:3px">Esto la IA lo va a tener en cuenta en los próximos protocolos de esta clienta.</div>
+      </div>
       <div class="form-group full"><label>Notas para la próxima sesión</label><textarea id="ses-proxima" placeholder="¿Qué cambiar? ¿Qué reforzar? ¿Qué recordar la próxima vez?"></textarea></div>
       <div class="form-group"><label>Precio cobrado ($)</label><input type="number" id="ses-precio" min="0"></div>
       <div class="form-group"><label>Forma de pago</label><select id="ses-pago"><option value="">—</option><option>Efectivo</option><option>Transferencia</option><option>Débito</option><option>Crédito</option><option>Sin cobrar</option></select></div>
@@ -4939,6 +4947,11 @@ function abrirModalSesion(){
   document.getElementById('ses-rechazo').checked=false;
   document.getElementById('rechazo-det').style.display='none';
   document.getElementById('modal-sesion-titulo').textContent=(clientas[clientaActualId]?.nombre||'')+'  — Nueva Sesión';
+  // Una sesión normal no viene de ningún protocolo: limpiamos la marca
+  // para que no quede pegada de una vez anterior que se canceló.
+  _sesionDesdeProtocolo=null;
+  const _wc=document.getElementById('ses-cambios-wrap');
+  if(_wc){ _wc.style.display='none'; const _ci=document.getElementById('ses-cambios'); if(_ci) _ci.value=''; }
   document.getElementById('modal-sesion').classList.add('open');
 }
 async function guardarSesion(){
@@ -4955,11 +4968,44 @@ async function guardarSesion(){
     tuvoRechazo,rechazoProd:tuvoRechazo?v('ses-rechazo-prod'):'',
     rechazoDesc:tuvoRechazo?v('ses-rechazo-desc'):'',
     productoReemplazo:tuvoRechazo?v('ses-reemplazo'):'',
-    notaProxima:v('ses-proxima'),precio:parseInt(v('ses-precio'))||0,pago:v('ses-pago')};
+    notaProxima:v('ses-proxima'),precio:parseInt(v('ses-precio'))||0,pago:v('ses-pago'),
+    // Si la sesión salió de un protocolo de la IA, guardamos cuál fue
+    // y qué cambió la cosmetóloga. Eso alimenta los próximos protocolos.
+    protocoloIA: _sesionDesdeProtocolo || null,
+    cambiosProtocolo: v('ses-cambios') || ''};
   sesiones[id]=ses;await saveDoc('sesiones',id,ses);
-  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  _sesionDesdeProtocolo=null;
+  const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='none';
   closeModal('modal-sesion');renderPlanModal();renderHistorialModal();renderClientas();updateStats();
   alert('✅ Sesión registrada!');
+}
+
+/* ---------- REGISTRAR SESIÓN DIRECTO DESDE EL PROTOCOLO ---------- */
+let _sesionDesdeProtocolo = null;
+
+function registrarSesionDesdeProtocolo(tratamiento){
+  if(!clientaActualId){ alert('Abrí primero la ficha de la clienta.'); return; }
+  abrirModalSesion();          // esto limpia la marca…
+  _sesionDesdeProtocolo = tratamiento || '';   // …y acá la ponemos, en este orden
+  // Precargamos el tratamiento del protocolo y mostramos el campo de cambios
+  setTimeout(()=>{
+    const sel=document.getElementById('ses-tratamiento');
+    if(sel && tratamiento){
+      const existe=[...sel.options].some(o=>o.value===tratamiento||o.textContent===tratamiento);
+      if(existe) sel.value=tratamiento;
+    }
+    const wrap=document.getElementById('ses-cambios-wrap');
+    if(wrap) wrap.style.display='';
+    const tit=document.getElementById('modal-sesion-titulo');
+    if(tit) tit.textContent=`${clientas[clientaActualId]?.nombre||''} — ${tratamiento}`;
+    const dur=document.getElementById('ses-duracion');
+    if(dur && !dur.value){
+      // Si el protocolo dijo una duración, la traemos
+      const m=(_ultimaRespuestaIA||'').match(/Duraci[oó]n estimada:\s*(\d+)/i);
+      if(m) dur.value=m[1];
+    }
+  },60);
 }
 function renderHistorialModal(){
   const cont=document.getElementById('modal-historial');
@@ -4977,6 +5023,7 @@ function renderHistorialModal(){
     ${s.productos?`<div style="font-size:0.78rem;margin-top:4px"><strong>Usados:</strong> ${s.productos}</div>`:''}
     ${s.reaccion?`<div style="font-size:0.78rem;margin-top:4px;background:var(--light);padding:6px;border-radius:10px">${s.reaccion}</div>`:''}
     ${s.tuvoRechazo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff0f0;padding:6px;border-radius:10px;color:var(--danger)">⚠️ <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ '+s.productoReemplazo:''}</div>`:''}
+    ${s.cambiosProtocolo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff8e3;padding:6px;border-radius:10px;color:#6a4a10"><strong>✏️ Cambié del protocolo:</strong> ${s.cambiosProtocolo}</div>`:''}
     ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:10px;color:#1a5a3a">📌 ${s.notaProxima}</div>`:''}
     <div style="text-align:right;margin-top:7px"><button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')"><span data-ic-html="eliminar-16" style="display:inline-flex;vertical-align:-0.1em"></span></button></div>
   </div>`).join('');
@@ -5074,7 +5121,13 @@ function perfilClientaTexto(c){
 - Productos que rechazó antes: ${rechazos||'ninguno'}
 
 HISTORIAL (${sesCli.length} sesiones):
-${sesCli.slice(0,8).map((s,i)=>`· Ses.${s.numero||i+1} (${s.fecha}) ${s.tratamiento} — piel al inicio: ${s.estadoPiel||'—'} | reacción: ${s.reacPiel||s.reaccion||'—'} | mejoró: ${s.mejoro||'—'} | eval ${s.evaluacion||'—'}/5 | domiciliario: ${s.domiciliario||'—'} | productos usados: ${s.productos||'—'}`).join('\n')||'Sin sesiones previas — es la primera vez.'}
+${sesCli.slice(0,8).map((s,i)=>`· Ses.${s.numero||i+1} (${s.fecha}) ${s.tratamiento} — piel al inicio: ${s.estadoPiel||'—'} | reacción: ${s.reacPiel||s.reaccion||'—'} | mejoró: ${s.mejoro||'—'} | eval ${s.evaluacion||'—'}/5 | domiciliario: ${s.domiciliario||'—'} | productos usados: ${s.productos||'—'}${s.cambiosProtocolo?`\n    ↳ LA COSMETÓLOGA CAMBIÓ ESTO DEL PROTOCOLO QUE LE DISTE: "${s.cambiosProtocolo}"`:''}`).join('\n')||'Sin sesiones previas — es la primera vez.'}
+${sesCli.some(s=>s.cambiosProtocolo)?`
+⚠️ ATENCIÓN — CORRECCIONES DE LA PROFESIONAL:
+Arriba hay sesiones donde la cosmetóloga CAMBIÓ algo del protocolo que vos le habías armado, y anotó por qué. Eso es conocimiento real de ella sobre esta clienta, viendo su piel en la camilla. Vos no la viste.
+· Tomá esas correcciones como criterio válido y aplicalas de entrada en este protocolo.
+· No vuelvas a proponer lo que ella ya descartó para esta clienta, salvo que tengas un motivo clínico nuevo — y si lo hacés, explicá por qué en una línea.
+· Si el cambio fue por algo puntual de ese día (ej: la piel estaba más reactiva de lo habitual), tenelo en cuenta pero no lo tomes como permanente.`:''}
 
 CÓMO USAR EL HISTORIAL (importante):
 · SÍ usalo para: ver cómo evolucionó la piel, qué reacciones tuvo, qué le funcionó o le irritó, si cumple el domiciliario, y qué falta trabajar del objetivo.
@@ -5264,6 +5317,53 @@ const PROTOCOLOS_BASE = {
 // Combos: se resuelven concatenando protocolos base en el orden correcto.
 // La lógica de combos ya está descrita en REGLAS_CLINICAS y en las fichas de servicio.
 
+/* ---------- INSPECTOR: QUÉ SE LE MANDÓ REALMENTE A LA IA ---------- */
+function verPromptIA(){
+  if(!_ultimoPrompt){
+    alert('Todavía no se le pidió nada a la IA en esta sesión. Generá un análisis o un protocolo y volvé a tocar acá.');
+    return;
+  }
+  const p=_ultimoPrompt;
+  const tiene=(re)=>re.test(p);
+  const chequeos=[
+    ['La ficha de la clienta',            /PERFIL DE LA CLIENTA/],
+    ['Su historial de sesiones',          /HISTORIAL \(/],
+    ['Tu inventario con las descripciones', /INVENTARIO REAL DEL GABINETE/],
+    ['La ficha oficial del servicio',     /FICHA OFICIAL DEL SERVICIO/],
+    ['La guía de elección de activos',    /GUÍA DE ELECCIÓN DE ACTIVOS/],
+    ['Las reglas clínicas',               /REGLAS CLÍNICAS OBLIGATORIAS/],
+    // Detectamos por una frase que SOLO existe en el bloque del análisis:
+    // "TU PROPIO ANÁLISIS" también aparece en la lista de validación.
+    ['El análisis previo (paso 1)',       /lo escribiste vos hace un momento/],
+  ];
+  // Cuántos productos vio realmente
+  const mInv=p.match(/INVENTARIO REAL DEL GABINETE[\s\S]*?(?=\n[A-ZÁÉÍÓÚ]{4,}|$)/);
+  const nProd=mInv?(mInv[0].match(/^\s*·\s*"/gm)||[]).length:0;
+
+  const resumen=`═══════════════════════════════════════
+QUÉ RECIBIÓ LA IA · ${_ultimoPromptQue}
+═══════════════════════════════════════
+${chequeos.map(([n,re])=>`${tiene(re)?'✅':'❌'}  ${n}`).join('\n')}
+
+📦  Productos de tu inventario que vio: ${nProd}
+📏  Tamaño del pedido: ${p.length.toLocaleString('es-AR')} caracteres
+
+Si algo tiene ❌, eso es lo que la IA NO está viendo.
+Abajo está el pedido completo, palabra por palabra.
+═══════════════════════════════════════
+
+
+`;
+  const cuerpo=document.getElementById('analisis-grande-cuerpo');
+  const fecha=document.getElementById('analisis-grande-fecha');
+  cuerpo.textContent=resumen+p;
+  cuerpo.scrollTop=0;
+  if(fecha) fecha.textContent='Lo que se le mandó a la inteligencia artificial';
+  const m=document.getElementById('modal-analisis');
+  m.style.display='flex';
+  if(typeof aplicarIconos==='function') aplicarIconos(m);
+}
+
 /* ---------- LECTOR DEL ANÁLISIS A PANTALLA COMPLETA ---------- */
 function verAnalisisGrande(){
   const c=clientas[clientaActualId];
@@ -5390,8 +5490,15 @@ CÓMO ELEGIR, PASO A PASO
 2. Cruzá esos activos con el diagnóstico de ESTA clienta: tipo de piel, estado de la barrera, problemáticas, fototipo, objetivo.
 3. Elegí el producto cuyo activo resuelve lo que ella necesita HOY. Escribí en "Por qué" qué activo es y por qué ese y no otro.
 4. NO ACUMULES PRODUCTOS DE LA MISMA FUNCIÓN. Si el paso pide un desmaquillante, va UNO solo, el que corresponda a su piel — no tres. Tener tres limpiadores en el inventario significa que hay uno para cada tipo de piel, no que se usen los tres juntos.
-5. Si dos productos sirven para el paso, elegí el más específico para ella y decí en una línea por qué descartaste el otro.
-6. Cuidado con repetir siempre el mismo activo: si en el paso anterior ya usaste niacinamida, revisá si el sérum tratante realmente tiene que ser niacinamida otra vez o si esta clienta necesita otra cosa.`;
+5. COMPARÁ ANTES DE ELEGIR — esto es obligatorio y es donde más se falla.
+   Para cada paso que lleve producto, primero LISTÁ mentalmente TODOS los del inventario que podrían servir en ese paso. Recién después elegí.
+   Si había más de uno posible, en la línea "Por qué" tenés que nombrar al menos uno que descartaste y decir en tres palabras por qué. Ejemplo: "Elijo la arcilla verde por el exceso de sebo en zona T; descarto la blanca porque es para piel seca y ella no lo es."
+   Está PROHIBIDO agarrar la primera opción razonable sin haber mirado las otras.
+
+   Caso mascarillas, que es donde más se repite el error: la cosmetóloga suele tener varias. Las arcillas absorbentes (verde/bentonita) son para piel grasa, mixta o acneica. Las suaves (blanca/caolín) son para piel seca, sensible o madura. Los geles calmantes o descongestivos son para piel reactiva o post-extracción, NO son la opción por defecto. Las de lámina con colágeno, retinol o nicotinamida tienen su propia indicación. Elegí la que corresponde al diagnóstico de ELLA y justificá contra las otras.
+
+6. NO REPITAS POR INERCIA: si el producto que vas a elegir es el mismo que pondrías para cualquier clienta, algo estás haciendo mal. Preguntate qué tiene ESTA piel de particular y si ese producto es realmente el mejor para eso.
+7. Cuidado con repetir el mismo activo dentro de la misma sesión: si en un paso anterior ya usaste niacinamida, revisá si el sérum tratante realmente tiene que ser niacinamida otra vez o si esta clienta necesita otra cosa.`;
 
 function protocoloBaseTexto(tratamiento){
   const pasos = PROTOCOLOS_BASE[tratamiento];
@@ -5443,6 +5550,13 @@ async function generarAnalisisIA(c){
 ${REGLAS_CLINICAS}
 
 ${perfilClientaTexto(c)}
+
+${inventarioTexto()}
+
+REGLA IMPORTANTE SOBRE LO QUE RECOMENDÁS:
+Solo podés recomendar tratamientos y aparatos que la cosmetóloga TENGA de verdad, según el inventario de arriba.
+Si nombrás una aparatología (LED de un color, alta frecuencia, ultrasonido, microcorriente, vaporizador), fijate primero que figure en su inventario o en sus insumos. Si no la tiene, no la nombres: recomendá lo que sí puede hacer hoy.
+Esto es clave porque después vas a tener que escribir el protocolo paso a paso, y todo lo que prometas acá tiene que poder ejecutarse.
 
 TAREA — Devolvé SOLO esto, corto y concreto (máximo 250 palabras en total):
 
@@ -5579,6 +5693,8 @@ Antes de escribir la respuesta final, revisá que:
 ✓ Cada producto sale del inventario y está nombrado exacto.
 ✓ No sugeriste comprar/incorporar nada que ya exista en el inventario.
 ✓ Cada paso que cambiaste u omitiste tiene su motivo escrito.
+✓ RELEÉ TU PROPIO ANÁLISIS de más arriba y buscá cada aparato, activo o LED que hayas nombrado ahí. ¿Está cada uno en algún paso del protocolo? Si nombraste "LED roja" o "LED amarilla" en el análisis y no aparece en ningún paso, AGREGALA donde corresponde o escribí por qué la descartaste. Es el error más común: prometer algo en el análisis y olvidarlo en el protocolo.
+✓ ¿Elegiste los productos por sus activos y por el caso de ella, o caíste en el primero de la lista? Si en el protocolo anterior de otra clienta habrías puesto lo mismo, revisá si de verdad corresponde acá.
 ✓ No hay contradicciones entre un paso y el siguiente (activos incompatibles, orden ilógico).
 Si algo falla, CORREGILO antes de mostrar. La respuesta que muestres ya tiene que estar validada.
 
@@ -5624,11 +5740,26 @@ La frecuencia sale de SU caso: su tipo de piel, el estado de su barrera y su obj
 
   await callIA(prompt, cont);
   iaTextoActual=cont.innerText;
+  _ultimaRespuestaIA = cont.innerText || cont.textContent || '';
+
+  // Botón para registrar este mismo tratamiento como sesión
+  const registrar=document.createElement('button');
+  registrar.className='btn-registrar-ses';
+  registrar.innerHTML='✓ Registrar esta sesión';
+  registrar.onclick=()=>registrarSesionDesdeProtocolo(tratamiento);
+  cont.appendChild(registrar);
 
   // Botón para volver a elegir otro tratamiento
   const volver=document.createElement('button');
   volver.className='btn-volver-trat';
   volver.textContent='↩ Elegir otro tratamiento';
+  // Botón para auditar qué recibió la IA
+  const auditar=document.createElement('button');
+  auditar.className='btn-ver-grande';
+  auditar.style.marginTop='7px';
+  auditar.textContent='🔍 Ver qué recibió la IA';
+  auditar.onclick=()=>verPromptIA();
+  cont.appendChild(auditar);
   volver.onclick=()=>{ const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
   cont.appendChild(volver);
 }
@@ -5663,7 +5794,16 @@ Sugerí: 1) Tratamientos recomendados con protocolo adaptado 2) Contraindicacion
 }
 
 const WORKER_URL_IA = "https://ginails-ia.gis-eesp91.workers.dev";
+/* Guardamos el último pedido tal cual se envió, para poder inspeccionarlo.
+   Sirve para responder sin adivinar: ¿le llegó el análisis? ¿qué productos
+   tenía disponibles? ¿le llegaron los criterios de la ficha del servicio? */
+let _ultimoPrompt = '';
+let _ultimoPromptQue = '';
+let _ultimaRespuestaIA = '';
+
 async function callIA(prompt,resultDiv){
+  _ultimoPrompt = prompt || '';
+  _ultimoPromptQue = new Date().toLocaleString('es-AR');
   try{
     const r=await fetch(WORKER_URL_IA,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
     const data=await r.json();
