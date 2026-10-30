@@ -2896,18 +2896,8 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
       <div class="form-group"><label>Fecha *</label><input type="date" id="ses-fecha"></div>
       <div class="form-group"><label>Número de sesión</label><input type="number" id="ses-numero" min="1"></div>
       <div class="form-group full"><label>Servicio realizado *</label>
-        <select id="ses-tratamiento"><option value="">Seleccionar</option>
-          <option>Limpieza Facial Profunda</option><option>Hidratación Profunda</option>
-          <option>Control de Acné</option><option>Despigmentación & Luminosidad</option>
-          <option>Anti-Edad & Lifting Facial</option><option>Calmante & Barrera Protectora</option>
-          <option>Revitalización & Glow</option><option>Peeling Químico Superficial</option>
-          <option>Lifting de Pestañas</option><option>Laminado de Cejas</option>
-          <option>Henna de Cejas</option><option>Tinte de Cejas</option><option>Tinte de Pestañas</option>
-          <option>Diseño & Perfilado de Cejas</option><option>Combo Limpieza + Perfilado</option>
-          <option>Combo Mirada Completa</option><option>Combo Lifting + Tinte Pestañas</option>
-          <option>Combo Henna + Perfilado</option><option>Combo Limpieza + Peeling</option>
-          <option>Combo Facial + Mirada Completa</option><option>Combo Laminado + Henna</option><option>Combo Laminado + Tinte</option><option>Servicio personalizado (ver notas)</option>
-        </select>
+        <select id="ses-tratamiento" onchange="toggleServicioOtro()"><option value="">Seleccionar</option></select>
+        <input type="text" id="ses-trat-otro" placeholder="¿Qué servicio hiciste?" style="display:none;margin-top:6px">
       </div>
       <div class="form-group"><label>Estado piel al inicio</label>
         <select id="ses-estado-piel"><option value="">Seleccionar</option><option>Muy bueno</option><option>Bueno</option><option>Regular</option><option>Con brote activo</option><option>Deshidratada</option><option>Sensible / reactiva</option><option>Irritada</option></select>
@@ -4962,8 +4952,9 @@ function renderPlanModal(){
 // ===================== SESIONES =====================
 function abrirModalSesion(){
   setHoy('ses-fecha');
+  llenarServiciosSesion();
   const plan=Object.values(planes).find(p=>p.clientaId===clientaActualId&&p.activo);
-  if(plan)document.getElementById('ses-tratamiento').value=plan.servicio;
+  if(plan)seleccionarServicioSesion(plan.servicio);
   const sesPlan=plan?Object.values(sesiones).filter(s=>s.planId===plan.id):[];
   document.getElementById('ses-numero').value=sesPlan.length+1;
   document.getElementById('ses-rechazo').checked=false;
@@ -4978,8 +4969,8 @@ function abrirModalSesion(){
   document.getElementById('modal-sesion').classList.add('open');
 }
 async function guardarSesion(){
-  const trat=v('ses-tratamiento');
-  if(!trat){alert('Seleccioná el servicio');return;}
+  const trat=servicioSesionElegido();
+  if(!trat){alert(v('ses-tratamiento')==='__otro__'?'Escribí qué servicio hiciste':'Seleccioná el servicio');return;}
   const plan=Object.values(planes).find(p=>p.clientaId===clientaActualId&&p.activo);
   const tuvoRechazo=vb('ses-rechazo');
   const id=uid();
@@ -4997,7 +4988,7 @@ async function guardarSesion(){
     protocoloIA: _sesionDesdeProtocolo || null,
     cambiosProtocolo: v('ses-cambios') || ''};
   sesiones[id]=ses;await saveDoc('sesiones',id,ses);
-  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios','ses-dictado'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios','ses-dictado','ses-trat-otro'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   _sesionDesdeProtocolo=null; detenerDictado();
   const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='none';
   closeModal('modal-sesion');renderPlanModal();renderHistorialModal();renderClientas();updateStats();
@@ -5013,11 +5004,7 @@ function registrarSesionDesdeProtocolo(tratamiento){
   _sesionDesdeProtocolo = tratamiento || '';   // …y acá la ponemos, en este orden
   // Precargamos el tratamiento del protocolo y mostramos el campo de cambios
   setTimeout(()=>{
-    const sel=document.getElementById('ses-tratamiento');
-    if(sel && tratamiento){
-      const existe=[...sel.options].some(o=>o.value===tratamiento||o.textContent===tratamiento);
-      if(existe) sel.value=tratamiento;
-    }
+    if(tratamiento) seleccionarServicioSesion(tratamiento);
     const wrap=document.getElementById('ses-cambios-wrap');
     if(wrap) wrap.style.display='';
     const tit=document.getElementById('modal-sesion-titulo');
@@ -5047,26 +5034,49 @@ function tratamientoDeTextoProtocolo(texto){
   return (m?m[1]:linea).trim();
 }
 
-// Elige el servicio en el formulario de sesión; si no está en la lista, lo agrega
+// Lista de servicios del registro de sesión: la misma del generador + los de Mis Servicios
+function llenarServiciosSesion(){
+  const sel=document.getElementById('ses-tratamiento'); if(!sel) return;
+  const antes=sel.value;
+  const customs=Object.values(serviciosCustom||{}).map(x=>x.nombre).filter(Boolean);
+  const vistos=new Set(), lista=[];
+  [...SERVICIOS_LISTA,...customs].forEach(n=>{const k=normTxt(n); if(k&&!vistos.has(k)){vistos.add(k);lista.push(n);}});
+  sel.innerHTML='';
+  const o0=document.createElement('option'); o0.value=''; o0.textContent='Seleccionar'; sel.appendChild(o0);
+  lista.forEach(n=>{const o=document.createElement('option'); o.value=n; o.textContent=n; sel.appendChild(o);});
+  const oo=document.createElement('option'); oo.value='__otro__'; oo.textContent='Otro servicio (escribir cuál)'; sel.appendChild(oo);
+  if(antes && [...sel.options].some(o=>o.value===antes)) sel.value=antes;
+  else if(antes) seleccionarServicioSesion(antes);
+  toggleServicioOtro();
+}
+function toggleServicioOtro(){
+  const sel=document.getElementById('ses-tratamiento'), inp=document.getElementById('ses-trat-otro');
+  if(!sel||!inp) return;
+  const otro=sel.value==='__otro__';
+  inp.style.display=otro?'':'none';
+  if(!otro) inp.value='';
+}
+// Servicio que se va a guardar: el de la lista o el que escribió
+function servicioSesionElegido(){
+  const val=v('ses-tratamiento');
+  return val==='__otro__' ? (v('ses-trat-otro')||'').trim() : val;
+}
+// Elige el servicio en el formulario; si no está en la lista, usa "Otro" con el nombre escrito
 function seleccionarServicioSesion(nombre){
   const sel=document.getElementById('ses-tratamiento');
   if(!sel||!nombre) return '';
   const n=normTxt(nombre);
-  let op=[...sel.options].find(o=>o.value && normTxt(o.value)===n);
-  if(!op){
-    // Buscamos el nombre bien escrito en Mis Servicios (el título viene en mayúsculas)
-    let lindo=nombre;
-    try{
-      const info=(typeof PRECIOS_INFO!=='undefined'?PRECIOS_INFO:[]).find(p=>normTxt(p.nombre)===n);
-      if(info) lindo=info.nombre;
-      else if(nombre===nombre.toUpperCase()) lindo=nombre.charAt(0)+nombre.slice(1).toLowerCase();
-    }catch(e){}
-    op=document.createElement('option'); op.textContent=lindo; op.value=lindo;
-    const ult=sel.options[sel.options.length-1];
-    sel.insertBefore(op, ult && /personalizado/i.test(ult.value)?ult:null);
-  }
-  sel.value=op.value;
-  return op.value;
+  const op=[...sel.options].find(o=>o.value && o.value!=='__otro__' && normTxt(o.value)===n);
+  if(op){ sel.value=op.value; toggleServicioOtro(); return op.value; }
+  let lindo=nombre;
+  try{
+    const info=(typeof PRECIOS_INFO!=='undefined'?PRECIOS_INFO:[]).find(p=>normTxt(p.nombre)===n);
+    if(info) lindo=info.nombre;
+    else if(nombre===nombre.toUpperCase()) lindo=nombre.charAt(0)+nombre.slice(1).toLowerCase();
+  }catch(e){}
+  sel.value='__otro__'; toggleServicioOtro();
+  const inp=document.getElementById('ses-trat-otro'); if(inp) inp.value=lindo;
+  return lindo;
 }
 
 // Saca del texto del protocolo lo que sirve para la sesión
@@ -5225,6 +5235,18 @@ function _elegirOpcion(selId,valor){
   sel.value=op.value; marcarCampoIA(selId); return true;
 }
 
+// ¿Son el mismo producto? ("agua micelar" = "Agua micelar Idraet")
+function mismoProducto(a,b){
+  const na=normTxt(a), nb=normTxt(b);
+  if(!na||!nb) return false;
+  if(na.includes(nb)||nb.includes(na)) return true;
+  const vacias=new Set(['de','del','la','el','los','las','con','para','por','y','en','al','gel','crema']);
+  const pal=t=>t.split(/[^a-z0-9]+/).filter(w=>w.length>2&&!vacias.has(w));
+  const pa=pal(na), pb=pal(nb);
+  const [corta,larga]=pa.length<=pb.length?[pa,pb]:[pb,pa];
+  return corta.length>0 && corta.every(w=>larga.some(x=>x.startsWith(w)||w.startsWith(x)));
+}
+
 async function ordenarDictadoIA(){
   const ta=document.getElementById('ses-dictado');
   const est=document.getElementById('dict-estado');
@@ -5232,37 +5254,48 @@ async function ordenarDictadoIA(){
   if(_grabando) detenerDictado();
   const dicho=(ta?.value||'').trim();
   if(!dicho){ alert('Primero dictá o escribí lo que pasó en la sesión.'); return; }
-  const opciones=id=>[...document.getElementById(id).options].map(o=>o.value).filter(Boolean);
+  const opciones=id=>[...document.getElementById(id).options].map(o=>o.value).filter(x=>x&&x!=='__otro__');
   const actual={
-    tratamiento:v('ses-tratamiento'), estadoPiel:v('ses-estado-piel'), duracion:v('ses-duracion'),
+    tratamiento:servicioSesionElegido(), estadoPiel:v('ses-estado-piel'), duracion:v('ses-duracion'),
     productos:v('ses-productos'), reaccion:v('ses-reaccion'), rechazo:vb('ses-rechazo'),
     rechazoProd:v('ses-rechazo-prod'), rechazoDesc:v('ses-rechazo-desc'), reemplazo:v('ses-reemplazo'),
     cambios:v('ses-cambios'), proxima:v('ses-proxima'), precio:v('ses-precio'), pago:v('ses-pago')
   };
-  const prompt=`Sos la asistente de una cosmetóloga. Ella acaba de terminar una sesión y te dictó por voz lo que pasó. Tu trabajo es SOLO ordenar lo que dijo en los campos del registro de sesión. No des consejos ni opiniones.
+  const prompt=`Sos la asistente de una cosmetóloga. Ella acaba de terminar una sesión y te dictó por voz lo que pasó. Tu trabajo es SOLO repartir lo que dijo en los campos correctos del registro de sesión. No des consejos ni opiniones.
 
-Devolvé ÚNICAMENTE un objeto JSON válido (sin texto antes ni después, sin \`\`\`), con SOLO los campos que hay que cambiar según lo que dijo.
+El formulario ya viene cargado con el protocolo que se planificó. Lo que ella dicta son, casi siempre, las DIFERENCIAS con ese protocolo y cómo le fue.
 
-REGLAS
-- No inventes nada. Si no lo dijo, ese campo NO va en el JSON.
-- El dictado puede tener errores de transcripción: corregí los obvios (nombres de productos, términos de cosmetología).
-- Escribí los textos breves y prolijos, en primera persona de ella, en español rioplatense.
-- En "reaccion", "cambios" y "proxima": si el campo ya tiene texto y ella suma algo, devolvé el texto combinado. Si contradice lo que había, manda lo que dijo ella.
-- En "productos": partí de la lista actual y aplicá los cambios que dijo (sacá lo que no usó, agregá lo que usó). Si no habló de productos, no lo incluyas.
-- "precio" es un número entero en pesos: "18 mil" = 18000, "dieciocho mil quinientos" = 18500.
-- "rechazo" es true SOLO si hubo una reacción adversa a un producto (no un enrojecimiento esperable que se fue).
+Devolvé ÚNICAMENTE un objeto JSON válido (sin texto antes ni después, sin \`\`\`), con SOLO los campos que hay que cambiar.
 
-CAMPOS POSIBLES
-- tratamiento: uno de ${JSON.stringify(opciones('ses-tratamiento'))}
-- estadoPiel: uno de ${JSON.stringify(opciones('ses-estado-piel'))}
-- duracion: número de minutos
-- productos: texto, separado por comas
-- reaccion: resultado y cómo reaccionó
-- rechazo, rechazoProd, rechazoDesc, reemplazo
-- cambios: qué cambió respecto del protocolo y por qué
-- proxima: notas para la próxima sesión (incluí cuándo vuelve si lo dijo)
-- precio
-- pago: uno de ${JSON.stringify(opciones('ses-pago'))}
+QUÉ VA EN CADA CAMPO
+- tratamiento: SOLO si dice que hizo otro servicio distinto al cargado. Uno de ${JSON.stringify(opciones('ses-tratamiento'))}, o el nombre que dijo si no está en la lista.
+- estadoPiel: cómo estaba la piel AL LLEGAR. Uno de ${JSON.stringify(opciones('ses-estado-piel'))}.
+- duracion: minutos totales, número.
+- productosQuitar: lista de productos o aparatos del protocolo que NO usó (los que cambió, sacó, reemplazó o salteó).
+- productosAgregar: lista de productos o aparatos que SÍ usó y no estaban en el protocolo (los que puso en reemplazo o sumó).
+- cambios: qué cambió respecto del protocolo y por qué, en una o dos frases.
+- reaccion: cómo respondió la piel durante y al final (tolerancia, enrojecimiento, resultado visible).
+- rechazo: true SOLO si hubo una reacción adversa a un producto (no un enrojecimiento esperable que se fue). Con rechazo: rechazoProd, rechazoDesc, reemplazo.
+- proxima: qué hacer o tener en cuenta la próxima vez, y cuándo vuelve si lo dijo.
+- precio: número entero en pesos ("18 mil" = 18000, "dieciocho mil quinientos" = 18500).
+- pago: uno de ${JSON.stringify(opciones('ses-pago'))}.
+
+REGLAS IMPORTANTES
+- No inventes nada. Si no lo dijo, ese campo NO va.
+- Un producto que ella dice que CAMBIÓ, SACÓ o NO USÓ va SIEMPRE en productosQuitar, NUNCA en productosAgregar.
+- Si nombra un producto solo para contar cómo reaccionó, no lo quites ni lo agregues.
+- Usá el nombre del producto como ella lo dijo; no hace falta que coincida exacto con la lista.
+- El dictado puede tener errores de transcripción: corregí los obvios.
+- Textos breves y prolijos, en primera persona de ella, español rioplatense.
+- En reaccion, cambios y proxima: si el campo ya tiene texto, devolvé el texto combinado; si contradice lo que había, manda lo que dijo ella.
+
+EJEMPLOS
+Dictado: "cambié el agua micelar por leche de limpieza porque tenía la piel seca"
+→ {"productosQuitar":["agua micelar"],"productosAgregar":["leche de limpieza"],"cambios":"Reemplacé el agua micelar por leche de limpieza porque tenía la piel seca."}
+Dictado: "esta vez no usé el agua micelar"
+→ {"productosQuitar":["agua micelar"],"cambios":"No usé el agua micelar."}
+Dictado: "la alta frecuencia no la hice, le quedó un poco rojo el mentón pero se le fue, cobré 20 mil en efectivo"
+→ {"productosQuitar":["alta frecuencia"],"cambios":"No hice alta frecuencia.","reaccion":"Leve enrojecimiento en el mentón que se fue al final.","precio":20000,"pago":"Efectivo"}
 
 FORMULARIO COMO ESTÁ AHORA
 ${JSON.stringify(actual)}
@@ -5281,12 +5314,21 @@ LO QUE DICTÓ
     const res=JSON.parse(txt.slice(i,j+1));
     let n=0;
     const poner=(id,val)=>{ if(val===undefined||val===null||val==='') return; const el=document.getElementById(id); if(!el) return; el.value=String(val); marcarCampoIA(id); n++; };
-    if(res.tratamiento){ if(_elegirOpcion('ses-tratamiento',res.tratamiento)) n++; }
+    if(res.tratamiento && normTxt(res.tratamiento)!==normTxt(servicioSesionElegido())){ seleccionarServicioSesion(res.tratamiento); marcarCampoIA('ses-tratamiento'); n++; }
     if(res.estadoPiel){ if(_elegirOpcion('ses-estado-piel',res.estadoPiel)) n++; }
     if(res.pago){ if(_elegirOpcion('ses-pago',res.pago)) n++; }
     if(res.duracion!==undefined){ const d=parseInt(res.duracion); if(d>0) poner('ses-duracion',d); }
     if(res.precio!==undefined){ const p=parseInt(String(res.precio).replace(/[^\d]/g,'')); if(p>0) poner('ses-precio',p); }
-    poner('ses-productos',res.productos);
+    // Productos: los sacamos/agregamos acá, sobre la lista que ya estaba, para no perder nada
+    const quitar=[].concat(res.productosQuitar||[]).filter(Boolean);
+    const agregar=[].concat(res.productosAgregar||[]).filter(Boolean);
+    if(quitar.length||agregar.length){
+      const prodEl=document.getElementById('ses-productos');
+      const antes=(prodEl.value||'').split(',').map(x=>x.trim()).filter(Boolean);
+      let lista=antes.filter(item=>!quitar.some(q=>mismoProducto(item,q)));
+      agregar.forEach(a=>{ if(!quitar.some(q=>mismoProducto(a,q)) && !lista.some(item=>mismoProducto(item,a))) lista.push(a); });
+      if(lista.join(', ')!==antes.join(', ')){ prodEl.value=lista.join(', '); marcarCampoIA('ses-productos'); n++; }
+    } else if(res.productos){ poner('ses-productos',res.productos); }
     poner('ses-reaccion',res.reaccion);
     poner('ses-proxima',res.proxima);
     if(res.cambios){
