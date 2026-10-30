@@ -77,6 +77,16 @@ html.dark .caja-selector-trat *{color:var(--text) !important;}
 html.dark .caja-selector-trat select{background:#1b1e23 !important;border-color:var(--border) !important;}
 html.dark .caja-selector-trat button{color:#fff !important;}
 
+.dict-box{background:var(--light);border:1.5px dashed var(--border);border-radius:var(--r-md,14px);padding:11px;}
+.dict-row{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}
+.dict-btn{flex:1;min-width:130px;padding:10px 12px;border-radius:12px;border:1.5px solid var(--border);background:white;color:var(--deep);font-family:'DM Sans',sans-serif;font-size:0.84rem;font-weight:600;cursor:pointer}
+.dict-btn.grabando{background:#c4637a;border-color:#c4637a;color:#fff;animation:dictPulse 1.2s infinite}
+.dict-btn.ia{background:linear-gradient(135deg,var(--sage),#4d8060);border:none;color:#fff}
+.dict-btn:disabled{opacity:.55;cursor:wait}
+@keyframes dictPulse{0%,100%{box-shadow:0 0 0 0 rgba(196,99,122,.45)}50%{box-shadow:0 0 0 7px rgba(196,99,122,0)}}
+.campo-ia{outline:2.5px solid var(--sage)!important;outline-offset:1px;transition:outline-color .4s}
+html.dark .dict-btn{background:var(--cream);color:var(--text)}
+html.dark .dict-btn.grabando,html.dark .dict-btn.ia{color:#fff}
 .btn-registrar-ses{width:100%;margin-top:12px;padding:13px;background:linear-gradient(135deg,var(--sage),#4d8060);color:white;border:none;border-radius:14px;font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:600;cursor:pointer;box-shadow:0 4px 14px rgba(106,158,122,0.3);}
 html.dark .btn-registrar-ses{color:#fff !important;}
 
@@ -491,6 +501,7 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
         <div id="analisis-grande-fecha" style="font-size:0.76rem;color:var(--muted)"></div>
       </div>
       <div style="display:flex;gap:6px;flex-shrink:0">
+        <button id="btn-registrar-grande" onclick="cerrarAnalisisGrande();registrarSesionDesdeGuardado()" title="Registrar sesión con este protocolo" style="padding:8px 12px;background:linear-gradient(135deg,var(--sage),#4d8060);border:none;border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:#fff;cursor:pointer">✓ Registrar sesión</button>
         <button onclick="copiarAnalisisGrande()" title="Copiar el texto" style="padding:8px 12px;background:none;border:1.5px solid var(--border);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:0.78rem;font-weight:600;color:var(--deep);cursor:pointer">Copiar</button>
         <button onclick="cerrarAnalisisGrande()" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:6px"><span data-ic-html="cerrar-20"></span></button>
       </div>
@@ -2871,6 +2882,16 @@ html.dark .cuenta-flecha{color:#9aa0ab !important;opacity:1;}
   <div class="modal">
     <button class="modal-close" onclick="closeModal('modal-sesion')"><span data-ic-html="cerrar-16" style="display:inline-flex;vertical-align:-0.1em"></span></button>
     <div class="modal-title" id="modal-sesion-titulo">Registrar Sesión</div>
+    <div class="dict-box" id="dict-box" style="margin-bottom:12px">
+      <div style="font-weight:700;font-size:0.86rem;color:var(--deep)">🎙️ Contámelo con la voz</div>
+      <div style="font-size:0.74rem;color:var(--muted);margin-top:2px">Decí qué hiciste, qué cambiaste, cómo reaccionó, cuánto cobraste y cuándo vuelve. La IA lo acomoda en cada campo y vos revisás.</div>
+      <textarea id="ses-dictado" placeholder="Acá aparece lo que dictás (también podés escribirlo)" style="margin-top:8px;min-height:60px;width:100%;box-sizing:border-box"></textarea>
+      <div class="dict-row">
+        <button type="button" class="dict-btn" id="btn-dictar" onclick="toggleDictado()">🎙️ Dictar</button>
+        <button type="button" class="dict-btn ia" id="btn-ordenar-ia" onclick="ordenarDictadoIA()">✨ Ordenar con IA</button>
+      </div>
+      <div id="dict-estado" style="font-size:0.74rem;color:var(--muted);margin-top:6px"></div>
+    </div>
     <div class="form-grid">
       <div class="form-group"><label>Fecha *</label><input type="date" id="ses-fecha"></div>
       <div class="form-group"><label>Número de sesión</label><input type="number" id="ses-numero" min="1"></div>
@@ -4748,7 +4769,7 @@ function toggleServ(h){
     body.style.display = 'none';
   }
 }
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');if(id==='modal-sesion'&&typeof detenerDictado==='function')detenerDictado();}
 function toggleRechazo(){document.getElementById('rechazo-det').style.display=vb('ses-rechazo')?'block':'none';}
 function setHoy(id){const el=document.getElementById(id);if(el&&!el.value)el.value=new Date().toISOString().split('T')[0];}
 
@@ -4868,6 +4889,7 @@ function abrirFicha(id){
       <p style="font-size:0.76rem;color:var(--muted);margin-bottom:8px">${(c.analisisIA[c.analisisIA.length-1].fecha)}</p>
       <div id="ia-guardado-texto" onclick="verAnalisisGrande()" title="Tocá para verlo en grande" style="font-size:0.83rem;line-height:1.7;white-space:pre-wrap;max-height:200px;overflow-y:auto;background:white;border-radius:10px;padding:10px;border:1px solid var(--border);cursor:zoom-in">${(c.analisisIA[c.analisisIA.length-1].texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</div>
       <button onclick="verAnalisisGrande()" class="btn-ver-grande"><span data-ic-html="buscar-14" style="display:inline-flex;vertical-align:-0.15em;margin-right:5px"></span>Ver en grande</button>
+      <button onclick="registrarSesionDesdeGuardado()" class="btn-registrar-ses">✓ Registrar sesión con este protocolo</button>
       ${c.analisisIA.length>1?`<div style="font-size:0.74rem;color:var(--muted);margin-top:5px">${c.analisisIA.length} análisis guardados — mostrando el último</div>`:''}
     </div>`:''}
   `;
@@ -4947,6 +4969,7 @@ function abrirModalSesion(){
   document.getElementById('ses-rechazo').checked=false;
   document.getElementById('rechazo-det').style.display='none';
   document.getElementById('modal-sesion-titulo').textContent=(clientas[clientaActualId]?.nombre||'')+'  — Nueva Sesión';
+  resetDictado();
   // Una sesión normal no viene de ningún protocolo: limpiamos la marca
   // para que no quede pegada de una vez anterior que se canceló.
   _sesionDesdeProtocolo=null;
@@ -4974,8 +4997,8 @@ async function guardarSesion(){
     protocoloIA: _sesionDesdeProtocolo || null,
     cambiosProtocolo: v('ses-cambios') || ''};
   sesiones[id]=ses;await saveDoc('sesiones',id,ses);
-  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
-  _sesionDesdeProtocolo=null;
+  ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios','ses-dictado'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
+  _sesionDesdeProtocolo=null; detenerDictado();
   const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='none';
   closeModal('modal-sesion');renderPlanModal();renderHistorialModal();renderClientas();updateStats();
   alert('✅ Sesión registrada!');
@@ -5007,6 +5030,287 @@ function registrarSesionDesdeProtocolo(tratamiento){
     }
   },60);
 }
+/* ---------- REGISTRAR SESIÓN DESDE EL ANÁLISIS GUARDADO EN LA FICHA ---------- */
+let _tratamientoProtocoloActual = '';
+
+function normTxt(s){
+  return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().replace(/\s+/g,' ').trim();
+}
+
+// Lee el título "📋 TRATAMIENTO — Nombre" de un protocolo guardado
+function tratamientoDeTextoProtocolo(texto){
+  const lineas=String(texto||'').split('\n').map(l=>l.replace(/\*\*/g,'').trim()).filter(Boolean);
+  let linea=lineas.find(l=>l.includes('📋'));
+  if(!linea) return '';
+  linea=linea.replace('📋','').trim();
+  const m=linea.match(/^(.+?)\s+[—–-]\s+/);
+  return (m?m[1]:linea).trim();
+}
+
+// Elige el servicio en el formulario de sesión; si no está en la lista, lo agrega
+function seleccionarServicioSesion(nombre){
+  const sel=document.getElementById('ses-tratamiento');
+  if(!sel||!nombre) return '';
+  const n=normTxt(nombre);
+  let op=[...sel.options].find(o=>o.value && normTxt(o.value)===n);
+  if(!op){
+    // Buscamos el nombre bien escrito en Mis Servicios (el título viene en mayúsculas)
+    let lindo=nombre;
+    try{
+      const info=(typeof PRECIOS_INFO!=='undefined'?PRECIOS_INFO:[]).find(p=>normTxt(p.nombre)===n);
+      if(info) lindo=info.nombre;
+      else if(nombre===nombre.toUpperCase()) lindo=nombre.charAt(0)+nombre.slice(1).toLowerCase();
+    }catch(e){}
+    op=document.createElement('option'); op.textContent=lindo; op.value=lindo;
+    const ult=sel.options[sel.options.length-1];
+    sel.insertBefore(op, ult && /personalizado/i.test(ult.value)?ult:null);
+  }
+  sel.value=op.value;
+  return op.value;
+}
+
+// Saca del texto del protocolo lo que sirve para la sesión
+function extraerDatosProtocolo(texto){
+  const t=String(texto||'').replace(/\*\*/g,'');
+  const lineas=t.split('\n').map(l=>l.trim());
+  const res={tratamiento:tratamientoDeTextoProtocolo(t),duracion:'',productos:'',proxima:'',esProtocolo:/PASO\s*1/i.test(t)};
+  const md=t.match(/Duraci[oó]n estimada:\s*(\d+)/i); if(md) res.duracion=md[1];
+  const vacio=s=>!s||/^(ninguno|ninguna|sin producto|sin aparato|no aplica|n\/a|omitido|[—\-–]+)/i.test(s.trim());
+  const lista=[], vistos=new Set();
+  const sumar=s=>{
+    s=String(s||'').replace(/^[\["“”'\s]+|[\]"“”'\s.;]+$/g,'').trim();
+    if(vacio(s)) return;
+    const k=normTxt(s); if(!k||vistos.has(k)) return;
+    vistos.add(k); lista.push(s);
+  };
+  // Productos de cada paso
+  lineas.forEach(l=>{
+    const m=l.match(/Productos?:\s*(.+)$/i);
+    if(!m || !/🧴|^Productos?:/i.test(l)) return;
+    const val=m[1];
+    const comillas=[...val.matchAll(/"([^"]+)"|“([^”]+)”/g)].map(x=>x[1]||x[2]);
+    if(comillas.length) comillas.forEach(sumar);
+    else sumar(val.replace(/\(.*?\)/g,''));
+  });
+  // Aparatos: primero los del encabezado, si no los de cada paso
+  const ma=t.match(/Aparatos a usar:\s*([^\n]+)/i);
+  if(ma && !vacio(ma[1])) ma[1].split(/,|·|\/| y /).forEach(sumar);
+  else lineas.forEach(l=>{
+    const m=l.match(/⚙️?\s*Aparato:\s*(.+)$/i);
+    if(m && !vacio(m[1])) sumar(m[1].split(/,|—|–|\(|:/)[0]);
+  });
+  res.productos=lista.join(', ');
+  const mp=t.match(/Pr[oó]xima sesi[oó]n:\s*([^\n]+)/i); if(mp) res.proxima=mp[1].trim();
+  return res;
+}
+
+function marcarCampoIA(id){
+  const el=document.getElementById(id); if(!el) return;
+  el.classList.add('campo-ia');
+  setTimeout(()=>el.classList.remove('campo-ia'),4000);
+}
+
+function registrarSesionDesdeGuardado(){
+  if(!clientaActualId){ alert('Abrí primero la ficha de la clienta.'); return; }
+  const c=clientas[clientaActualId];
+  const lista=(c&&c.analisisIA)||[];
+  if(!lista.length){ alert('Esta clienta no tiene ningún análisis guardado.'); return; }
+  const ultimo=lista[lista.length-1];
+  const d=extraerDatosProtocolo(ultimo.texto);
+  const tratGuardado=ultimo.tratamiento || (d.esProtocolo?d.tratamiento:'');
+
+  abrirModalSesion();   // limpia la marca de protocolo…
+  let trat='';
+  if(tratGuardado){ trat=seleccionarServicioSesion(tratGuardado); marcarCampoIA('ses-tratamiento'); }
+
+  if(d.esProtocolo){
+    _sesionDesdeProtocolo = trat || tratGuardado || 'Protocolo guardado';   // …y acá la ponemos
+    const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='';
+    if(d.duracion){ document.getElementById('ses-duracion').value=d.duracion; marcarCampoIA('ses-duracion'); }
+    if(d.productos){ document.getElementById('ses-productos').value=d.productos; marcarCampoIA('ses-productos'); }
+    if(d.proxima){ document.getElementById('ses-proxima').value=d.proxima; marcarCampoIA('ses-proxima'); }
+  }
+  const precio=trat?precioDeTratamiento(trat):0;
+  if(precio){ document.getElementById('ses-precio').value=precio; marcarCampoIA('ses-precio'); }
+
+  const tit=document.getElementById('modal-sesion-titulo');
+  if(tit) tit.textContent=`${c.nombre||''} — ${trat||'Sesión'}`;
+  const est=document.getElementById('dict-estado');
+  if(est) est.textContent = d.esProtocolo
+    ? `Precargué los datos del protocolo guardado el ${ultimo.fecha||''} (resaltados). Dictá o escribí lo que cambió y tocá "Ordenar con IA".`
+    : 'El análisis guardado no tiene un protocolo elegido, así que no hay pasos para precargar. Elegí el servicio o dictá lo que hiciste.';
+}
+
+/* ---------- DICTADO POR VOZ PARA LA SESIÓN ---------- */
+let _rec=null, _grabando=false, _dictBase='', _dictFinal='';
+
+function soportaDictado(){ return !!(window.SpeechRecognition||window.webkitSpeechRecognition); }
+
+function uiDictado(){
+  const b=document.getElementById('btn-dictar'); if(!b) return;
+  b.classList.toggle('grabando',_grabando);
+  b.textContent=_grabando?'⏹ Listo':'🎙️ Dictar';
+}
+
+function resetDictado(){
+  detenerDictado();
+  const ta=document.getElementById('ses-dictado'); if(ta) ta.value='';
+  const est=document.getElementById('dict-estado');
+  if(est) est.textContent = soportaDictado() ? '' :
+    'Este navegador no permite dictar desde la app. Usá Chrome, o tocá la cajita y usá el micrófono del teclado: después "Ordenar con IA" funciona igual.';
+  const bi=document.getElementById('btn-ordenar-ia'); if(bi){ bi.disabled=false; bi.textContent='✨ Ordenar con IA'; }
+}
+
+function toggleDictado(){ _grabando ? detenerDictado() : iniciarDictado(); }
+
+function iniciarDictado(){
+  if(!soportaDictado()){
+    alert('Este navegador no permite dictar. Usá Chrome, o el micrófono del teclado del celular dentro de la cajita.');
+    return;
+  }
+  const R=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const ta=document.getElementById('ses-dictado');
+  const est=document.getElementById('dict-estado');
+  _rec=new R();
+  _rec.lang='es-AR';
+  _rec.interimResults=true;
+  // En Android el modo continuo duplica frases: ahí escuchamos de a tramos y reiniciamos solos
+  _rec.continuous=!/Android/i.test(navigator.userAgent);
+  _dictBase=ta.value.trim()?ta.value.trim()+' ':'';
+  _dictFinal='';
+  _rec.onresult=e=>{
+    let interino='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const tx=e.results[i][0].transcript;
+      if(e.results[i].isFinal) _dictFinal+=tx.trim()+' ';
+      else interino+=tx;
+    }
+    ta.value=_dictBase+_dictFinal+interino;
+  };
+  _rec.onerror=e=>{
+    if(e.error==='no-speech'||e.error==='aborted') return;
+    _grabando=false; uiDictado();
+    if(est) est.textContent = (e.error==='not-allowed'||e.error==='service-not-allowed')
+      ? 'No tengo permiso para usar el micrófono. Habilitalo en el candadito de la barra de direcciones (o en los permisos de la app) y probá de nuevo.'
+      : e.error==='network' ? 'El dictado necesita internet. Revisá la conexión.'
+      : 'Se cortó el dictado ('+e.error+'). Probá de nuevo.';
+  };
+  _rec.onend=()=>{
+    _dictBase=_dictBase+_dictFinal; _dictFinal='';
+    ta.value=_dictBase;
+    if(_grabando){ try{ _rec.start(); }catch(err){ _grabando=false; uiDictado(); } }
+    else uiDictado();
+  };
+  try{ _rec.start(); _grabando=true; }
+  catch(err){ _grabando=false; alert('No pude iniciar el micrófono.'); }
+  uiDictado();
+  if(est&&_grabando) est.textContent='Escuchando… hablá tranquila. Tocá "Listo" cuando termines.';
+}
+
+function detenerDictado(){
+  const estaba=_grabando;
+  _grabando=false;
+  if(_rec){ try{ _rec.stop(); }catch(e){} }
+  uiDictado();
+  const est=document.getElementById('dict-estado');
+  if(estaba&&est) est.textContent='Revisá el texto si querés y tocá "Ordenar con IA".';
+}
+
+function _elegirOpcion(selId,valor){
+  const sel=document.getElementById(selId); if(!sel||!valor) return false;
+  const n=normTxt(valor);
+  const op=[...sel.options].find(o=>o.value&&normTxt(o.value)===n)
+        || [...sel.options].find(o=>o.value&&(normTxt(o.value).includes(n)||n.includes(normTxt(o.value))));
+  if(!op) return false;
+  sel.value=op.value; marcarCampoIA(selId); return true;
+}
+
+async function ordenarDictadoIA(){
+  const ta=document.getElementById('ses-dictado');
+  const est=document.getElementById('dict-estado');
+  const btn=document.getElementById('btn-ordenar-ia');
+  if(_grabando) detenerDictado();
+  const dicho=(ta?.value||'').trim();
+  if(!dicho){ alert('Primero dictá o escribí lo que pasó en la sesión.'); return; }
+  const opciones=id=>[...document.getElementById(id).options].map(o=>o.value).filter(Boolean);
+  const actual={
+    tratamiento:v('ses-tratamiento'), estadoPiel:v('ses-estado-piel'), duracion:v('ses-duracion'),
+    productos:v('ses-productos'), reaccion:v('ses-reaccion'), rechazo:vb('ses-rechazo'),
+    rechazoProd:v('ses-rechazo-prod'), rechazoDesc:v('ses-rechazo-desc'), reemplazo:v('ses-reemplazo'),
+    cambios:v('ses-cambios'), proxima:v('ses-proxima'), precio:v('ses-precio'), pago:v('ses-pago')
+  };
+  const prompt=`Sos la asistente de una cosmetóloga. Ella acaba de terminar una sesión y te dictó por voz lo que pasó. Tu trabajo es SOLO ordenar lo que dijo en los campos del registro de sesión. No des consejos ni opiniones.
+
+Devolvé ÚNICAMENTE un objeto JSON válido (sin texto antes ni después, sin \`\`\`), con SOLO los campos que hay que cambiar según lo que dijo.
+
+REGLAS
+- No inventes nada. Si no lo dijo, ese campo NO va en el JSON.
+- El dictado puede tener errores de transcripción: corregí los obvios (nombres de productos, términos de cosmetología).
+- Escribí los textos breves y prolijos, en primera persona de ella, en español rioplatense.
+- En "reaccion", "cambios" y "proxima": si el campo ya tiene texto y ella suma algo, devolvé el texto combinado. Si contradice lo que había, manda lo que dijo ella.
+- En "productos": partí de la lista actual y aplicá los cambios que dijo (sacá lo que no usó, agregá lo que usó). Si no habló de productos, no lo incluyas.
+- "precio" es un número entero en pesos: "18 mil" = 18000, "dieciocho mil quinientos" = 18500.
+- "rechazo" es true SOLO si hubo una reacción adversa a un producto (no un enrojecimiento esperable que se fue).
+
+CAMPOS POSIBLES
+- tratamiento: uno de ${JSON.stringify(opciones('ses-tratamiento'))}
+- estadoPiel: uno de ${JSON.stringify(opciones('ses-estado-piel'))}
+- duracion: número de minutos
+- productos: texto, separado por comas
+- reaccion: resultado y cómo reaccionó
+- rechazo, rechazoProd, rechazoDesc, reemplazo
+- cambios: qué cambió respecto del protocolo y por qué
+- proxima: notas para la próxima sesión (incluí cuándo vuelve si lo dijo)
+- precio
+- pago: uno de ${JSON.stringify(opciones('ses-pago'))}
+
+FORMULARIO COMO ESTÁ AHORA
+${JSON.stringify(actual)}
+
+LO QUE DICTÓ
+"""${dicho}"""`;
+
+  if(btn){ btn.disabled=true; btn.textContent='Ordenando…'; }
+  if(est) est.textContent='La IA está acomodando lo que dijiste…';
+  try{
+    const r=await fetch(WORKER_URL_IA,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({prompt})});
+    const data=await r.json();
+    let txt=String(data.text||'').replace(/```json|```/gi,'');
+    const i=txt.indexOf('{'), j=txt.lastIndexOf('}');
+    if(i<0||j<=i) throw new Error('sin json');
+    const res=JSON.parse(txt.slice(i,j+1));
+    let n=0;
+    const poner=(id,val)=>{ if(val===undefined||val===null||val==='') return; const el=document.getElementById(id); if(!el) return; el.value=String(val); marcarCampoIA(id); n++; };
+    if(res.tratamiento){ if(_elegirOpcion('ses-tratamiento',res.tratamiento)) n++; }
+    if(res.estadoPiel){ if(_elegirOpcion('ses-estado-piel',res.estadoPiel)) n++; }
+    if(res.pago){ if(_elegirOpcion('ses-pago',res.pago)) n++; }
+    if(res.duracion!==undefined){ const d=parseInt(res.duracion); if(d>0) poner('ses-duracion',d); }
+    if(res.precio!==undefined){ const p=parseInt(String(res.precio).replace(/[^\d]/g,'')); if(p>0) poner('ses-precio',p); }
+    poner('ses-productos',res.productos);
+    poner('ses-reaccion',res.reaccion);
+    poner('ses-proxima',res.proxima);
+    if(res.cambios){
+      const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='';
+      poner('ses-cambios',res.cambios);
+    }
+    if(res.rechazo===true){
+      const chk=document.getElementById('ses-rechazo');
+      if(chk&&!chk.checked){ chk.checked=true; toggleRechazo(); }
+      marcarCampoIA('ses-rechazo'); n++;
+      poner('ses-rechazo-prod',res.rechazoProd);
+      poner('ses-rechazo-desc',res.rechazoDesc);
+      poner('ses-reemplazo',res.reemplazo);
+    }
+    if(est) est.textContent = n
+      ? `Listo: acomodé ${n} ${n===1?'campo':'campos'} (resaltados). Revisalos y guardá.`
+      : 'No encontré nada para cambiar en lo que dictaste. Probá contarlo con un poco más de detalle.';
+  }catch(e){
+    if(est) est.textContent='No pude ordenar el dictado (revisá la conexión o probá de nuevo). Tu texto sigue en la cajita.';
+  }finally{
+    if(btn){ btn.disabled=false; btn.textContent='✨ Ordenar con IA'; }
+  }
+}
+
 function renderHistorialModal(){
   const cont=document.getElementById('modal-historial');
   const lista=Object.values(sesiones).filter(s=>s.clientaId===clientaActualId).sort((a,b)=>b.fechaTs-a.fechaTs);
@@ -5359,6 +5663,7 @@ Abajo está el pedido completo, palabra por palabra.
   cuerpo.textContent=resumen+p;
   cuerpo.scrollTop=0;
   if(fecha) fecha.textContent='Lo que se le mandó a la inteligencia artificial';
+  const _brg=document.getElementById('btn-registrar-grande'); if(_brg) _brg.style.display='none';
   const m=document.getElementById('modal-analisis');
   m.style.display='flex';
   if(typeof aplicarIconos==='function') aplicarIconos(m);
@@ -5375,6 +5680,7 @@ function verAnalisisGrande(){
   if(!cuerpo) return;
   cuerpo.innerHTML=(ultimo.texto||'').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
   cuerpo.scrollTop=0;
+  const _brg=document.getElementById('btn-registrar-grande'); if(_brg) _brg.style.display='';
   if(fecha) fecha.textContent=`${c.nombre} · ${ultimo.fecha||''}${lista.length>1?` · el último de ${lista.length}`:''}`;
   const m=document.getElementById('modal-analisis');
   m.style.display='flex';
@@ -5742,6 +6048,7 @@ La frecuencia sale de SU caso: su tipo de piel, el estado de su barrera y su obj
   iaTextoActual=cont.innerText;
   _ultimaRespuestaIA = cont.innerText || cont.textContent || '';
 
+  _tratamientoProtocoloActual = tratamiento || '';
   // Botón para registrar este mismo tratamiento como sesión
   const registrar=document.createElement('button');
   registrar.className='btn-registrar-ses';
@@ -5760,7 +6067,7 @@ La frecuencia sale de SU caso: su tipo de piel, el estado de su barrera y su obj
   auditar.textContent='🔍 Ver qué recibió la IA';
   auditar.onclick=()=>verPromptIA();
   cont.appendChild(auditar);
-  volver.onclick=()=>{ const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
+  volver.onclick=()=>{ _tratamientoProtocoloActual=''; const cc=document.getElementById('ia-contenido'); cc.innerHTML=window._iaPaso1||''; mostrarSelectorTratamiento(); };
   cont.appendChild(volver);
 }
 
@@ -5768,7 +6075,12 @@ async function guardarAnalisisIA(){
   if(!clientaActualId||!iaTextoActual)return;
   const c=clientas[clientaActualId];
   c.analisisIA=c.analisisIA||[];
-  c.analisisIA.push({texto:iaTextoActual,fecha:new Date().toLocaleString('es-AR')});
+  // Guardamos también el tratamiento, si el texto es un protocolo completo
+  const _esProto=/PASO\s*1/i.test(iaTextoActual||'');
+  const _trat=_esProto?(_tratamientoProtocoloActual||tratamientoDeTextoProtocolo(iaTextoActual)):'';
+  const _reg={texto:iaTextoActual,fecha:new Date().toLocaleString('es-AR')};
+  if(_trat) _reg.tratamiento=_trat;
+  c.analisisIA.push(_reg);
   await saveDoc('clientas',clientaActualId,c);
   alert('✅ Análisis guardado en la ficha!');
   closeModal('modal-ia');
