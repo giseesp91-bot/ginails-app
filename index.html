@@ -4950,7 +4950,9 @@ function renderPlanModal(){
 }
 
 // ===================== SESIONES =====================
+let _sesionEditandoId=null;
 function abrirModalSesion(){
+  _sesionEditandoId=null;
   setHoy('ses-fecha');
   llenarServiciosSesion();
   const plan=Object.values(planes).find(p=>p.clientaId===clientaActualId&&p.activo);
@@ -4973,7 +4975,8 @@ async function guardarSesion(){
   if(!trat){alert(v('ses-tratamiento')==='__otro__'?'Escribí qué servicio hiciste':'Seleccioná el servicio');return;}
   const plan=Object.values(planes).find(p=>p.clientaId===clientaActualId&&p.activo);
   const tuvoRechazo=vb('ses-rechazo');
-  const id=uid();
+  const _prev=_sesionEditandoId?sesiones[_sesionEditandoId]:null;
+  const id=_prev?_sesionEditandoId:uid();
   const ses={id,clientaId:clientaActualId,planId:plan?plan.id:null,
     fecha:v('ses-fecha')||new Date().toLocaleDateString('es-AR'),fechaTs:Date.now(),
     numero:parseInt(v('ses-numero'))||1,tratamiento:trat,
@@ -4987,12 +4990,22 @@ async function guardarSesion(){
     // y qué cambió la cosmetóloga. Eso alimenta los próximos protocolos.
     protocoloIA: _sesionDesdeProtocolo || null,
     cambiosProtocolo: v('ses-cambios') || ''};
+  if(_prev){
+    // Editando: conservamos lo que no se toca desde el formulario
+    ses.clientaId=_prev.clientaId||ses.clientaId;
+    ses.planId=_prev.planId!==undefined?_prev.planId:ses.planId;
+    ses.fechaTs=_prev.fechaTs||ses.fechaTs;
+    ses.protocoloIA=_prev.protocoloIA||ses.protocoloIA;
+    ses.editadoTs=Date.now();
+    Object.keys(_prev).forEach(k=>{ if(!(k in ses)) ses[k]=_prev[k]; });
+  }
   sesiones[id]=ses;await saveDoc('sesiones',id,ses);
+  const _fueEdicion=!!_prev; _sesionEditandoId=null;
   ['ses-reaccion','ses-proxima','ses-productos','ses-rechazo-prod','ses-rechazo-desc','ses-reemplazo','ses-cambios','ses-dictado','ses-trat-otro'].forEach(i=>{const el=document.getElementById(i);if(el)el.value='';});
   _sesionDesdeProtocolo=null; detenerDictado();
   const wrap=document.getElementById('ses-cambios-wrap'); if(wrap) wrap.style.display='none';
   closeModal('modal-sesion');renderPlanModal();renderHistorialModal();renderClientas();updateStats();
-  alert('✅ Sesión registrada!');
+  alert(_fueEdicion?'✅ Sesión actualizada!':'✅ Sesión registrada!');
 }
 
 /* ---------- REGISTRAR SESIÓN DIRECTO DESDE EL PROTOCOLO ---------- */
@@ -5371,8 +5384,43 @@ function renderHistorialModal(){
     ${s.tuvoRechazo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff0f0;padding:6px;border-radius:10px;color:var(--danger)">⚠️ <strong>${s.rechazoProd||'—'}</strong>${s.rechazoDesc?' — '+s.rechazoDesc:''}${s.productoReemplazo?'<br>↔️ '+s.productoReemplazo:''}</div>`:''}
     ${s.cambiosProtocolo?`<div style="font-size:0.78rem;margin-top:4px;background:#fff8e3;padding:6px;border-radius:10px;color:#6a4a10"><strong>✏️ Cambié del protocolo:</strong> ${s.cambiosProtocolo}</div>`:''}
     ${s.notaProxima?`<div style="font-size:0.78rem;margin-top:4px;background:#e8f7ee;padding:6px;border-radius:10px;color:#1a5a3a">📌 ${s.notaProxima}</div>`:''}
-    <div style="text-align:right;margin-top:7px"><button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')"><span data-ic-html="eliminar-16" style="display:inline-flex;vertical-align:-0.1em"></span></button></div>
+    <div style="text-align:right;margin-top:7px;display:flex;gap:6px;justify-content:flex-end"><button class="btn btn-secondary btn-sm" onclick="editarSesion('${s.id}')"><span data-ic-html="editar-15" style="display:inline-flex;vertical-align:-0.12em;margin-right:4px"></span>Editar</button><button class="btn btn-danger btn-sm" onclick="eliminarSesion('${s.id}')"><span data-ic-html="eliminar-16" style="display:inline-flex;vertical-align:-0.1em"></span></button></div>
   </div>`).join('');
+}
+function editarSesion(id){
+  const s=sesiones[id]; if(!s){ alert('No encontré esa sesión.'); return; }
+  if(s.clientaId) clientaActualId=s.clientaId;
+  abrirModalSesion();          // limpia todo y deja el modo "nueva"…
+  _sesionEditandoId=id;        // …y acá pasamos a modo edición
+  const set=(i,val)=>{ const el=document.getElementById(i); if(el) el.value=(val===undefined||val===null)?'':val; };
+  // Fecha: el campo necesita AAAA-MM-DD
+  let f=String(s.fecha||'');
+  const m=f.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) f=`${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;
+  set('ses-fecha', /^\d{4}-\d{2}-\d{2}$/.test(f)?f:'');
+  set('ses-numero', s.numero||'');
+  if(s.tratamiento) seleccionarServicioSesion(s.tratamiento);
+  set('ses-estado-piel', s.estadoPiel||'');
+  if(s.estadoPiel && v('ses-estado-piel')!==s.estadoPiel) _elegirOpcion('ses-estado-piel', s.estadoPiel);
+  set('ses-duracion', s.duracion||'');
+  set('ses-productos', s.productos||'');
+  set('ses-reaccion', s.reaccion||'');
+  const chk=document.getElementById('ses-rechazo'); if(chk) chk.checked=!!s.tuvoRechazo;
+  toggleRechazo();
+  set('ses-rechazo-prod', s.rechazoProd||'');
+  set('ses-rechazo-desc', s.rechazoDesc||'');
+  set('ses-reemplazo', s.productoReemplazo||'');
+  set('ses-cambios', s.cambiosProtocolo||'');
+  const wrap=document.getElementById('ses-cambios-wrap');
+  if(wrap) wrap.style.display=(s.protocoloIA||s.cambiosProtocolo)?'':'none';
+  _sesionDesdeProtocolo=s.protocoloIA||null;
+  set('ses-proxima', s.notaProxima||'');
+  set('ses-precio', s.precio||'');
+  set('ses-pago', s.pago||'');
+  const tit=document.getElementById('modal-sesion-titulo');
+  if(tit) tit.textContent=`Editar sesión — ${clientas[clientaActualId]?.nombre||''}`;
+  const est=document.getElementById('dict-estado');
+  if(est) est.textContent=`Estás editando la sesión del ${s.fecha||''}. Cambiá lo que quieras o dictá lo que te faltó y tocá "Ordenar con IA".`;
 }
 async function eliminarSesion(id){
   if(!confirm('¿Eliminar esta sesión?'))return;
